@@ -6,10 +6,15 @@
     "dev": "remix dev"
   },
   "dependencies": {
+    "@magic-ext/connect": "^3.0.0",
     "@remix-run/node": "^1.7.3",
     "@remix-run/react": "^1.7.3",
     "@remix-run/vercel": "^1.7.3",
+    "@thirdweb-dev/react": "^3.4.2",
+    "@thirdweb-dev/sdk": "^3.4.2",
     "@vercel/node": "^2.4.4",
+    "ethers": "^5.7.2",
+    "magic-sdk": "^10.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
