@@ -49,6 +49,8 @@ module.exports = {
       'success': '#1A9550',
       'warning': '#F3B71E',
       'error': '#FD4040',
+      'white': '#FFFFFF',
+      'black': '#000000',
     },
     borderRadius: {
       '8': '8px',
