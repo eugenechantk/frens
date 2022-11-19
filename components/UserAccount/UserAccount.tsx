@@ -8,7 +8,7 @@ interface IUserAccountProps {
 }
 
 export default function UserAccount({ authed, ...props }: IUserAccountProps) {
-  const [expand, setExpand] = useState(true);
+  const [expand, setExpand] = useState(false);
   const [walletAddress, setWalletAddress] = useState(
     "0xfc69FE666D5E1FB8374151c11Feb058300FfDCb5"
   );
