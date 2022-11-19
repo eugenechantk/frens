@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import AccountButton from "./AccountButton";
 import ReactTooltip from "react-tooltip";
 import { Button } from "../Button/Button";
-import OutsideClickHandler from "react-outside-click-handler";
+import OutsideClickHandler from 'react-outside-click-handler';
 interface IUserAccountProps {
   authed?: boolean;
 }
