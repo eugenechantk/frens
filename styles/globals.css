@@ -58,6 +58,10 @@
     font-family: Montserrat, system-ui, sans-serif;
   }
 
+  body {
+    @apply bg-secondary-100
+  }
+
   h1,h2,h3,h4,h5,h6 {
     font-family: Goldplay, Inter, system-ui, sans-serif;
   }
