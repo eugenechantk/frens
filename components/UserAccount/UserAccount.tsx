@@ -25,6 +25,7 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
 
   return (
     <main className="relative">
+      {/* TODO: fix unable to close dropdown when clicking AccountButton again */}
       <AccountButton authed={authed} onClick={toggleExpand} />
       {expand && (
         <OutsideClickHandler onOutsideClick={() => setExpand(false)}>

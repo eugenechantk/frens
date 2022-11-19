@@ -19,7 +19,7 @@ export default function NavBar() {
         className="absolute left-[calc(50%-40px/2+3px)] top-[calc(50%-40px/2+2px)]"
       />
       <div className="absolute top-[calc(50%-38px/2)] right-4">
-        <UserAccount />
+        <UserAccount authed/>
       </div>
     </div>
   );
