@@ -15,7 +15,9 @@
     "firebase-admin": "^11.3.0",
     "next": "latest",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-spring": "^9.5.5",
+    "react-tooltip": "^4.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
