@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import AccountButton from "./AccountButton";
 import ReactTooltip from "react-tooltip";
 import { Button } from "../Button/Button";
-
 interface IUserAccountProps {
   authed?: boolean;
 }
