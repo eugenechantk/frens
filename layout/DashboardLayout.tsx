@@ -1,9 +1,10 @@
 import React from 'react'
+import NavBar from '../components/NavBar/NavBar'
 
 export default function DashboardLayout({children}: {children: React.ReactNode}) {
   return (
     <>
-      <div className='bg-secondary-200 p-6 w-full'></div>
+      <NavBar/>
       <main>{children}</main>
     </>
   )
