@@ -8,6 +8,8 @@ import 'firebase/firestore'
 import 'firebase/storage'
 import 'firebase/analytics'
 import 'firebase/performance'
+import { browserSessionPersistence, getAuth } from "firebase/auth";
+import * as firebase from 'firebase/app'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -20,5 +22,9 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-export const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+export const firebaseClient = initializeApp(firebaseConfig);
+export const db = getFirestore(firebaseClient);
+
+// Initialize Firebase Authentication and get a reference to the service
+const auth = getAuth(firebaseClient);
+auth.setPersistence(browserSessionPersistence);
