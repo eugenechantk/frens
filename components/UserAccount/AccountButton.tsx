@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "../Button/Button";
 import devProfilePic from "../../public/user_avatar.png";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
@@ -14,13 +14,18 @@ export default function AccountButton({
   authed,
   ...props
 }: IAccountButtonProps) {
+  const [renderAuth, setRenderAuth] = useState(!authed ? false : true);
+  
   const handleLogin = async () => {
     await provider!.send("eth_accounts", []);
+    setRenderAuth(true);
   };
 
   const handleLogout = async () => {
     await magic?.connect.disconnect().catch((e) => console.log(e));
+    setRenderAuth(false);
   }
+
   return (
     <>
       <Button
@@ -28,7 +33,7 @@ export default function AccountButton({
         className="w-[70px] h-[38px] px-1"
         onClick={handleLogin}
       >
-        {!authed ? (
+        {!renderAuth ? (
           <h6>Log in</h6>
         ) : (
           <>
