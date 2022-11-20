@@ -8,10 +8,12 @@ import { magic } from "../../lib/magic";
 
 interface IAccountButtonProps {
   authed?: boolean;
+  onClick?: () => void;
 }
 
 export default function AccountButton({
   authed,
+  onClick,
   ...props
 }: IAccountButtonProps) {
   const [renderAuth, setRenderAuth] = useState(!authed ? false : true);
@@ -31,7 +33,7 @@ export default function AccountButton({
       <Button
         type="secondary-outline"
         className="w-[70px] h-[38px] px-1"
-        onClick={handleLogin}
+        onClick={!renderAuth ? handleLogin : onClick}
       >
         {!renderAuth ? (
           <h6>Log in</h6>
