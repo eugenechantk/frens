@@ -6,7 +6,7 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { provider } from "../../lib/provider";
 import { magic } from "../../lib/magic";
 import { ethers } from "ethers";
-import { signInMessage, verifyAddress } from "../../utils/ethereum";
+import { signInMessage, verifyAddress } from "../../lib/ethereum";
 
 interface IAccountButtonProps {
   authed?: boolean;
