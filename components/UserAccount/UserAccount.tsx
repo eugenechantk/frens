@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import AccountButton from "./AccountButton";
 import ReactTooltip from "react-tooltip";
 import { Button } from "../Button/Button";
-import OutsideClickHandler from 'react-outside-click-handler';
+import OutsideClickHandler from "react-outside-click-handler";
+import NoSSR from "react-no-ssr";
 interface IUserAccountProps {
   authed?: boolean;
 }
@@ -26,7 +27,9 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
   return (
     <main className="relative">
       {/* TODO: fix unable to close dropdown when clicking AccountButton again */}
-      <AccountButton authed={authed} onClick={toggleExpand} />
+      <NoSSR>
+        <AccountButton authed={authed} />
+      </NoSSR>
       {expand && (
         <OutsideClickHandler onOutsideClick={() => setExpand(false)}>
           <div

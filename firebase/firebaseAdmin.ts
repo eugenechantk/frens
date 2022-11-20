@@ -4,7 +4,7 @@ import * as firebaseAdmin from 'firebase-admin';
 // you can also store the values in environment variables
 const serviceAccount = JSON.parse(
   process.env.NEXT_PUBLIC_FIREBASE_ADMIN_SECRET as string
-);
+)
 
 if (!firebaseAdmin.apps.length) {
   firebaseAdmin.initializeApp({
