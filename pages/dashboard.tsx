@@ -4,7 +4,7 @@ import DashboardLayout from "../layout/DashboardLayout";
 import { NextPageWithLayout } from "./_app";
 import nookies from "nookies";
 import { getAuth } from "firebase/auth";
-import { firebaseClient } from "../firebase/initFirebase";
+import { firebaseClient } from "../firebase/firebaseClient";
 import { firebaseAdmin } from "../firebase/firebaseAdmin";
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
