@@ -2,7 +2,9 @@ import * as firebaseAdmin from 'firebase-admin';
 
 // get this JSON from the Firebase board
 // you can also store the values in environment variables
-import serviceAccount from '../firebase-secret.json';
+const serviceAccount = JSON.parse(
+  process.env.NEXT_PUBLIC_FIREBASE_ADMIN_SECRET as string
+);
 
 if (!firebaseAdmin.apps.length) {
   firebaseAdmin.initializeApp({
