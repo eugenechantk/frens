@@ -21,7 +21,7 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
     setTimeout(() => setTooltip("Copy wallet address"), 1500);
   };
 
-  const toggleExpand = () => authed && setExpand(!expand);
+  const toggleExpand = () => setExpand(!expand);
 
   return (
     <main className="relative">
