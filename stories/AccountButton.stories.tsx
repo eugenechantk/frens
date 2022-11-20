@@ -9,5 +9,5 @@ export default {
 } as ComponentMeta<typeof AccountButton>;
 
 export const Primary: ComponentStory<typeof AccountButton> = (args) => (
-  <AccountButton onClick={() => console.log('clicked')} {...args}/>
+  <AccountButton {...args}/>
 );
