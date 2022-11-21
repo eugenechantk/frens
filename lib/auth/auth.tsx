@@ -16,7 +16,6 @@ export function AuthProvider({ children }: any) {
     }
     return firebaseClientAuth.onIdTokenChanged(async (user) => {
       console.log(`token changed!`);
-      console.log(user);
       if (!user) {
         console.log(`no token found...`);
         setUser(null);

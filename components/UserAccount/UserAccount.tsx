@@ -4,11 +4,16 @@ import AccountButton from "./AccountButton";
 import ReactTooltip from "react-tooltip";
 import { Button } from "../Button/Button";
 import OutsideClickHandler from "react-outside-click-handler";
+import { useAuth } from "../../lib/auth/auth";
+import { magic } from "../../lib/magic";
+import { signOut } from "firebase/auth";
+import { firebaseClientAuth } from "../../firebase/firebaseClient";
 interface IUserAccountProps {
   authed?: boolean;
 }
 
 export default function UserAccount({ authed, ...props }: IUserAccountProps) {
+  const { user } = useAuth();
   const [expand, setExpand] = useState(false);
   const [walletAddress, setWalletAddress] = useState(
     "0xfc69FE666D5E1FB8374151c11Feb058300FfDCb5"
@@ -23,13 +28,21 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
 
   const toggleExpand = () => setExpand(!expand);
 
+  const handleLogout = async () => {
+    await signOut(firebaseClientAuth).then(
+      async () => await magic?.connect.disconnect().catch((e) => console.log(e))
+    );
+  };
+
   return (
     <main className="relative">
       {/* TODO: fix unable to close dropdown when clicking AccountButton again */}
       <div suppressHydrationWarning={true}>
-        {typeof window != undefined ? <AccountButton authed={authed} onClick={toggleExpand}/> : null}
+        {typeof window != undefined ? (
+          <AccountButton onClick={toggleExpand} />
+        ) : null}
       </div>
-      {expand && (
+      {user && expand && (
         <OutsideClickHandler onOutsideClick={() => setExpand(false)}>
           <div
             className="
@@ -76,7 +89,7 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
                 <h5>Edit profile</h5>
               </Button>
             </div>
-            <Button className="w-full">
+            <Button className="w-full" onClick={handleLogout}>
               <h5>Log out</h5>
             </Button>
           </div>

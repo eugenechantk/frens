@@ -6,6 +6,7 @@ import nookies from "nookies";
 import { getAuth } from "firebase/auth";
 import { firebaseClient } from "../firebase/firebaseClient";
 import { firebaseAdmin } from "../firebase/firebaseAdmin";
+import { useAuth } from "../lib/auth/auth";
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   try {
@@ -30,15 +31,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   }
 }
 
-const Dashboard: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = (props) => {
+const Dashboard: NextPageWithLayout<any> = () => {
+  const user = useAuth()
   return (
-    <>
-      {props.authed ? (
-        <p>Logged in</p>
-      ) : (
-        <p>Not logged in</p>
-      )}
-    </>
+    <>{user.user ? user.user?.uid : 'Dashboard'}</>
   );
 };
 

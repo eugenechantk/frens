@@ -37,22 +37,13 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
     // STEP 2: CREATE NEW USER IN FIREBASE AUTH
     // Check if there is an existing user in firebase auth
     try {
-      userFetch = await firebaseAdmin.auth().getUser(address);
-      // DEBUG START
-      console.log("EXISTING USER: ", userFetch);
-      console.log("TOKEN: ", customToken);
-      // DEBUG END
+      await firebaseAdmin.auth().getUser(address);
     } catch (err: FirebaseError | any) {
       // if there is no existing user in firebase auth, create a new user
       if (err.code === "auth/user-not-found") {
         await firebaseAdmin.auth().createUser({
           uid: address,
         });
-        // DEBUG START
-        userFetch = await firebaseAdmin.auth().getUser(address);
-        console.log("NEW USER: ", userFetch);
-        console.log("TOKEN: ", customToken);
-        // DEBUG END
       } else {
         res.status(500).send(err);
         res.end();
@@ -65,7 +56,7 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
     });
     res.end();
     return;
-    
+
   } else {
     res.status(401).send("Error: sign in signature not verified");
     res.end();

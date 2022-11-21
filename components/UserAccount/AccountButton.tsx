@@ -4,34 +4,25 @@ import { Button } from "../Button/Button";
 import devProfilePic from "../../public/user_avatar.png";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { provider } from "../../lib/provider";
-import { magic } from "../../lib/magic";
+
 import { signInMessage } from "../../lib/ethereum";
 import { signInWithCustomToken } from "firebase/auth";
 import { firebaseClientAuth } from "../../firebase/firebaseClient";
+import { useAuth } from "../../lib/auth/auth";
 
 interface IAccountButtonProps {
-  authed?: boolean;
   onClick?: () => void;
 }
 
 export default function AccountButton({
-  authed,
   onClick,
   ...props
 }: IAccountButtonProps) {
-  const [renderAuth, setRenderAuth] = useState(!authed ? false : true);
+  const { user } = useAuth();
 
   const handleLogin = async () => {
     await provider!.send("eth_accounts", []);
-    setRenderAuth(true);
-  };
 
-  const handleLogout = async () => {
-    await magic?.connect.disconnect().catch((e) => console.log(e));
-    setRenderAuth(false);
-  };
-
-  const loginBackend = async () => {
     // getting the end-users signer
     const _signer = provider!.getSigner();
     const address = await _signer!.getAddress();
@@ -55,46 +46,29 @@ export default function AccountButton({
         return data.token;
       })
       .catch((err) => console.log(err));
-    
-    const user = await signInWithCustomToken(firebaseClientAuth, customToken);
-    console.log('CLIENT SIDE firebaseClientAuth: ', firebaseClientAuth);
-  };
 
-  const makeRequest = async () => {
-    const _signer = provider?.getSigner();
-    // @ts-ignore
-    fetch("/api/login", { method: "POST", body: _signer });
+    await signInWithCustomToken(firebaseClientAuth, customToken);
   };
 
   return (
-    <>
-      <Button
-        type="secondary-outline"
-        className="w-[70px] h-[38px] px-1"
-        onClick={!renderAuth ? handleLogin : onClick}
-      >
-        {!renderAuth ? (
-          <h6>Log in</h6>
-        ) : (
-          <>
-            <Image
-              src={devProfilePic}
-              alt="User Profile"
-              width={30}
-              height={30}
-            />
-            <ChevronDownIcon className="w-5 mr-2" />
-          </>
-        )}
-      </Button>
-      {renderAuth && (
+    <Button
+      type="secondary-outline"
+      className="w-[70px] h-[38px] px-1"
+      onClick={!user ? handleLogin : onClick}
+    >
+      {!user ? (
+        <h6>Log in</h6>
+      ) : (
         <>
-          <button onClick={handleLogout}>Log out</button>
-          <button className="block" onClick={loginBackend}>
-            Auth backend
-          </button>
+          <Image
+            src={devProfilePic}
+            alt="User Profile"
+            width={30}
+            height={30}
+          />
+          <ChevronDownIcon className="w-5 mr-2" />
         </>
       )}
-    </>
+    </Button>
   );
 }
