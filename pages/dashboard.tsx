@@ -10,7 +10,7 @@ import { useAuth } from "../lib/auth";
 
 const Dashboard: NextPageWithLayout<any> = () => {
   const user = useAuth()
-  console.log(user && user.user)
+  // console.log(user && user.user)
   return (
     <>
       <p>{user.user ? user.user?.uid : 'Dashboard'}</p>
