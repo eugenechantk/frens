@@ -1,3 +1,64 @@
+/* ======== */
+/* Apply tailwindcss defaults and theme */
+/* ======== */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ======== */
+/* Goldplay font import */
+/* ======== */
+@font-face {
+  font-family: "Goldplay";
+  src: url('../public/fonts/Goldplay-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Goldplay";
+  src: url('../public/fonts/Goldplay-BoldIt.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Goldplay";
+  src: url('../public/fonts/Goldplay-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Goldplay";
+  src: url('../public/fonts/Goldplay-SemiBoldIt.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Goldplay";
+  src: url('../public/fonts/Goldplay-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Goldplay";
+  src: url('../public/fonts/Goldplay-MediumIt.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* ======== */
+/* Global styles */
+/* ======== */
+@layer base {
+  html {
+    font-family: Montserrat, system-ui, sans-serif;
+  }
+
+  h1,h2,h3,h4,h5,h6 {
+    font-family: Goldplay, Inter, system-ui, sans-serif;
+  }
+}
