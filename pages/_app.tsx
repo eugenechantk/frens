@@ -1,7 +1,7 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import type { NextPage } from 'next'
-import { AuthProvider } from '../lib/auth'
+import { AuthProvider } from '../lib/auth/auth'
 
 export type NextPageWithLayout<Props> = NextPage<Props> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode
