@@ -8,7 +8,7 @@ import { provider } from "../../lib/provider";
 import { signInMessage } from "../../lib/ethereum";
 import { signInWithCustomToken } from "firebase/auth";
 import { firebaseClientAuth } from "../../firebase/firebaseClient";
-import { useAuth } from "../../lib/auth/auth";
+import { useAuth } from "../../lib/auth";
 
 interface IAccountButtonProps {
   onClick?: (e: any) => void;

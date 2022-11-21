@@ -4,7 +4,7 @@ import AccountButton from "./AccountButton";
 import ReactTooltip from "react-tooltip";
 import { Button } from "../Button/Button";
 import OutsideClickHandler from "react-outside-click-handler";
-import { useAuth } from "../../lib/auth/auth";
+import { useAuth } from "../../lib/auth";
 import { magic } from "../../lib/magic";
 import { signOut } from "firebase/auth";
 import { firebaseClientAuth } from "../../firebase/firebaseClient";
