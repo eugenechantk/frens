@@ -27,17 +27,22 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
   };
 
   const handleLogout = async () => {
-    await signOut(firebaseClientAuth).then(
-      async () => await magic?.connect.disconnect().catch((e) => console.log(e))
-    );
+    await signOut(firebaseClientAuth).then(async () => {
+      try {
+        await magic?.connect.disconnect();
+      } catch (err) {
+        throw err;
+      }
+      setExpand(false);
+    });
   };
 
-  const toggleExpand = (e:any) => {
+  const toggleExpand = (e: any) => {
     e.preventDefault();
     if (user) {
       setExpand(!expand);
     }
-  }
+  };
   return (
     <main className="relative">
       {/* TODO: fix unable to close dropdown when clicking AccountButton again */}
