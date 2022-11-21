@@ -33,7 +33,7 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
     // STEP 2: CREATE CUSTOM TOKEN USING USER'S ADDRESS AS UID
     const customToken = await firebaseAdmin.auth().createCustomToken(address);
     let userFetch: UserRecord;
-    
+
     // STEP 2: CREATE NEW USER IN FIREBASE AUTH
     // Check if there is an existing user in firebase auth
     try {
@@ -42,7 +42,7 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
       console.log("EXISTING USER: ", userFetch);
       console.log("TOKEN: ", customToken);
       // DEBUG END
-    } catch (err: any) {
+    } catch (err: FirebaseError | any) {
       // if there is no existing user in firebase auth, create a new user
       if (err.code === "auth/user-not-found") {
         await firebaseAdmin.auth().createUser({
@@ -59,17 +59,15 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
         return;
       }
     }
-
-    // STEP 3: Sign in with Firebase with the custom token
-    const userRecord = await signInWithCustomToken(firebaseClientAuth, customToken).then((userCredential) => userCredential.user);
-    
-
-
-    res.status(202).json({ user: userRecord });
+    // STEP 3: RETURN THE CUSTOM TOKEN
+    res.status(202).json({
+      token: customToken,
+    });
     res.end();
     return;
+    
   } else {
-    res.status(401).json({ status: "not ok" });
+    res.status(401).send("Error: sign in signature not verified");
     res.end();
     return;
   }
