@@ -5,8 +5,9 @@ import devProfilePic from "../../public/user_avatar.png";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { provider } from "../../lib/provider";
 import { magic } from "../../lib/magic";
-import { ethers } from "ethers";
-import { signInMessage, verifyAddress } from "../../lib/ethereum";
+import { signInMessage } from "../../lib/ethereum";
+import { signInWithCustomToken } from "firebase/auth";
+import { firebaseClientAuth } from "../../firebase/firebaseClient";
 
 interface IAccountButtonProps {
   authed?: boolean;
@@ -31,26 +32,32 @@ export default function AccountButton({
   };
 
   const loginBackend = async () => {
-
     // getting the end-users signer
-    const _signer = provider?.getSigner();
-    const signerAddress = await _signer?.getAddress();
+    const _signer = provider!.getSigner();
+    const address = await _signer!.getAddress();
 
     // sending the message for the end-user to sign
     const sig = await _signer?.signMessage(signInMessage);
 
     // const recoveredAddress = ethers.utils.recoverAddress(msgHashBytes, sig!);
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
+    const customToken = await fetch("/api/auth/login", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        address: signerAddress,
-        sig
+        address,
+        sig,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        return data.token;
       })
-    }).then((res) => res.json())
-    console.log(res)
+      .catch((err) => console.log(err));
+    
+    const user = await signInWithCustomToken(firebaseClientAuth, customToken);
+    console.log('CLIENT SIDE firebaseClientAuth: ', firebaseClientAuth);
   };
 
   const makeRequest = async () => {
