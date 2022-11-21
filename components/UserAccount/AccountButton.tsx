@@ -11,7 +11,7 @@ import { firebaseClientAuth } from "../../firebase/firebaseClient";
 import { useAuth } from "../../lib/auth/auth";
 
 interface IAccountButtonProps {
-  onClick?: () => void;
+  onClick?: (e: any) => void;
 }
 
 export default function AccountButton({
@@ -20,7 +20,8 @@ export default function AccountButton({
 }: IAccountButtonProps) {
   const { user } = useAuth();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
     await provider!.send("eth_accounts", []);
 
     // getting the end-users signer
@@ -54,7 +55,7 @@ export default function AccountButton({
     <Button
       type="secondary-outline"
       className="w-[70px] h-[38px] px-1"
-      onClick={!user ? handleLogin : onClick}
+      onClick={user ? onClick : handleLogin}
     >
       {!user ? (
         <h6>Log in</h6>

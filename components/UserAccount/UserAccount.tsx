@@ -26,14 +26,18 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
     setTimeout(() => setTooltip("Copy wallet address"), 1500);
   };
 
-  const toggleExpand = () => setExpand(!expand);
-
   const handleLogout = async () => {
     await signOut(firebaseClientAuth).then(
       async () => await magic?.connect.disconnect().catch((e) => console.log(e))
     );
   };
 
+  const toggleExpand = (e:any) => {
+    e.preventDefault();
+    if (user) {
+      setExpand(!expand);
+    }
+  }
   return (
     <main className="relative">
       {/* TODO: fix unable to close dropdown when clicking AccountButton again */}
