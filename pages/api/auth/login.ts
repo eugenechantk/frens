@@ -1,7 +1,9 @@
 import { FirebaseError } from "@firebase/util";
 import { UserRecord } from "firebase-admin/lib/auth/user-record";
+import { signInWithCustomToken } from "firebase/auth";
 import { NextApiRequest, NextApiResponse } from "next";
 import { firebaseAdmin } from "../../../firebase/firebaseAdmin";
+import { firebaseClientAuth } from "../../../firebase/firebaseClient";
 import { verifyAddress } from "../../../lib/ethereum";
 
 interface ILoginApiRequest extends NextApiRequest {
@@ -23,31 +25,47 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
 
   const { address, sig } = req.body;
 
+  // STEP 1: CHECK IF THE INCOMING USER IS LEGIT BY ITS SIGNATURE
   // verify if the message is really signed by the user
   const verified = verifyAddress(sig, address);
 
   if (verified) {
+    // STEP 2: CREATE CUSTOM TOKEN USING USER'S ADDRESS AS UID
     const customToken = await firebaseAdmin.auth().createCustomToken(address);
-    let user: UserRecord;
+    let userFetch: UserRecord;
+    
+    // STEP 2: CREATE NEW USER IN FIREBASE AUTH
+    // Check if there is an existing user in firebase auth
     try {
-      user = await firebaseAdmin.auth().getUser(address);
-      console.log("EXISTING USER: ", user);
+      userFetch = await firebaseAdmin.auth().getUser(address);
+      // DEBUG START
+      console.log("EXISTING USER: ", userFetch);
       console.log("TOKEN: ", customToken);
+      // DEBUG END
     } catch (err: any) {
+      // if there is no existing user in firebase auth, create a new user
       if (err.code === "auth/user-not-found") {
         await firebaseAdmin.auth().createUser({
           uid: address,
         });
-        user = await firebaseAdmin.auth().getUser(address);
-        console.log("NEW USER: ", user);
+        // DEBUG START
+        userFetch = await firebaseAdmin.auth().getUser(address);
+        console.log("NEW USER: ", userFetch);
         console.log("TOKEN: ", customToken);
+        // DEBUG END
       } else {
-        res.status(500).json({ message: JSON.stringify(err) });
+        res.status(500).send(err);
         res.end();
         return;
       }
     }
-    res.status(202).json({ status: "ok" });
+
+    // STEP 3: Sign in with Firebase with the custom token
+    const userRecord = await signInWithCustomToken(firebaseClientAuth, customToken).then((userCredential) => userCredential.user);
+    
+
+
+    res.status(202).json({ user: userRecord });
     res.end();
     return;
   } else {
