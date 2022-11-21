@@ -22,11 +22,11 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// async function setupEmulator(auth: Auth) {
-//   const authUrl = "http://127.0.0.1:9099";
-//   await fetch(authUrl);
-//   connectAuthEmulator(firebaseClientAuth, authUrl);
-// }
+async function setupEmulator(auth: Auth) {
+  const authUrl = "http://127.0.0.1:9099";
+  await fetch(authUrl);
+  connectAuthEmulator(firebaseClientAuth, authUrl);
+}
 
 export const firebaseClient = initializeApp(firebaseConfig);
 export const db = getFirestore(firebaseClient);
@@ -34,4 +34,4 @@ export const db = getFirestore(firebaseClient);
 // Initialize Firebase Authentication and get a reference to the service
 export const firebaseClientAuth = getAuth(firebaseClient);
 firebaseClientAuth.setPersistence(browserSessionPersistence);
-// setupEmulator(firebaseClientAuth);
+setupEmulator(firebaseClientAuth);
