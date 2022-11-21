@@ -34,4 +34,8 @@ export const db = getFirestore(firebaseClient);
 // Initialize Firebase Authentication and get a reference to the service
 export const firebaseClientAuth = getAuth(firebaseClient);
 firebaseClientAuth.setPersistence(browserSessionPersistence);
-setupEmulator(firebaseClientAuth);
+
+// Only setup emulator in development mode
+if (process.env.NEXT_PUBLIC_NODE_ENV === 'local') {
+  setupEmulator(firebaseClientAuth);
+}
