@@ -37,22 +37,22 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
     });
   };
 
-  const toggleExpand = (e: any) => {
+  const toggleExpandAccoutBtn = (e: any) => {
     e.preventDefault();
     if (user) {
       setExpand(!expand);
     }
   };
   return (
-    <main className="relative">
-      {/* TODO: fix unable to close dropdown when clicking AccountButton again */}
-      <div suppressHydrationWarning={true}>
-        {typeof window != undefined ? (
-          <AccountButton onClick={toggleExpand} />
-        ) : null}
-      </div>
-      {user && expand && (
-        <OutsideClickHandler onOutsideClick={() => setExpand(false)}>
+    <OutsideClickHandler onOutsideClick={() => setExpand(false)}>
+      <main className="relative">
+        {/* TODO: fix unable to close dropdown when clicking AccountButton again */}
+        <div suppressHydrationWarning={true}>
+          {typeof window != undefined ? (
+            <AccountButton onClick={toggleExpandAccoutBtn} />
+          ) : null}
+        </div>
+        {user && expand && (
           <div
             className="
           absolute -left-[209px] top-[46px]
@@ -102,8 +102,8 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
               <h5>Log out</h5>
             </Button>
           </div>
-        </OutsideClickHandler>
-      )}
-    </main>
+        )}
+      </main>
+    </OutsideClickHandler>
   );
 }
