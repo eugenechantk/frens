@@ -46,7 +46,6 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
   return (
     <OutsideClickHandler onOutsideClick={() => setExpand(false)}>
       <main className="relative">
-        {/* TODO: fix unable to close dropdown when clicking AccountButton again */}
         <div suppressHydrationWarning={true}>
           {typeof window != undefined ? (
             <AccountButton onClick={toggleExpandAccoutBtn} />
