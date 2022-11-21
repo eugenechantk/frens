@@ -32,7 +32,7 @@ export default function AccountButton({
     const sig = await _signer?.signMessage(signInMessage);
 
     // const recoveredAddress = ethers.utils.recoverAddress(msgHashBytes, sig!);
-    const customToken = await fetch("/api/auth/login", {
+    const {token, new_user} = await fetch("/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -42,13 +42,9 @@ export default function AccountButton({
         sig,
       }),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        return data.token;
-      })
+      .then((res) => {return res.json()})
       .catch((err) => console.log(err));
-
-    await signInWithCustomToken(firebaseClientAuth, customToken);
+    await signInWithCustomToken(firebaseClientAuth, token);
   };
 
   return (

@@ -32,12 +32,12 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
   if (verified) {
     // STEP 2: CREATE CUSTOM TOKEN USING USER'S ADDRESS AS UID
     const customToken = await firebaseAdmin.auth().createCustomToken(address);
-    let userFetch: UserRecord;
+    let newUser = true;
 
     // STEP 2: CREATE NEW USER IN FIREBASE AUTH
     // Check if there is an existing user in firebase auth
     try {
-      await firebaseAdmin.auth().getUser(address);
+      await firebaseAdmin.auth().getUser(address).then(() => newUser = false);
     } catch (err: FirebaseError | any) {
       // if there is no existing user in firebase auth, create a new user
       if (err.code === "auth/user-not-found") {
@@ -53,6 +53,7 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
     // STEP 3: RETURN THE CUSTOM TOKEN
     res.status(202).json({
       token: customToken,
+      new_user: newUser,
     });
     res.end();
     return;
