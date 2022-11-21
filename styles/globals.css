@@ -58,7 +58,36 @@
     font-family: Montserrat, system-ui, sans-serif;
   }
 
+  body {
+    @apply bg-secondary-100
+  }
+
   h1,h2,h3,h4,h5,h6 {
     font-family: Goldplay, Inter, system-ui, sans-serif;
   }
+
+  h6 {
+    @apply text-sm
+  }
+
+  h5 {
+    @apply text-base
+  }
+
+  h4 {
+    @apply text-xl
+  }
+
+  h3 {
+    @apply text-2xl
+  }
+
+  h2 {
+    @apply text-3xl
+  }
+
+  h1 {
+    @apply text-4xl
+  }
+
 }

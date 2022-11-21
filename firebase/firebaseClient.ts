@@ -8,6 +8,8 @@ import 'firebase/firestore'
 import 'firebase/storage'
 import 'firebase/analytics'
 import 'firebase/performance'
+import { browserSessionPersistence, getAuth, connectAuthEmulator, Auth } from "firebase/auth";
+import * as firebase from 'firebase/app'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -20,7 +22,20 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-export const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const perf = getPerformance(app);
-export const db = getFirestore(app);
+async function setupEmulator(auth: Auth) {
+  const authUrl = "http://127.0.0.1:9099";
+  await fetch(authUrl);
+  connectAuthEmulator(firebaseClientAuth, authUrl);
+}
+
+export const firebaseClient = initializeApp(firebaseConfig);
+export const db = getFirestore(firebaseClient);
+
+// Initialize Firebase Authentication and get a reference to the service
+export const firebaseClientAuth = getAuth(firebaseClient);
+firebaseClientAuth.setPersistence(browserSessionPersistence);
+
+// Only setup emulator in development mode
+if (process.env.NEXT_PUBLIC_NODE_ENV === 'local') {
+  setupEmulator(firebaseClientAuth);
+}
