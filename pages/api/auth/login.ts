@@ -60,11 +60,7 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
           .updateUser(address, {
             displayName: _displayName,
             photoURL: _profilePicUrl,
-          })
-          // FOR DEBUGGING
-          .then((userRecord) =>
-            console.log("Successfully updated user: ", userRecord.toJSON())
-          );
+          });
       } else {
         res.status(500).send(err);
         res.end();
