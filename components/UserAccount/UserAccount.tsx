@@ -42,6 +42,10 @@ export default function UserAccount() {
     });
   };
 
+  const handleWallet = () => {
+    magic?.connect.showWallet();
+  }
+
   const toggleExpandAccoutBtn = (e: any) => {
     e.preventDefault();
     if (user) {
@@ -95,7 +99,7 @@ export default function UserAccount() {
               />
             </div>
             <div className="flex flex-col items-start gap-1 w-full">
-              <Button type="secondary" className="w-full">
+              <Button type="secondary" className="w-full" onClick={handleWallet}>
                 <h5>Show wallet</h5>
               </Button>
               {/* TODO: implement profile page for v1
