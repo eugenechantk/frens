@@ -3,6 +3,7 @@ import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from 'firebase/app'
 import { getPerformance } from "firebase/performance";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 import 'firebase/auth'
 import 'firebase/firestore'
 import 'firebase/storage'
@@ -32,4 +33,5 @@ if (process.env.NEXT_PUBLIC_NODE_ENV === 'development' && !firebaseClientAuth.em
 }
 firebaseClientAuth.setPersistence(browserSessionPersistence);
 export const db = getFirestore(firebaseClient);
+export const clientStorage = getStorage(firebaseClient);
 
