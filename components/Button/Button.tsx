@@ -55,7 +55,7 @@ const secondaryStyle = clsx(
   // default styling
   'bg-secondary-200 border border-secondary-300 text-secondary-600',
   // hover state styling
-  'hover:bg-secondary-300',
+  'hover:bg-secondary-300 hover:border-secondary-400',
   // disabled state styling
   'disabled:bg-gray-200 disabled:text-gray-400 disabled:border-0 disabled:pointer-events-none'
 );
