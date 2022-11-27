@@ -1,12 +1,7 @@
 import { FirebaseError } from "@firebase/util";
-import { UserRecord } from "firebase-admin/lib/auth/user-record";
-import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { NextApiRequest, NextApiResponse } from "next";
 import { firebaseAdmin } from "../../../firebase/firebaseAdmin";
-import {
-  clientStorage,
-  firebaseClientAuth,
-} from "../../../firebase/firebaseClient";
+import { clientStorage } from "../../../firebase/firebaseClient";
 import { verifyAddress } from "../../../lib/ethereum";
 import generate from "project-name-generator";
 import _ from "lodash";
@@ -53,7 +48,6 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
         const _userCreated = await firebaseAdmin.auth().createUser({
           uid: address,
         });
-        // TODO: Create a user in firestore as well
         const _displayName = _.upperFirst(generate().spaced);
         const _profileImg = _.random(1, 8);
         const _profilePicStorageRef = ref(
