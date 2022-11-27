@@ -10,5 +10,5 @@ export default {
 } as ComponentMeta<typeof UserAccount>;
 
 export const Primary: ComponentStory<typeof UserAccount> = (args) => (
-  <UserAccount {...args}/>
+  <UserAccount/>
 );
