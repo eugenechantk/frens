@@ -1,10 +1,11 @@
 import { FirebaseError } from "@firebase/util";
-import { UserRecord } from "firebase-admin/lib/auth/user-record";
-import { signInWithCustomToken } from "firebase/auth";
 import { NextApiRequest, NextApiResponse } from "next";
 import { firebaseAdmin } from "../../../firebase/firebaseAdmin";
-import { firebaseClientAuth } from "../../../firebase/firebaseClient";
+import { clientStorage } from "../../../firebase/firebaseClient";
 import { verifyAddress } from "../../../lib/ethereum";
+import generate from "project-name-generator";
+import _ from "lodash";
+import { getDownloadURL, ref } from "firebase/storage";
 
 interface ILoginApiRequest extends NextApiRequest {
   body: {
@@ -37,13 +38,33 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
     // STEP 2: CREATE NEW USER IN FIREBASE AUTH
     // Check if there is an existing user in firebase auth
     try {
-      await firebaseAdmin.auth().getUser(address).then(() => newUser = false);
+      await firebaseAdmin
+        .auth()
+        .getUser(address)
+        .then(() => (newUser = false));
     } catch (err: FirebaseError | any) {
-      // if there is no existing user in firebase auth, create a new user
+      // if there is no existing user in firebase auth, create a new user in firebase auth
       if (err.code === "auth/user-not-found") {
-        await firebaseAdmin.auth().createUser({
+        const _userCreated = await firebaseAdmin.auth().createUser({
           uid: address,
         });
+        const _displayName = _.upperFirst(generate().spaced);
+        const _profileImg = _.random(1, 8);
+        const _profilePicStorageRef = ref(
+          clientStorage,
+          `default_avatars/${_profileImg}.png`
+        );
+        const _profilePicUrl = await getDownloadURL(_profilePicStorageRef);
+        await firebaseAdmin
+          .auth()
+          .updateUser(address, {
+            displayName: _displayName,
+            photoURL: _profilePicUrl,
+          })
+          // FOR DEBUGGING
+          .then((userRecord) =>
+            console.log("Successfully updated user: ", userRecord.toJSON())
+          );
       } else {
         res.status(500).send(err);
         res.end();
@@ -57,7 +78,6 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
     });
     res.end();
     return;
-
   } else {
     res.status(401).send("Error: sign in signature not verified");
     res.end();

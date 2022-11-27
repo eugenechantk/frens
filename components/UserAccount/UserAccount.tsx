@@ -1,5 +1,5 @@
 import { Square2StackIcon } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AccountButton from "./AccountButton";
 import ReactTooltip from "react-tooltip";
 import { Button } from "../Button/Button";
@@ -8,17 +8,22 @@ import { useAuth } from "../../lib/auth";
 import { magic } from "../../lib/magic";
 import { signOut } from "firebase/auth";
 import { firebaseClientAuth } from "../../firebase/firebaseClient";
-interface IUserAccountProps {
-  authed?: boolean;
-}
+import defaultProfilePic from '../../public/default_avatar.png'
+import { StaticImageData } from "next/image";
 
-export default function UserAccount({ authed, ...props }: IUserAccountProps) {
+export default function UserAccount() {
   const { user } = useAuth();
   const [expand, setExpand] = useState(false);
-  const [walletAddress, setWalletAddress] = useState(
-    "0xfc69FE666D5E1FB8374151c11Feb058300FfDCb5"
-  );
+  const [walletAddress, setWalletAddress] = useState<string>("");
+  const [profilePicUrl, setProfilePicUrl] = useState<string | StaticImageData>(defaultProfilePic);
   const [tooltip, setTooltip] = useState("Copy wallet address");
+
+  useEffect(() => {
+    if (user) {
+      setWalletAddress(user.uid);
+      setProfilePicUrl(user.photoURL!);
+    }
+  }, [user])
 
   const copyAddress = () => {
     navigator.clipboard.writeText(walletAddress.toString());
@@ -37,6 +42,10 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
     });
   };
 
+  const handleWallet = () => {
+    magic?.connect.showWallet();
+  }
+
   const toggleExpandAccoutBtn = (e: any) => {
     e.preventDefault();
     if (user) {
@@ -48,7 +57,7 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
       <main className="relative">
         <div suppressHydrationWarning={true}>
           {typeof window != undefined ? (
-            <AccountButton onClick={toggleExpandAccoutBtn} />
+            <AccountButton onClick={toggleExpandAccoutBtn} profilePicUrl={profilePicUrl}/>
           ) : null}
         </div>
         {user && expand && (
@@ -90,12 +99,13 @@ export default function UserAccount({ authed, ...props }: IUserAccountProps) {
               />
             </div>
             <div className="flex flex-col items-start gap-1 w-full">
-              <Button type="secondary" className="w-full">
+              <Button type="secondary" className="w-full" onClick={handleWallet}>
                 <h5>Show wallet</h5>
               </Button>
+              {/* TODO: implement profile page for v1
               <Button type="secondary" className="w-full">
                 <h5>Edit profile</h5>
-              </Button>
+              </Button> */}
             </div>
             <Button className="w-full" onClick={handleLogout}>
               <h5>Log out</h5>

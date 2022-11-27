@@ -1,7 +1,6 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import React, { useState } from "react";
 import { Button } from "../Button/Button";
-import devProfilePic from "../../public/user_avatar.png";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { provider } from "../../lib/provider";
 
@@ -12,10 +11,12 @@ import { useAuth } from "../../lib/auth";
 
 interface IAccountButtonProps {
   onClick?: (e: any) => void;
+  profilePicUrl: string | StaticImageData;
 }
 
 export default function AccountButton({
   onClick,
+  profilePicUrl,
   ...props
 }: IAccountButtonProps) {
   const { user } = useAuth();
@@ -58,7 +59,7 @@ export default function AccountButton({
       ) : (
         <>
           <Image
-            src={devProfilePic}
+            src={profilePicUrl}
             alt="User Profile"
             width={30}
             height={30}
