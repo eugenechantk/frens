@@ -66,29 +66,46 @@ export default function InputField({
           )}
         </div>
       )}
-      <input
-        ref={inputRef}
-        type={type}
-        defaultValue={defaultValue}
-        className={clsx(
-          inputFieldStruc,
-          defaultFieldSkin,
-          focusFieldSkin,
-          disabledFieldSkin,
-          error && errorFieldSkin
-        )}
-        placeholder={props.placeholder}
-        disabled={disabled}
-        onFocus={clearError}
-      ></input>
+      {type != "text-area" ? (
+        <input
+          ref={inputRef}
+          type={type}
+          defaultValue={defaultValue}
+          className={clsx(
+            inputFieldStruc,
+            defaultFieldSkin,
+            focusFieldSkin,
+            disabledFieldSkin,
+            error && errorFieldSkin
+          )}
+          placeholder={props.placeholder}
+          disabled={disabled}
+          onFocus={clearError}
+        ></input>
+      ) : (
+        <textarea
+          ref={inputRef}
+          defaultValue={defaultValue}
+          className={clsx(
+            inputFieldStruc,
+            defaultFieldSkin,
+            focusFieldSkin,
+            disabledFieldSkin,
+            error && errorFieldSkin
+          )}
+          placeholder={props.placeholder}
+          disabled={disabled}
+          rows={6}
+          onFocus={clearError}
+        ></textarea>
+      )}
+
       {props.helpText && (
         <p className="w-full text-sm leading-5 text-gray-400">
           {props.helpText}
         </p>
       )}
-      {error && (
-        <p className="w-full text-sm leading-5 text-error">{error}</p>
-      )}
+      {error && <p className="w-full text-sm leading-5 text-error">{error}</p>}
     </div>
   );
 }
