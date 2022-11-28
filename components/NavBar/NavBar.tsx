@@ -8,7 +8,7 @@ export default function NavBar() {
   return (
     <div className="w-full h-[76px] relative">
       <Button
-        type="ghost"
+        variant="ghost"
         className="absolute top-[calc(50%-44px/2)] left-[6px]"
       >
         <h5>My clubs</h5>
