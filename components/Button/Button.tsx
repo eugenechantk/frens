@@ -2,32 +2,34 @@ import clsx from 'clsx';
 import React from 'react'
 
 interface ButtonProps {
-  type?: 'primary' | 'secondary' | 'outline' | 'secondary-outline' | 'text-only' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'outline' | 'secondary-outline' | 'text-only' | 'ghost';
   disabled?: boolean;
   size?: 'sm' | 'base' | 'lg';
   className?: string;
   onClick?: (e?: any) => void;
   children?: React.ReactNode;
+  type?: 'button' | 'reset' | 'submit';
 }
 
 export const Button = ({
-  type='primary',
+  type='button',
+  variant='primary',
   size = 'base',
   ...props
 }: ButtonProps) => {
   return (
     <button
-      type="button"
+      type={type}
       className={clsx(
-        type === 'primary' && primaryStyle,
-        type === 'secondary' && secondaryStyle,
-        type === 'outline' && outlinedStyle,
-        type === 'secondary-outline' && secOutlinedStyle,
-        type === 'ghost' && ghostStyle,
-        type === 'text-only' && textOnlyStyle,
-        size === 'sm' && (type === 'text-only' ? textOnlySmSizing : smSizing) ,
-        size === 'base' && (type === 'text-only' ? textOnlyBaseSizing : baseSizing),
-        size === 'lg' && (type === 'text-only' ? textOnlyLgSizing : lgSizing),
+        variant === 'primary' && primaryStyle,
+        variant === 'secondary' && secondaryStyle,
+        variant === 'outline' && outlinedStyle,
+        variant === 'secondary-outline' && secOutlinedStyle,
+        variant === 'ghost' && ghostStyle,
+        variant === 'text-only' && textOnlyStyle,
+        size === 'sm' && (variant === 'text-only' ? textOnlySmSizing : smSizing) ,
+        size === 'base' && (variant === 'text-only' ? textOnlyBaseSizing : baseSizing),
+        size === 'lg' && (variant === 'text-only' ? textOnlyLgSizing : lgSizing),
         props.className,
       )}
       onClick={props.onClick}
