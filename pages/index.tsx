@@ -2,10 +2,10 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import InputField from "../components/InputField/InputField";
 import { Button } from "../components/Button/Button";
-import { SubmitHandler, FormHandles } from '@unform/core'
-import { Form } from '@unform/web'
+import { SubmitHandler, FormHandles } from "@unform/core";
+import { Form } from "@unform/web";
 import { useRef } from "react";
-import * as Yup from 'yup';
+import * as Yup from "yup";
 import ImageUpload from "../components/ImageUpload/ImageUpload";
 import Step from "../components/Stepper/Step";
 import Stepper from "../components/Stepper/Stepper";
@@ -21,19 +21,19 @@ const Home: NextPage = () => {
 
       await schema.validate(data, {
         abortEarly: false,
-      })
+      });
     } catch (err) {
-      const validationErrors:{[key: string]: any} = {};
+      const validationErrors: { [key: string]: any } = {};
       if (err instanceof Yup.ValidationError) {
-        err.inner.forEach(error => {
-          validationErrors[error.path!] = error.message
-        })
+        err.inner.forEach((error) => {
+          validationErrors[error.path!] = error.message;
+        });
 
         formRef.current!.setErrors(validationErrors);
       }
     }
-    console.log(data)
-  }
+    console.log(data);
+  };
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <Head>
@@ -46,22 +46,36 @@ const Home: NextPage = () => {
           Welcome to frens
         </h1>
         <Stepper>
-          <Step active/>
-          <Step last/>
+          <Step complete />
+          <Step active />
+          <Step />
         </Stepper>
-        
-        <Form ref={formRef} onSubmit={handleFormSubmit} initialData={{email: 'eugene@uni.minerva.edu', name:'abc'}} className=' flex flex-col gap-4 w-full justify-center my-6'>
+        <Form
+          ref={formRef}
+          onSubmit={handleFormSubmit}
+          initialData={{ email: "eugene@uni.minerva.edu", name: "abc" }}
+          className=" flex flex-col gap-4 w-full justify-center my-6"
+        >
           <InputField
             name="email"
             label="Email"
             placeholder="www.example.com"
             description="Each member will receive club tokens to represent their ownership of the club."
           />
-          <InputField name="name" label="Name" placeholder="www.example.com" type="text-area"/>
-          <Button type="submit" className=" w-[120px]">Submit</Button>
+          <InputField
+            name="name"
+            label="Name"
+            placeholder="www.example.com"
+            type="text-area"
+          />
+          <Button type="submit" className=" w-[120px]">
+            Submit
+          </Button>
         </Form>
-        <ImageUpload width={64} onClick={() => console.log('clicked image component')}/>
-        
+        <ImageUpload
+          width={64}
+          onClick={() => console.log("clicked image component")}
+        />
       </main>
     </div>
   );
