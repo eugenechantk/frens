@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Button } from "../Button/Button";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { provider } from "../../lib/provider";
-
 import { signInMessage } from "../../lib/ethereum";
 import { signInWithCustomToken } from "firebase/auth";
 import { firebaseClientAuth } from "../../firebase/firebaseClient";

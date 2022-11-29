@@ -6,6 +6,7 @@ import { SubmitHandler, FormHandles } from '@unform/core'
 import { Form } from '@unform/web'
 import { useRef } from "react";
 import * as Yup from 'yup';
+import ImageUpload from "../components/ImageUpload/ImageUpload";
 
 const Home: NextPage = () => {
   const formRef = useRef<FormHandles>(null);
@@ -42,17 +43,17 @@ const Home: NextPage = () => {
         <h1 className="text-6xl font-bold text-primary-600">
           Welcome to frens
         </h1>
-        <Form ref={formRef} onSubmit={handleFormSubmit} initialData={{email: 'eugene@uni.minerva.edu', name:'abc'}} className=' flex flex-col gap-1 w-full justify-center my-6'>
+        <Form ref={formRef} onSubmit={handleFormSubmit} initialData={{email: 'eugene@uni.minerva.edu', name:'abc'}} className=' flex flex-col gap-4 w-full justify-center my-6'>
           <InputField
             name="email"
             label="Email"
             placeholder="www.example.com"
             description="Each member will receive club tokens to represent their ownership of the club."
-            helpText="Make your password short and easy to guess."
           />
           <InputField name="name" label="Name" placeholder="www.example.com" type="text-area"/>
           <Button type="submit" className=" w-[120px]">Submit</Button>
         </Form>
+        <ImageUpload width={64} onClick={() => console.log('clicked image component')}/>
       </main>
     </div>
   );
