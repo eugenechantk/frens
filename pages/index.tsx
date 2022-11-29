@@ -23,6 +23,7 @@ const Home: NextPage = () => {
       await schema.validate(data, {
         abortEarly: false,
       });
+      console.log(data);
     } catch (err) {
       const validationErrors: { [key: string]: any } = {};
       if (err instanceof Yup.ValidationError) {
@@ -33,7 +34,6 @@ const Home: NextPage = () => {
         formRef.current!.setErrors(validationErrors);
       }
     }
-    console.log(data);
   };
 
   const [loading, setLoading] = useState(true);
