@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useField } from "@unform/core";
 import clsx from "clsx";
+import _ from "lodash";
 
 interface IInputFieldProps {
   // for the input
@@ -105,7 +106,7 @@ export default function InputField({
           {props.helpText}
         </p>
       )}
-      {error && <p className="w-full text-sm leading-5 text-error">{error}</p>}
+      {error && <p className="w-full text-sm leading-5 text-error">{_.upperFirst(error)}</p>}
     </div>
   );
 }
