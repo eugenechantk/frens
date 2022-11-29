@@ -4,11 +4,12 @@ import InputField from "../components/InputField/InputField";
 import { Button } from "../components/Button/Button";
 import { SubmitHandler, FormHandles } from "@unform/core";
 import { Form } from "@unform/web";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import * as Yup from "yup";
 import ImageUpload from "../components/ImageUpload/ImageUpload";
 import Step from "../components/Stepper/Step";
 import Stepper from "../components/Stepper/Stepper";
+import Spinner from "../components/Spinner/Spinner";
 
 const Home: NextPage = () => {
   const formRef = useRef<FormHandles>(null);
@@ -34,6 +35,8 @@ const Home: NextPage = () => {
     }
     console.log(data);
   };
+
+  const [loading, setLoading] = useState(true);
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <Head>
@@ -50,6 +53,9 @@ const Home: NextPage = () => {
           <Step active />
           <Step />
         </Stepper>
+
+        <Spinner size={32} loading/>
+
         <Form
           ref={formRef}
           onSubmit={handleFormSubmit}
