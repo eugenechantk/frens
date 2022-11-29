@@ -7,6 +7,8 @@ import { Form } from '@unform/web'
 import { useRef } from "react";
 import * as Yup from 'yup';
 import ImageUpload from "../components/ImageUpload/ImageUpload";
+import Step from "../components/Stepper/Step";
+import Stepper from "../components/Stepper/Stepper";
 
 const Home: NextPage = () => {
   const formRef = useRef<FormHandles>(null);
@@ -43,6 +45,11 @@ const Home: NextPage = () => {
         <h1 className="text-6xl font-bold text-primary-600">
           Welcome to frens
         </h1>
+        <Stepper>
+          <Step active/>
+          <Step last/>
+        </Stepper>
+        
         <Form ref={formRef} onSubmit={handleFormSubmit} initialData={{email: 'eugene@uni.minerva.edu', name:'abc'}} className=' flex flex-col gap-4 w-full justify-center my-6'>
           <InputField
             name="email"
@@ -54,6 +61,7 @@ const Home: NextPage = () => {
           <Button type="submit" className=" w-[120px]">Submit</Button>
         </Form>
         <ImageUpload width={64} onClick={() => console.log('clicked image component')}/>
+        
       </main>
     </div>
   );
