@@ -5,13 +5,13 @@ import defaultClubProfile from "../../public/default_club.png";
 
 interface IImageUploadProps {
   width: number;
+  imageSrc?: string;
   onClick?: () => any;
 }
 
-export default function ImageUpload({ width, onClick }: IImageUploadProps) {
+export default function ImageUpload({ width, onClick, imageSrc }: IImageUploadProps) {
   const [showHover, setShowHover] = useState(false);
-  // TODO: set renderImage to load the club profile image
-  const renderImage = defaultClubProfile;
+  const renderImage = imageSrc ? imageSrc : defaultClubProfile;
   return (
     <button
       className="border-2 border-secondary-300 rounded-10 relative overflow-clip"
@@ -21,7 +21,7 @@ export default function ImageUpload({ width, onClick }: IImageUploadProps) {
       onClick={onClick}
     >
       <Image
-        src={defaultClubProfile}
+        src={renderImage}
         alt="Club profile photo"
         fill
         className="z-0 absolute top-0 left-0"
