@@ -45,7 +45,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="flex w-full flex-1 flex-col justify-center px-20">
-        <h1 className="text-6xl font-bold text-primary-600">
+        <h1 className="text-6xl font-bold text-primary-600 mb-8">
           Welcome to frens
         </h1>
         <Stepper>
@@ -54,7 +54,7 @@ const Home: NextPage = () => {
           <Step />
         </Stepper>
 
-        <Spinner size={32} loading/>
+        <Spinner />
 
         <Form
           ref={formRef}
