@@ -54,12 +54,22 @@
 /* Global styles */
 /* ======== */
 @layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
   html {
     font-family: Montserrat, system-ui, sans-serif;
   }
 
   body {
-    @apply bg-secondary-100 font-medium w-screen h-screen
+    @apply bg-secondary-100 font-medium w-screen h-screen text-gray-800
+  }
+
+  * {
+    @apply box-border
   }
 
   #__next {
