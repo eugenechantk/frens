@@ -25,6 +25,12 @@ interface IInputFieldProps {
 
   // default value
   defaultValue?: string;
+
+  // onInput event listner
+  onInput?: any;
+
+  // custom input styling
+  className?: string;
 }
 
 export default function InputField({
@@ -83,12 +89,14 @@ export default function InputField({
             defaultFieldSkin,
             focusFieldSkin,
             disabledFieldSkin,
-            error && errorFieldSkin
+            error && errorFieldSkin,
+            props.className
           )}
           placeholder={props.placeholder}
           disabled={disabled}
           onFocus={clearError}
           onChange={props.onChange}
+          onInput={props.onInput}
         ></input>
       ) : (
         <textarea
@@ -100,11 +108,14 @@ export default function InputField({
             focusFieldSkin,
             disabledFieldSkin,
             error && errorFieldSkin,
+            props.className
           )}
           placeholder={props.placeholder}
           disabled={disabled}
           rows={6}
           onFocus={clearError}
+          onChange={props.onChange}
+          onInput={props.onInput}
         ></textarea>
       )}
 
