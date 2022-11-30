@@ -6,7 +6,7 @@ import UserAccount from "../UserAccount/UserAccount";
 
 export default function NavBar() {
   return (
-    <div className="w-full min-h-[76px] relative">
+    <div className="w-full min-h-[76px] relative z-50">
       <Button
         variant="ghost"
         className="absolute top-[calc(50%-44px/2)] left-[6px]"
