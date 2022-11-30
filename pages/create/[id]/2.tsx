@@ -20,7 +20,7 @@ const StepTwo: NextPageWithLayout<any> = () => {
             We have difficulty receiving the creation fee. Make sure your wallet
             has at least 0.08 ETH before trying again
           </p>
-          <Button className="w-[245px]">Initiate payment again</Button>
+          <Button className="w-[245px]"><h3>Initiate payment again</h3></Button>
         </>
       ) : success ? (
         <>
@@ -38,7 +38,7 @@ const StepTwo: NextPageWithLayout<any> = () => {
             “Initiate payment again” button below
           </p>
           <Button variant="secondary" className="w-[245px]">
-            Initiate payment again
+            <h3>Initiate payment again</h3>
           </Button>
         </>
       )}

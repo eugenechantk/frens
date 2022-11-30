@@ -19,7 +19,7 @@ const StepThree: NextPageWithLayout<any> = () => {
             We have received the creation fee but have difficulty creating the
             club. You can try creating your club again.
           </p>
-          <Button className="w-[245px]">Create club again</Button>
+          <Button className="w-[245px]"><h3>Create club again</h3></Button>
         </>
       ) : success ? (
         <>
