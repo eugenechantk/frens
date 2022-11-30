@@ -19,6 +19,18 @@ interface IInputFieldProps {
 
   // for the helptext below input field
   helpText?: string;
+
+  // onChange event listener
+  onChange?: any;
+
+  // default value
+  defaultValue?: string;
+
+  // onInput event listner
+  onInput?: any;
+
+  // custom input styling
+  className?: string;
 }
 
 export default function InputField({
@@ -47,7 +59,7 @@ export default function InputField({
   }, [fieldName, registerField]);
 
   return (
-    <div className={` flex flex-col gap-2 w-full`}>
+    <div className={`flex flex-col gap-2 w-full`}>
       {props.label && (
         <div className="flex flex-col gap-1">
           <div className="flex flex-row items-start gap-4">
@@ -71,33 +83,39 @@ export default function InputField({
         <input
           ref={inputRef}
           type={type}
-          defaultValue={defaultValue}
+          defaultValue={props.defaultValue ? props.defaultValue : defaultValue}
           className={clsx(
             inputFieldStruc,
             defaultFieldSkin,
             focusFieldSkin,
             disabledFieldSkin,
-            error && errorFieldSkin
+            error && errorFieldSkin,
+            props.className
           )}
           placeholder={props.placeholder}
           disabled={disabled}
           onFocus={clearError}
+          onChange={props.onChange}
+          onInput={props.onInput}
         ></input>
       ) : (
         <textarea
           ref={inputRef}
-          defaultValue={defaultValue}
+          defaultValue={props.defaultValue ? props.defaultValue : defaultValue}
           className={clsx(
             inputFieldStruc,
             defaultFieldSkin,
             focusFieldSkin,
             disabledFieldSkin,
-            error && errorFieldSkin
+            error && errorFieldSkin,
+            props.className
           )}
           placeholder={props.placeholder}
           disabled={disabled}
           rows={6}
           onFocus={clearError}
+          onChange={props.onChange}
+          onInput={props.onInput}
         ></textarea>
       )}
 
@@ -115,19 +133,19 @@ const inputFieldStruc = clsx(
   // sizing
   "w-full px-4 py-5",
   // rounded
-  "rounded-8"
+  "rounded-8",
 );
 
 const defaultFieldSkin = clsx(
   // border
   "border-secondary-300 border",
   // text
-  "text-gray-800 text-base leading-5"
+  "text-gray-800 text-base leading-5",
 );
 
 const focusFieldSkin = clsx(
   // border
-  "focus:outline-2 focus:outline-primary-600"
+  "focus:outline-2 focus:outline-primary-600",
 );
 
 const disabledFieldSkin = clsx(
@@ -137,5 +155,5 @@ const disabledFieldSkin = clsx(
 
 const errorFieldSkin = clsx(
   // border
-  "focus:outline-error focus:outline-2 border-2 border-error text-error"
+  "focus:outline-error focus:outline-2 border-2 border-error text-error",
 );

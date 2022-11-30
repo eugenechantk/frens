@@ -8,7 +8,7 @@ interface IStepperProps {
 export default function Stepper({children, className}:IStepperProps) {
   const arrayChildren = React.Children.toArray(children);
   return (
-    <div className='flex flex-row items-center w-full'>
+    <div className={`flex flex-row items-center w-full ${className}`}>
       {React.Children.map(arrayChildren, (children, index) => {
         return (
           <>

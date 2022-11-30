@@ -19,7 +19,11 @@ export default function Spinner({
 }: ISpinnerProps) {
   return (
     <div className="relative" style={{ width: size, height: size }}>
-      {loading && (
+      {success ? (
+        <Image src={successImg} alt="successfully loaded" fill />
+      ) : error ? (
+        <Image src={errorImg} alt="successfully loaded" fill />
+      ) : (
         <div className=" flex flex-row items-center justify-center w-full h-full">
           <PulseLoader
             loading
@@ -29,8 +33,6 @@ export default function Spinner({
           />
         </div>
       )}
-      {success && <Image src={successImg} alt="successfully loaded" fill />}
-      {error && <Image src={errorImg} alt="successfully loaded" fill />}
     </div>
   );
 }

@@ -21,7 +21,9 @@ export default function UserAccount() {
   useEffect(() => {
     if (user) {
       setWalletAddress(user.uid);
-      setProfilePicUrl(user.photoURL!);
+      if (user.photoURL) {
+        setProfilePicUrl(user.photoURL!);
+      }
     }
   }, [user])
 
@@ -81,10 +83,10 @@ export default function UserAccount() {
                 onClick={copyAddress}
               >
                 <span>
-                  <h3 className="inline text-gray-400">
+                  <h3 className="inline text-gray-400 font-medium">
                     {walletAddress.slice(0, 2)}
                   </h3>
-                  <h3 className="inline text-gray-800">
+                  <h3 className="inline text-gray-800 font-medium">
                     {walletAddress.slice(2, 8)}...{walletAddress.slice(-6)}
                   </h3>
                 </span>

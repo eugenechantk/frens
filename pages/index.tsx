@@ -23,7 +23,6 @@ const Home: NextPage = () => {
       await schema.validate(data, {
         abortEarly: false,
       });
-      console.log(data);
     } catch (err) {
       const validationErrors: { [key: string]: any } = {};
       if (err instanceof Yup.ValidationError) {
@@ -34,6 +33,7 @@ const Home: NextPage = () => {
         formRef.current!.setErrors(validationErrors);
       }
     }
+    console.log(data);
   };
 
   const [loading, setLoading] = useState(true);
@@ -48,18 +48,10 @@ const Home: NextPage = () => {
         <h1 className="text-6xl font-bold text-primary-600 mb-8">
           Welcome to frens
         </h1>
-        <Stepper>
-          <Step complete />
-          <Step active />
-          <Step />
-        </Stepper>
-
-        <Spinner />
-
         <Form
           ref={formRef}
           onSubmit={handleFormSubmit}
-          initialData={{ email: "eugene@uni.minerva.edu", name: "abc" }}
+          initialData={{ name: "John Doe" }}
           className=" flex flex-col gap-4 w-full justify-center my-6"
         >
           <InputField
@@ -71,17 +63,19 @@ const Home: NextPage = () => {
           <InputField
             name="name"
             label="Name"
-            placeholder="www.example.com"
+            placeholder="John Smith"
+            type="text-area"
+          />
+          <InputField
+            name="description"
+            label="Club description"
+            placeholder="Something about your investment club"
             type="text-area"
           />
           <Button type="submit" className=" w-[120px]">
-            Submit
+            <h3>Submit</h3>
           </Button>
         </Form>
-        <ImageUpload
-          width={64}
-          onClick={() => console.log("clicked image component")}
-        />
       </main>
     </div>
   );
