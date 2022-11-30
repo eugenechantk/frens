@@ -6,7 +6,7 @@ import ImageUpload from "../../components/ImageUpload/ImageUpload";
 import InputField from "../../components/InputField/InputField";
 import { Form } from "@unform/web";
 import { Button } from "../../components/Button/Button";
-import { WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
+import FeeEstimate from "../../components/FeeEstimate/FeeEstimate";
 
 const CreateClub: NextPageWithLayout<any> = () => {
   const formRef = useRef(null);
@@ -71,26 +71,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
           raise money
         </p>
 
-        {/* Creation fee estimate box */}
-        <div className="flex flex-row items-start px-4 py-3 gap-4 bg-primary-200 border border-primary-300 rounded-8 w-full">
-          {/* Estimated fee icons and title */}
-          <div className="flex flex-row items-center gap-2 grow">
-            <WrenchScrewdriverIcon className="w-6 text-primary-800" />
-            <p className="text-base leading-6 font-semibold text-primary-800">
-              Estimated fees
-            </p>
-          </div>
-          {/* Fee estimate display */}
-          <div className="flex flex-row gap-2">
-            {/* TODO: render the estimated ETH price and USD equivalent */}
-            <p className="text-primary-800 text-base leading-6 font-semibold">
-              0.0756 ETH
-            </p>
-            <p className="text-primary-500 text-base leading-6 font-semibold">
-              12.37 USD
-            </p>
-          </div>
-        </div>
+        <FeeEstimate eth={0.0756} usd={12.37} className="w-full"/>
       </div>
       {/* Create button */}
       <div className="flex flex-col items-center gap-3">
