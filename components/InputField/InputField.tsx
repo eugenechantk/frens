@@ -19,6 +19,12 @@ interface IInputFieldProps {
 
   // for the helptext below input field
   helpText?: string;
+
+  // onChange event listener
+  onChange?: any;
+
+  // default value
+  defaultValue?: string;
 }
 
 export default function InputField({
@@ -71,7 +77,7 @@ export default function InputField({
         <input
           ref={inputRef}
           type={type}
-          defaultValue={defaultValue}
+          defaultValue={props.defaultValue ? props.defaultValue : defaultValue}
           className={clsx(
             inputFieldStruc,
             defaultFieldSkin,
@@ -82,17 +88,18 @@ export default function InputField({
           placeholder={props.placeholder}
           disabled={disabled}
           onFocus={clearError}
+          onChange={props.onChange}
         ></input>
       ) : (
         <textarea
           ref={inputRef}
-          defaultValue={defaultValue}
+          defaultValue={props.defaultValue ? props.defaultValue : defaultValue}
           className={clsx(
             inputFieldStruc,
             defaultFieldSkin,
             focusFieldSkin,
             disabledFieldSkin,
-            error && errorFieldSkin
+            error && errorFieldSkin,
           )}
           placeholder={props.placeholder}
           disabled={disabled}
@@ -115,19 +122,19 @@ const inputFieldStruc = clsx(
   // sizing
   "w-full px-4 py-5",
   // rounded
-  "rounded-8"
+  "rounded-8",
 );
 
 const defaultFieldSkin = clsx(
   // border
   "border-secondary-300 border",
   // text
-  "text-gray-800 text-base leading-5"
+  "text-gray-800 text-base leading-5",
 );
 
 const focusFieldSkin = clsx(
   // border
-  "focus:outline-2 focus:outline-primary-600"
+  "focus:outline-2 focus:outline-primary-600",
 );
 
 const disabledFieldSkin = clsx(
@@ -137,5 +144,5 @@ const disabledFieldSkin = clsx(
 
 const errorFieldSkin = clsx(
   // border
-  "focus:outline-error focus:outline-2 border-2 border-error text-error"
+  "focus:outline-error focus:outline-2 border-2 border-error text-error",
 );
