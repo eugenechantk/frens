@@ -20,8 +20,10 @@ export default function CreateProcessLayout(props: ICreateProcessLayoutProps) {
       <Stepper className='md:w-2/3 max-w-[280px]'>
         {steps.map((step, index) => {
           const stepProps: {active?: boolean, complete?: boolean} = {};
+          // determine if the step iterated is done
           if (step < stepNumber) {
             stepProps.complete = true;
+          // determine if the step iterated is the current step
           } else if (step === stepNumber) {
             stepProps.active = true;
           }

@@ -59,7 +59,7 @@ export default function InputField({
   }, [fieldName, registerField]);
 
   return (
-    <div className={` flex flex-col gap-2 w-full`}>
+    <div className={`flex flex-col gap-2 w-full`}>
       {props.label && (
         <div className="flex flex-col gap-1">
           <div className="flex flex-row items-start gap-4">
