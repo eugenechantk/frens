@@ -79,7 +79,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
           By clicking “Pay and create” you agree to our Terms of Service
         </p>
         <Button type="submit" className="w-1/3 min-w-[218px]">
-          Pay and create
+          <h3>Pay and create</h3>
         </Button>
       </div>
     </Form>

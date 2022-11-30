@@ -31,7 +31,7 @@ export default function CreateLayout({
           md:flex-row md:items-center md:gap-4 md:w-full
           flex-col items-start gap-4
           md:pb-4 md:sticky md:top-0 md:bg-secondary-100 md:p-6
-          p-4 z-20"
+          p-4 z-10"
         >
           <h3 className=" leading-8 font-bold md:order-1 order-2 grow ">Create your club</h3>
           <Button variant="secondary-outline" className="md:order-2 order-1" onClick={() => router.push('/dashboard')}>
