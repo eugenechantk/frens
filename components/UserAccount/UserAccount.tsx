@@ -99,11 +99,11 @@ export default function UserAccount() {
               />
             </div>
             <div className="flex flex-col items-start gap-1 w-full">
-              <Button type="secondary" className="w-full" onClick={handleWallet}>
+              <Button variant="secondary" className="w-full" onClick={handleWallet}>
                 <h5>Show wallet</h5>
               </Button>
               {/* TODO: implement profile page for v1
-              <Button type="secondary" className="w-full">
+              <Button variant="secondary" className="w-full">
                 <h5>Edit profile</h5>
               </Button> */}
             </div>
