@@ -21,7 +21,9 @@ export default function UserAccount() {
   useEffect(() => {
     if (user) {
       setWalletAddress(user.uid);
-      setProfilePicUrl(user.photoURL!);
+      if (user.photoURL) {
+        setProfilePicUrl(user.photoURL!);
+      }
     }
   }, [user])
 
