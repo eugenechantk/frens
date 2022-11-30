@@ -104,7 +104,8 @@
     @apply text-4xl
   }
 
-  input {
+  input,
+  textarea {
     background: transparent;
   }
 }
