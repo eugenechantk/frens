@@ -38,7 +38,7 @@ export default function CreateLayout({
             <XMarkIcon className="w-5"/>
           </Button>
         </div>
-        <div className="md:px-6 md:pb-6 px-4 pb-6">
+        <div className="md:px-6 md:pb-6 px-4 pb-6 grow w-full flex">
           {children}
         </div>
         
