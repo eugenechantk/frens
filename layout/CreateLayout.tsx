@@ -14,14 +14,15 @@ export default function CreateLayout({
     <div
       className="
       w-full h-full flex flex-col
-      md:items-center md:justify-center md:py-12"
+      md:items-center md:justify-center"
     >
       {/* For the container of all the create club conent */}
       <div
         className="
-        grow
+        h-full
         md:flex md:flex-col md:p-6 md:items-start md:gap-6
         md:border md:border-secondary-300 md:rounded-20 md:w-[620px]
+        md:overflow-auto md:my-12
         flex flex-col items-start pt-3 pb-6 px-4 gap-6"
       >
         {/* section header */}

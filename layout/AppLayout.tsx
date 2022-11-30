@@ -5,7 +5,7 @@ export default function AppLayout({children}: {children: React.ReactNode}) {
   return (
     <div className='h-full w-full flex flex-col'>
       <NavBar/>
-      <main className='grow'>{children}</main>
+      <main className='grow overflow-scroll'>{children}</main>
     </div>
   )
 }
