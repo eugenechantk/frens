@@ -59,7 +59,11 @@
   }
 
   body {
-    @apply bg-secondary-100 font-medium
+    @apply bg-secondary-100 font-medium w-screen h-screen
+  }
+
+  #__next {
+    @apply w-screen h-screen
   }
 
   h1,h2,h3,h4,h5,h6 {
