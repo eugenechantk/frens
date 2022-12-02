@@ -1,6 +1,6 @@
 import { FirebaseError } from "@firebase/util";
 import { NextApiRequest, NextApiResponse } from "next";
-import { firebaseAdmin } from "../../../firebase/firebaseAdmin";
+import { adminAuth } from "../../../firebase/firebaseAdmin";
 import { clientStorage } from "../../../firebase/firebaseClient";
 import { verifyAddress } from "../../../lib/ethereum";
 import generate from "project-name-generator";
@@ -32,20 +32,19 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
 
   if (verified) {
     // STEP 2: CREATE CUSTOM TOKEN USING USER'S ADDRESS AS UID
-    const customToken = await firebaseAdmin.auth().createCustomToken(address);
+    const customToken = await adminAuth.createCustomToken(address);
     let newUser = true;
 
     // STEP 2: CREATE NEW USER IN FIREBASE AUTH
     // Check if there is an existing user in firebase auth
     try {
-      await firebaseAdmin
-        .auth()
+      await adminAuth
         .getUser(address)
         .then(() => (newUser = false));
     } catch (err: FirebaseError | any) {
       // if there is no existing user in firebase auth, create a new user in firebase auth
       if (err.code === "auth/user-not-found") {
-        const _userCreated = await firebaseAdmin.auth().createUser({
+        const _userCreated = await adminAuth.createUser({
           uid: address,
         });
         const _displayName = _.upperFirst(generate().spaced);
@@ -55,8 +54,7 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
           `default_avatars/${_profileImg}.png`
         );
         const _profilePicUrl = await getDownloadURL(_profilePicStorageRef);
-        await firebaseAdmin
-          .auth()
+        await adminAuth
           .updateUser(address, {
             displayName: _displayName,
             photoURL: _profilePicUrl,
