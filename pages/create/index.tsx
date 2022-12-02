@@ -7,15 +7,36 @@ import InputField from "../../components/InputField/InputField";
 import { Form } from "@unform/web";
 import { Button } from "../../components/Button/Button";
 import FeeEstimate from "../../components/FeeEstimate/FeeEstimate";
+import axios from 'axios';
+
+interface IClubInfoData {
+  clubName: string;
+  clubDesc: string;
+  tokenSym: string;
+}
 
 const CreateClub: NextPageWithLayout<any> = () => {
   const formRef = useRef(null);
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = async (data: IClubInfoData) => {
     // TODO: implement form handle logic for creating a club
-    // TODO: before sending the data, transform the club token field to uppercase
-    console.log(data);
+
+    // Construct a FormData with all club information
+    let formData = new FormData()
+    formData.append('club_name', data.clubName);
+    formData.append('club_description', data.clubDesc);
+    formData.append('club_token_sym', data.tokenSym.toUpperCase());
+    formData.append('club_image', clubProfileFile);
+
+    // Make a post request to /api/create/club endpoint
+    const config = {
+      headers: { 'content-type': 'multipart/form-data' },
+    };
+
+    const response = await axios.post('/api/create/club', formData, config);
+    console.log('response', response.data)
   };
   const [clubName, setClubName] = useState("");
+  const [clubProfileFile, setClubProfileFile] = useState<any>();
   return (
     <Form
       ref={formRef}
@@ -34,7 +55,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
             <p className="text-sm text-gray-800 font-semibold leading-5 md:grow">
               Profile photo
             </p>
-            <ImageUpload />
+            <ImageUpload setImage={(imageFile: any) => setClubProfileFile(imageFile)}/>
           </div>
           <div className="md:flex md:flex-col md:items-start md:gap-4 md:shrink md:min-w-0 flex flex-col items-start gap-4 w-full">
             <InputField
