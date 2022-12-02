@@ -1,32 +1,43 @@
 import { CameraIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import defaultClubProfile from "../../public/default_club.png";
+import { useField } from '@unform/core'
 
 interface IImageUploadProps {
   width?: number;
   imageSrc?: string;
+  setImage?: any;
 }
 
 export default function ImageUpload({
   width,
   imageSrc,
+  setImage,
+  ...props
 }: IImageUploadProps) {
   const [showHover, setShowHover] = useState(false);
-  const [renderImage, setRenderImage] = useState(imageSrc ? imageSrc : defaultClubProfile);
-  const hiddenFileInput = useRef(null);
+  const [renderImage, setRenderImage] = useState(
+    imageSrc ? imageSrc : defaultClubProfile
+  );
+  const inputRef = useRef(null);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     // @ts-ignore
-    hiddenFileInput.current.click();
-  }
+    inputRef.current.click();
+  };
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files!.length > 0){
-      const src = URL.createObjectURL(e.target.files![0]);
-      setRenderImage(src);
+    if (!e.target.files!.length) {
+      return;
     }
-  }
+    // render the uploaded photo in the component
+    const src = URL.createObjectURL(e.target.files![0]);
+    setRenderImage(src);
+
+    // send the image file back to the form
+    setImage(e.target.files![0]);
+  };
 
   return (
     <>
@@ -46,14 +57,20 @@ export default function ImageUpload({
         />
         {showHover && (
           <div
-            className=" bg-white/50 backdrop-blur-md z-10 absolute top-0 left-0 flex flex-col justify-center items-center rounded-8"
+            className=" bg-white/60 backdrop-blur-sm z-10 absolute top-0 left-0 flex flex-col justify-center items-center rounded-8"
             style={{ width: "100%", aspectRatio: 1 / 1 }}
           >
             <CameraIcon className=" w-1/3" />
           </div>
         )}
       </button>
-      <input type="file" style={{display: 'none'}} ref={hiddenFileInput} accept='image/*' onChange={handleOnChange}/>
+      <input
+        type="file"
+        style={{ display: "none" }}
+        ref={inputRef}
+        accept="image/*"
+        onChange={handleOnChange}
+      />
     </>
   );
 }
