@@ -32,4 +32,5 @@ if (process.env.NEXT_PUBLIC_NODE_ENV === 'development' && !firebaseClientAuth.em
   connectAuthEmulator(firebaseClientAuth, "http://127.0.0.1:9099");
 }
 firebaseClientAuth.setPersistence(browserSessionPersistence);
+export const clientStorage = getStorage(firebaseClient);
 

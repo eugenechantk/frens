@@ -19,6 +19,6 @@ if (!firebaseAdmin.apps.length) {
 }
 
 const adminFirestore = firebaseAdmin.firestore();
-const adminStorage = firebaseAdmin.storage();
+const adminStorage = firebaseAdmin.storage().bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET);
 const adminAuth = firebaseAdmin.auth();
 export { firebaseAdmin, adminFirestore, adminAuth, adminStorage };
