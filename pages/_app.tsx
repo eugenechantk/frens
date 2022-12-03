@@ -2,6 +2,7 @@ import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import type { NextPage } from 'next'
 import { AuthProvider } from '../lib/auth'
+import { firebaseClient } from '../firebase/firebaseClient'
 
 export type NextPageWithLayout<Props> = NextPage<Props> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode
@@ -12,6 +13,7 @@ type AppPropsWithLayout = AppProps & {
 }
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  firebaseClient
   const getLayout = Component.getLayout ?? ((page) => page)
   return (
     <AuthProvider>
