@@ -41,3 +41,7 @@ next-env.d.ts
 
 # all log files
 *.log
+
+# firebase emulation files
+firestore.rules
+firestore.indexes.json
