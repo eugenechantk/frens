@@ -13,10 +13,14 @@ import Spinner from "../components/Spinner/Spinner";
 import { initWallet } from "../lib/ethereum";
 
 const Home: NextPage = () => {
-  const getWalletBackend = () => {
-    fetch("/api/create/wallet", { method: "GET" }).then((response) =>
-      console.log(response)
-    );
+  const getWalletBackend = (clubId: string) => {
+    fetch("/api/create/wallet", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ clubId: clubId }),
+    }).then((response) => console.log(response));
   };
 
   const getWalletFE = () => {
@@ -37,7 +41,7 @@ const Home: NextPage = () => {
         <h1 className="text-6xl font-bold text-primary-600 mb-8">
           Welcome to frens
         </h1>
-        <Button onClick={getWalletBackend}>
+        <Button onClick={() => getWalletBackend("fQ26ccd2ptW3924T0qcy")}>
           <h3>Initialize wallet</h3>
         </Button>
       </main>
