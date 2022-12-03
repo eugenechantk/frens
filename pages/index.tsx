@@ -13,11 +13,18 @@ import Spinner from "../components/Spinner/Spinner";
 import { initWallet } from "../lib/ethereum";
 
 const Home: NextPage = () => {
-  const getWallet = () => {
-    const mnemonic = 'camp viable army easy document betray lens empower report leaf twenty achieve'
+  const getWalletBackend = () => {
+    fetch("/api/create/wallet", { method: "GET" }).then((response) =>
+      console.log(response)
+    );
+  };
+
+  const getWalletFE = () => {
+    const mnemonic =
+      "camp viable army easy document betray lens empower report leaf twenty achieve";
     const wallet = initWallet(mnemonic);
-    console.log(wallet, wallet.provider, wallet.privateKey, wallet.publicKey);
-  }
+    console.log(wallet);
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
@@ -30,7 +37,9 @@ const Home: NextPage = () => {
         <h1 className="text-6xl font-bold text-primary-600 mb-8">
           Welcome to frens
         </h1>
-        <Button onClick={getWallet}><h3>Initialize wallet</h3></Button>
+        <Button onClick={getWalletBackend}>
+          <h3>Initialize wallet</h3>
+        </Button>
       </main>
     </div>
   );
