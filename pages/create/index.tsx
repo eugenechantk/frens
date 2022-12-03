@@ -8,6 +8,7 @@ import { Form } from "@unform/web";
 import { Button } from "../../components/Button/Button";
 import FeeEstimate from "../../components/FeeEstimate/FeeEstimate";
 import axios from 'axios';
+import { useRouter } from "next/router";
 
 interface IClubInfoData {
   clubName: string;
@@ -16,9 +17,16 @@ interface IClubInfoData {
 }
 
 const CreateClub: NextPageWithLayout<any> = () => {
+  const router = useRouter();
   const formRef = useRef(null);
+  const [clubName, setClubName] = useState("");
+  const [clubProfileFile, setClubProfileFile] = useState<any>();
+  const [createLoading, setCreateLoading] = useState(false);
+
   const handleFormSubmit = async (data: IClubInfoData) => {
     // TODO: implement form handle logic for creating a club
+
+    setCreateLoading(true)
 
     // Construct a FormData with all club information
     let formData = new FormData()
@@ -32,11 +40,17 @@ const CreateClub: NextPageWithLayout<any> = () => {
       headers: { 'content-type': 'multipart/form-data' },
     };
 
-    const response = await axios.post('/api/create/club', formData, config);
-    console.log('response', response.data)
+    try {
+      const club_id = await axios.post('/api/create/club', formData, config).then((response) => response.data).then(data => data.club_id);
+      router.push(`/create/${club_id}/1`);
+      setCreateLoading(false);
+    } catch (err) {
+      setCreateLoading(true)
+      console.log(err);
+
+    }
   };
-  const [clubName, setClubName] = useState("");
-  const [clubProfileFile, setClubProfileFile] = useState<any>();
+
   return (
     <Form
       ref={formRef}
@@ -76,7 +90,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
               name="tokenSym"
               label="Club token symbol"
               description="Each member will receive club tokens to represent their ownership of the club."
-              defaultValue={clubName && clubName.slice(0, 6).toUpperCase()}
+              defaultValue={clubName && clubName.replace(/\s/g, "").slice(0, 6).toUpperCase()}
               className="uppercase"
             />
           </div>
@@ -99,7 +113,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
         <p className="text-sm leading-5 text-gray-500">
           By clicking “Pay and create” you agree to our Terms of Service
         </p>
-        <Button type="submit" className="w-1/3 min-w-[218px]">
+        <Button type="submit" className="w-1/3 min-w-[218px]" loading={createLoading}>
           <h3>Pay and create</h3>
         </Button>
       </div>
