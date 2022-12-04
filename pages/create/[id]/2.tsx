@@ -6,29 +6,33 @@ import CreateProcessLayout from "../../../layout/CreateProcessLayout";
 import Spinner from "../../../components/Spinner/Spinner";
 import { Button } from "../../../components/Button/Button";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 const StepTwo: NextPageWithLayout<any> = () => {
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<any>();
   const router = useRouter();
 
   useEffect(() => {
-    const createClubWallet = async () => await handleClubWalletCreate();
+    const createClubWallet = async () => {
+      handleClubWalletCreate();
+    };
     createClubWallet();
   }, [router.query.id]);
 
   const handleClubWalletCreate = async () => {
-    // console.log("create club wallet now");
     const { id } = router.query;
-    // console.log(id, router.query);
-    const data = await fetch("/api/create/wallet", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ clubId: id }),
-    }).then(response => response.json());
-    console.log(data.address)
+    const data = await axios
+      .post("/api/create/wallet", { clubId: id })
+      .then((res) => {
+        setSuccess(true);
+        return res.data
+      })
+      .catch((err) => {
+        setError(err);
+        console.log(err);
+      });
+    console.log(data)
   };
 
   return (
