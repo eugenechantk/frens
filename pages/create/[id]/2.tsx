@@ -13,28 +13,41 @@ import { doc, DocumentData, getDoc } from "firebase/firestore";
 import { ethers } from "ethers";
 
 const StepTwo: NextPageWithLayout<any> = () => {
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<any>();
   const router = useRouter();
 
   useEffect(() => {
-    const createClubWallet = async () => {
-      // Step 1: get the address of the club wallet
-      const { address } = await handleClubWalletCreate();
-      // Step 2: send fee from the user wallet to the club wallet
-    };
-    createClubWallet();
+    initClubWallet();
   }, [router.query.id]);
+
+  const initClubWallet = async () => {
+    try {
+      console.log("Initializing club wallet");
+      setLoading(true);
+      // Step 1: get the address of the club wallet
+      const data = await handleClubWalletCreate();
+      // Step 2: send fee from the user wallet to the club wallet
+      const transaction = await sendFeeToClubWallet();
+      console.log(data, transaction);
+      // Step 3: move to next step
+    } catch (err) {
+      setLoading(false);
+      setError(err);
+    }
+  };
 
   const handleClubWalletCreate = async () => {
     const { id } = router.query;
     const data = await axios
       .post("/api/create/wallet", { clubId: id })
       .then((res) => {
-        setSuccess(true);
         return res.data;
       })
       .catch((err) => {
+        setLoading(false);
+        setSuccess(false);
         setError(err);
         console.log(err);
       });
@@ -43,9 +56,9 @@ const StepTwo: NextPageWithLayout<any> = () => {
 
   const sendFeeToClubWallet = async () => {
     const clubId = String(router.query.id);
-    const [_gasPrice, signer, clubWalletAddress] = await Promise.allSettled([
+    const _signer = await provider!.getSigner();
+    const [_gasPrice, clubWalletAddress] = await Promise.allSettled([
       await provider?.getGasPrice(),
-      await provider?.getSigner(),
       await (await getDoc(doc(clientFireStore, "clubs", clubId))).data()!
         .club_wallet_address,
     ])
@@ -59,25 +72,33 @@ const StepTwo: NextPageWithLayout<any> = () => {
         })
       )
       .catch((err) => {
-        console.log(err);
+        setLoading(false);
+        setSuccess(false);
+        setError(err);
         return [];
       });
-    const userAddress = await signer.getAddress();
-    const _nonce = await provider?.getTransactionCount(userAddress, 'latest');
+    const userAddress = await _signer.getAddress();
+    const _nonce = await provider?.getTransactionCount(userAddress, "latest");
     const tx = {
       from: userAddress,
       to: clubWalletAddress,
-      value: ethers.utils.parseUnits('0.001', 'ether'),
+      value: ethers.utils.parseUnits("0.001", "ether"),
       gasPrice: _gasPrice,
       gasLimit: ethers.utils.hexlify(100000),
       nonce: _nonce,
-    }
-    console.log(_gasPrice, signer, clubWalletAddress, userAddress, _nonce);
+    };
+    console.log(_gasPrice, _signer, clubWalletAddress, userAddress, _nonce);
     try {
-      const transaction = await signer.sendTransaction(tx);
-      console.log(transaction);
+      const transaction = await _signer.sendTransaction(tx);
+      setLoading(false);
+      setSuccess(true);
+      setError({})
+      return transaction;
     } catch (err) {
-      console.log(err)
+      setLoading(false);
+      setSuccess(false);
+      setError(err);
+      return err;
     }
   };
 
@@ -92,7 +113,11 @@ const StepTwo: NextPageWithLayout<any> = () => {
             We have difficulty receiving the creation fee. Make sure your wallet
             has at least 0.08 ETH before trying again
           </p>
-          <Button className="w-[245px]">
+          <Button
+            className="w-[245px]"
+            onClick={initClubWallet}
+            loading={loading}
+          >
             <h3>Initiate payment again</h3>
           </Button>
         </>
@@ -108,17 +133,18 @@ const StepTwo: NextPageWithLayout<any> = () => {
         <>
           <h3 className="text-center">Receiving creation fee...</h3>
           <p className="text-center">
-            If you do not receive a notification for payment, press the
-            “Initiate payment again” button below
+            If you do not receive a notification for payment in 30 seconds,
+            press the “Initiate payment again” button below
           </p>
-          <Button variant="secondary" className="w-[245px]">
+          <Button
+            variant="secondary"
+            className="w-[245px]"
+            onClick={initClubWallet}
+          >
             <h3>Initiate payment again</h3>
           </Button>
         </>
       )}
-      <Button onClick={sendFeeToClubWallet}>
-        <h3>Try sending transaction</h3>
-      </Button>
     </div>
   );
 };
