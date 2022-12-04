@@ -7,6 +7,10 @@ import Spinner from "../../../components/Spinner/Spinner";
 import { Button } from "../../../components/Button/Button";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { provider } from "../../../lib/provider";
+import { clientFireStore } from "../../../firebase/firebaseClient";
+import { doc, DocumentData, getDoc } from "firebase/firestore";
+import { ethers } from "ethers";
 
 const StepTwo: NextPageWithLayout<any> = () => {
   const [success, setSuccess] = useState(false);
@@ -15,7 +19,9 @@ const StepTwo: NextPageWithLayout<any> = () => {
 
   useEffect(() => {
     const createClubWallet = async () => {
-      handleClubWalletCreate();
+      // Step 1: get the address of the club wallet
+      const { address } = await handleClubWalletCreate();
+      // Step 2: send fee from the user wallet to the club wallet
     };
     createClubWallet();
   }, [router.query.id]);
@@ -26,13 +32,53 @@ const StepTwo: NextPageWithLayout<any> = () => {
       .post("/api/create/wallet", { clubId: id })
       .then((res) => {
         setSuccess(true);
-        return res.data
+        return res.data;
       })
       .catch((err) => {
         setError(err);
         console.log(err);
       });
-    console.log(data)
+    return { ...data };
+  };
+
+  const sendFeeToClubWallet = async () => {
+    const clubId = String(router.query.id);
+    const [_gasPrice, signer, clubWalletAddress] = await Promise.allSettled([
+      await provider?.getGasPrice(),
+      await provider?.getSigner(),
+      await (await getDoc(doc(clientFireStore, "clubs", clubId))).data()!
+        .club_wallet_address,
+    ])
+      .then((results) =>
+        results.map((result) => {
+          if (result.status === "fulfilled") {
+            return result.value;
+          } else {
+            throw new Error(result.reason);
+          }
+        })
+      )
+      .catch((err) => {
+        console.log(err);
+        return [];
+      });
+    const userAddress = await signer.getAddress();
+    const _nonce = await provider?.getTransactionCount(userAddress, 'latest');
+    const tx = {
+      from: userAddress,
+      to: clubWalletAddress,
+      value: ethers.utils.parseUnits('0.001', 'ether'),
+      gasPrice: _gasPrice,
+      gasLimit: ethers.utils.hexlify(100000),
+      nonce: _nonce,
+    }
+    console.log(_gasPrice, signer, clubWalletAddress, userAddress, _nonce);
+    try {
+      const transaction = await signer.sendTransaction(tx);
+      console.log(transaction);
+    } catch (err) {
+      console.log(err)
+    }
   };
 
   return (
@@ -70,6 +116,9 @@ const StepTwo: NextPageWithLayout<any> = () => {
           </Button>
         </>
       )}
+      <Button onClick={sendFeeToClubWallet}>
+        <h3>Try sending transaction</h3>
+      </Button>
     </div>
   );
 };
