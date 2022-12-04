@@ -10,8 +10,6 @@ import { useRouter } from "next/router";
 const StepOne: NextPageWithLayout<any> = () => {
   const router = useRouter();
   const {id} = router.query;
-  const {pathname, query} = router
-  console.log(pathname, query);
   return (
     <div className="grow flex flex-col items-center gap-4 w-full">
       <h3 className="text-center">Confirm creation fee</h3>
