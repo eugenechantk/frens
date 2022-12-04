@@ -33,7 +33,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
     try {
       const schema = Yup.object().shape({
         clubName: Yup.string().required('Club name is required'),
-        tokenSym: Yup.string().uppercase().max(6, 'Token symbol cannot be more than 6 characters').required('Token symbol is required'),
+        tokenSym: Yup.string().max(6, 'Token symbol cannot be more than 6 characters').required('Token symbol is required'),
       });
   
       await schema.validate(data, {
@@ -56,7 +56,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
     let formData = new FormData()
     formData.append('club_name', data.clubName);
     formData.append('club_description', data.clubDesc);
-    formData.append('club_token_sym', data.tokenSym);
+    formData.append('club_token_sym', data.tokenSym.toUpperCase());
     formData.append('club_image', clubProfileFile);
 
     // Make a post request to /api/create/club endpoint

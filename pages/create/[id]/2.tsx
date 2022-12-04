@@ -1,14 +1,36 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 import AppLayout from "../../../layout/AppLayout";
 import CreateLayout from "../../../layout/CreateLayout";
 import CreateProcessLayout from "../../../layout/CreateProcessLayout";
 import Spinner from "../../../components/Spinner/Spinner";
 import { Button } from "../../../components/Button/Button";
+import { useRouter } from "next/router";
 
 const StepTwo: NextPageWithLayout<any> = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const createClubWallet = async () => await handleClubWalletCreate();
+    createClubWallet();
+  }, [router.query.id]);
+
+  const handleClubWalletCreate = async () => {
+    // console.log("create club wallet now");
+    const { id } = router.query;
+    // console.log(id, router.query);
+    const data = await fetch("/api/create/wallet", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ clubId: id }),
+    }).then(response => response.json());
+    console.log(data.address)
+  };
+
   return (
     <div className="grow flex flex-col items-center gap-4 w-full">
       <Spinner success={success} error={error} />
@@ -20,7 +42,9 @@ const StepTwo: NextPageWithLayout<any> = () => {
             We have difficulty receiving the creation fee. Make sure your wallet
             has at least 0.08 ETH before trying again
           </p>
-          <Button className="w-[245px]"><h3>Initiate payment again</h3></Button>
+          <Button className="w-[245px]">
+            <h3>Initiate payment again</h3>
+          </Button>
         </>
       ) : success ? (
         <>
