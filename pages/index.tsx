@@ -27,7 +27,7 @@ const Home: NextPage = () => {
 
   const fetchClubWallet = async (clubId: string) => {
     const docSnap = await getDoc(doc(clientFireStore, 'clubs', clubId));
-    console.log(docSnap);
+    console.log(docSnap.data());
   }
 
   return (
