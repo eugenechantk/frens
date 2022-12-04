@@ -21,7 +21,6 @@ router
       const genMnemonic = ethers.utils.entropyToMnemonic(genEntropy);
       const path = `${process.env.NEXT_PUBLIC_ETH_STANDARD_PATH}/${process.env.NEXT_PUBLIC_DEFAULT_ACTIVE_INDEX}`;
       const wallet = ethers.Wallet.fromMnemonic(genMnemonic, path);
-      console.log(wallet);
 
       // Step 2: get the mnemonic and store in db
       const result = await adminFirestore

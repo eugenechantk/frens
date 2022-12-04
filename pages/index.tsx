@@ -11,6 +11,8 @@ import Step from "../components/Stepper/Step";
 import Stepper from "../components/Stepper/Stepper";
 import Spinner from "../components/Spinner/Spinner";
 import { initWallet } from "../lib/ethereum";
+import { doc, getDoc } from "firebase/firestore";
+import { clientFireStore } from "../firebase/firebaseClient";
 
 const Home: NextPage = () => {
   const getWalletBackend = (clubId: string) => {
@@ -23,12 +25,10 @@ const Home: NextPage = () => {
     }).then((response) => console.log(response));
   };
 
-  const getWalletFE = () => {
-    const mnemonic =
-      "camp viable army easy document betray lens empower report leaf twenty achieve";
-    const wallet = initWallet(mnemonic);
-    console.log(wallet);
-  };
+  const fetchClubWallet = async (clubId: string) => {
+    const docSnap = await getDoc(doc(clientFireStore, 'clubs', clubId));
+    console.log(docSnap);
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
@@ -43,6 +43,9 @@ const Home: NextPage = () => {
         </h1>
         <Button onClick={() => getWalletBackend("fQ26ccd2ptW3924T0qcy")}>
           <h3>Initialize wallet</h3>
+        </Button>
+        <Button onClick={() => fetchClubWallet("fQ26ccd2ptW3924T0qcy")}>
+          <h3>Fetch wallet on FE</h3>
         </Button>
       </main>
     </div>
