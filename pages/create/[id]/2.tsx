@@ -17,31 +17,33 @@ const StepTwo: NextPageWithLayout<any> = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<any>();
   const router = useRouter();
-  const clubId = router.query.id
+  const clubId = router.query.id;
 
   useEffect(() => {
     initClubWallet();
   }, [router.query.id]);
 
   const initClubWallet = async () => {
-    try {
-      console.log("Initializing club wallet");
-      setLoading(true);
-      // Step 1: get the address of the club wallet
-      const data = await handleClubWalletCreate();
+    console.log("Initializing club wallet");
+    setLoading(true);
+    // Step 1: get the address of the club wallet
+    await handleClubWalletCreate()
       // Step 2: send fee from the user wallet to the club wallet
-      const transaction = await sendFeeToClubWallet();
-      // console.log(data, transaction);
+      .then(async () => await sendFeeToClubWallet())
       // Step 3: change the deposited field of the club in DB to true
-      await updateDoc(doc(clientFireStore, "clubs", String(clubId)), {
-        deposited: true
-      })
+      .then(
+        async () =>
+          await updateDoc(doc(clientFireStore, "clubs", String(clubId)), {
+            deposited: true,
+          })
+      )
       // Step 4: Redirect to next step
-      setTimeout(() => router.push(`/create/${clubId}/3`), 1500);
-    } catch (err) {
-      setLoading(false);
-      setError(err);
-    }
+      .then(() => setTimeout(() => router.push(`/create/${clubId}/3`), 1500))
+      .catch((err) => {
+        setLoading(false);
+        setError(err);
+        // console.log(err);
+      });
   };
 
   const handleClubWalletCreate = async () => {
@@ -60,12 +62,13 @@ const StepTwo: NextPageWithLayout<any> = () => {
 
   const sendFeeToClubWallet = async () => {
     const _signer = await provider!.getSigner();
-    
+
     // Get gas price, club wallet address, nonce of the user and user address
     const [_gasPrice, clubWalletAddress] = await Promise.allSettled([
       await provider?.getGasPrice(),
-      await (await getDoc(doc(clientFireStore, "clubs", String(clubId)))).data()!
-        .club_wallet_address,
+      await (
+        await getDoc(doc(clientFireStore, "clubs", String(clubId)))
+      ).data()!.club_wallet_address,
     ])
       .then((results) =>
         results.map((result) => {
@@ -84,7 +87,7 @@ const StepTwo: NextPageWithLayout<any> = () => {
       });
     const userAddress = await _signer.getAddress();
     const _nonce = await provider?.getTransactionCount(userAddress, "latest");
-    
+
     // put all info into a transaction object
     const tx = {
       from: userAddress,
@@ -98,20 +101,12 @@ const StepTwo: NextPageWithLayout<any> = () => {
       nonce: _nonce,
     };
     // console.log(_gasPrice, _signer, clubWalletAddress, userAddress, _nonce);
-    
+
     // send the transaction using user's wallet
-    try {
-      const transaction = await _signer.sendTransaction(tx);
-      setLoading(false);
-      setSuccess(true);
-      setError({});
-      return transaction;
-    } catch (err) {
-      setLoading(false);
-      setSuccess(false);
-      setError(err);
-      return err;
-    }
+    const transaction = await _signer.sendTransaction(tx);
+    setLoading(false);
+    setSuccess(true);
+    setError({});
   };
 
   return (
@@ -155,7 +150,10 @@ const StepTwo: NextPageWithLayout<any> = () => {
           <Button
             variant="secondary"
             className="w-[245px]"
-            onClick={initClubWallet}
+            onClick={(e) => {
+              e.preventDefault();
+              initClubWallet();
+            }}
           >
             <h3>Initiate payment again</h3>
           </Button>
