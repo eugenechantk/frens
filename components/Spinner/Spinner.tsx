@@ -9,6 +9,7 @@ interface ISpinnerProps {
   success?: boolean;
   error?: any;
   size?: number;
+  color?: string;
 }
 
 export default function Spinner({
@@ -16,6 +17,7 @@ export default function Spinner({
   success,
   error,
   size = 64,
+  color = "#5A4FF3",
 }: ISpinnerProps) {
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -28,7 +30,7 @@ export default function Spinner({
           <PulseLoader
             loading
             size={size! / 6}
-            color={"#5A4FF3"}
+            color={color}
             margin={size! / 16}
           />
         </div>
