@@ -86,13 +86,6 @@ router
       res.end();
     }
   });
-  // 
-  // .use(async (req: MulterRequest, res, next) => {
-  //   if (req.body.club_image) {
-  //     upload.single("club_image");
-  //   }
-  //   res.status(200).send({file: req.file});
-  // });
 
 // Create a nextConnect router, with error checks as first middlewares
 
