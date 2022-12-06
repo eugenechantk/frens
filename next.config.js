@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
-  optimizeFonts: false,
   images: {
     remotePatterns:[
       {
@@ -9,5 +8,5 @@ module.exports = {
         hostname:'firebasestorage.googleapis.com'
       }
     ]
-  }
+  },
 }
