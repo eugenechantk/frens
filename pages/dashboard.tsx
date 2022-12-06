@@ -21,7 +21,7 @@ const Dashboard: NextPageWithLayout<any> = () => {
         <>
           <p>Signed up: {user.user.metadata.creationTime}</p>
           <p>Last login: {user.user.metadata.lastSignInTime}</p>
-          <Button className="mt-2" onClick={() => router.push('/create')}>Go to create</Button>
+          <Button className="mt-2" onClick={() => router.push('/create')}><h3>Go to create</h3></Button>
         </>
       )}
     </>
