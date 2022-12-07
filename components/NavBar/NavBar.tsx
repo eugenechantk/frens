@@ -3,13 +3,16 @@ import { Button } from "../Button/Button";
 import logoSrc from "../../public/logo.png";
 import Image from "next/image";
 import UserAccount from "../UserAccount/UserAccount";
+import { useRouter } from "next/router";
 
 export default function NavBar() {
+  const router = useRouter()
   return (
     <div className="w-full min-h-[76px] relative z-50">
       <Button
         variant="ghost"
         className="absolute top-[calc(50%-44px/2)] left-[6px]"
+        onClick={() => router.push('/clubs')}
       >
         <h5>My clubs</h5>
       </Button>
