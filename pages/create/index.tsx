@@ -129,7 +129,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
           raise money
         </p>
 
-        <FeeEstimate eth={0.0756} usd={12.37} className="w-full"/>
+        <FeeEstimate eth={String(process.env.NEXT_PUBLIC_CLUB_DEPOSIT)} usd={12.37} className="w-full"/>
       </div>
       {/* Create button */}
       <div className="flex flex-col items-center gap-3">

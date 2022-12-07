@@ -7,7 +7,7 @@ interface IFeeEstimateProps {
   className?: string;
 }
 
-export default function FeeEstimate({eth=String(process.env.NEXT_PUBLIC_CLUB_DEPOSIT),...props}: IFeeEstimateProps) {
+export default function FeeEstimate(props: IFeeEstimateProps) {
   return (
     <div className={`flex flex-row items-start px-4 py-3 gap-4 bg-primary-200 border border-primary-300 rounded-8 ${props.className}`}>
           {/* Estimated fee icons and title */}
@@ -21,10 +21,10 @@ export default function FeeEstimate({eth=String(process.env.NEXT_PUBLIC_CLUB_DEP
           <div className="flex flex-row gap-2">
             {/* TODO: render the estimated ETH price and USD equivalent */}
             <p className="text-primary-800 text-base leading-6 font-semibold">
-              {eth} ETH
+              {props.eth} ETH
             </p>
             <p className="text-primary-500 text-base leading-6 font-semibold">
-              {props.usd ? props.usd : eth} USD
+              {props.usd ? props.usd : props.eth} USD
             </p>
           </div>
         </div>
