@@ -19,17 +19,32 @@ export default function AccountButton({
   ...props
 }: IAccountButtonProps) {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
-    await provider!.send("eth_accounts", []);
+    setLoading(true);
+    let sig, address;
+    try {
+      await provider!.send("eth_accounts", []);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+      return;
+    }
 
-    // getting the end-users signer
-    const _signer = provider!.getSigner();
-    const address = await _signer!.getAddress();
+    try {
+      // getting the end-users signer
+      const _signer = provider!.getSigner();
+      address = await _signer!.getAddress();
 
-    // sending the message for the end-user to sign
-    const sig = await _signer?.signMessage(signInMessage);
+      // sending the message for the end-user to sign
+      sig = await _signer?.signMessage(signInMessage);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+      return;
+    }
 
     // const recoveredAddress = ethers.utils.recoverAddress(msgHashBytes, sig!);
     const { token, new_user } = await fetch("/api/auth/login", {
@@ -45,8 +60,19 @@ export default function AccountButton({
       .then((res) => {
         return res.json();
       })
-      .catch((err) => console.log(err));
-    await signInWithCustomToken(firebaseClientAuth, token);
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+        return;
+      });
+    try {
+      const userCred = await signInWithCustomToken(firebaseClientAuth, token);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+      return;
+    }
   };
 
   return (
@@ -54,6 +80,8 @@ export default function AccountButton({
       variant="secondary-outline"
       className="w-[70px] h-[38px] px-1"
       onClick={user ? onClick : handleLogin}
+      loading={loading}
+      spinnerColor="#948669"
     >
       {!user ? (
         <h6>Log in</h6>

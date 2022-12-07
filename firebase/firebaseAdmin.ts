@@ -14,7 +14,11 @@ if (!firebaseAdmin.apps.length) {
       projectId: serviceAccount.project_id,
     }),
     databaseURL: `https://${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebaseio.com`,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
   });
 }
 
-export { firebaseAdmin };
+const adminFirestore = firebaseAdmin.firestore();
+const adminStorage = firebaseAdmin.storage().bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET);
+const adminAuth = firebaseAdmin.auth();
+export { firebaseAdmin, adminFirestore, adminAuth, adminStorage };
