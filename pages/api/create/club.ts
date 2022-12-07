@@ -61,7 +61,7 @@ router
         console.log('trying to upload profile')
         console.log(req.file.club_image.filepath)
         const options = {
-          destination: `club_profile/${uid}/${req.file.club_image.newFilename}`,
+          destination: `club_profile/${req.file.club_image.newFilename}`,
           contentType: req.file.club_image.mimetype
         }
         const uploadResult = await adminStorage.upload(req.file.club_image.filepath, options);
