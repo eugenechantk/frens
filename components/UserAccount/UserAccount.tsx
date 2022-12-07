@@ -46,6 +46,7 @@ export default function UserAccount() {
 
   const handleWallet = () => {
     magic?.connect.showWallet();
+    setTimeout(() => setExpand(false), 1000)
   }
 
   const toggleExpandAccoutBtn = (e: any) => {

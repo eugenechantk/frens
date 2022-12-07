@@ -7,15 +7,73 @@ import InputField from "../../components/InputField/InputField";
 import { Form } from "@unform/web";
 import { Button } from "../../components/Button/Button";
 import FeeEstimate from "../../components/FeeEstimate/FeeEstimate";
+import axios from 'axios';
+import { useRouter } from "next/router";
+import * as Yup from 'yup';
+import { SubmitHandler, FormHandles } from "@unform/core";
+
+interface IClubInfoData {
+  clubName: string;
+  clubDesc: string;
+  tokenSym: string;
+}
 
 const CreateClub: NextPageWithLayout<any> = () => {
-  const formRef = useRef(null);
-  const handleFormSubmit = (data: any) => {
-    // TODO: implement form handle logic for creating a club
-    // TODO: before sending the data, transform the club token field to uppercase
-    console.log(data);
-  };
+  const router = useRouter();
+  const formRef = useRef<FormHandles>(null);
   const [clubName, setClubName] = useState("");
+  const [clubProfileFile, setClubProfileFile] = useState<any>();
+  const [createLoading, setCreateLoading] = useState(false);
+
+  const handleFormSubmit = async (data: IClubInfoData) => {
+    // TODO: implement form handle logic for creating a club
+
+    setCreateLoading(true)
+
+    try {
+      const schema = Yup.object().shape({
+        clubName: Yup.string().required('Club name is required'),
+        tokenSym: Yup.string().uppercase().max(6, 'Token symbol cannot be more than 6 characters').required('Token symbol is required'),
+      });
+  
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
+    } catch (err) {
+      const validationErrors: { [key: string]: any } = {};
+      if (err instanceof Yup.ValidationError) {
+        err.inner.forEach((error) => {
+          validationErrors[error.path!] = error.message;
+        });
+        formRef.current!.setErrors(validationErrors);
+      }
+      setCreateLoading(false);
+      return;
+    }
+
+    // Construct a FormData with all club information
+    let formData = new FormData()
+    formData.append('club_name', data.clubName);
+    formData.append('club_description', data.clubDesc);
+    formData.append('club_token_sym', data.tokenSym);
+    formData.append('club_image', clubProfileFile);
+
+    // Make a post request to /api/create/club endpoint
+    const config = {
+      headers: { 'content-type': 'multipart/form-data' },
+    };
+
+    try {
+      const club_id = await axios.post('/api/create/club', formData, config).then((response) => response.data).then(data => data.club_id);
+      await router.push(`/create/${club_id}/1`);
+      setCreateLoading(false);
+    } catch (err) {
+      setCreateLoading(false)
+      console.log(err);
+    }
+  };
+
   return (
     <Form
       ref={formRef}
@@ -34,7 +92,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
             <p className="text-sm text-gray-800 font-semibold leading-5 md:grow">
               Profile photo
             </p>
-            <ImageUpload />
+            <ImageUpload setImage={(imageFile: any) => setClubProfileFile(imageFile)}/>
           </div>
           <div className="md:flex md:flex-col md:items-start md:gap-4 md:shrink md:min-w-0 flex flex-col items-start gap-4 w-full">
             <InputField
@@ -55,7 +113,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
               name="tokenSym"
               label="Club token symbol"
               description="Each member will receive club tokens to represent their ownership of the club."
-              defaultValue={clubName && clubName.slice(0, 6).toUpperCase()}
+              defaultValue={clubName && clubName.replace(/\s/g, "").slice(0, 6).toUpperCase()}
               className="uppercase"
             />
           </div>
@@ -78,7 +136,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
         <p className="text-sm leading-5 text-gray-500">
           By clicking “Pay and create” you agree to our Terms of Service
         </p>
-        <Button type="submit" className="w-1/3 min-w-[218px]">
+        <Button type="submit" className="w-1/3 min-w-[218px]" loading={createLoading}>
           <h3>Pay and create</h3>
         </Button>
       </div>
