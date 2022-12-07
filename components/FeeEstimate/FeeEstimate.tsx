@@ -2,12 +2,12 @@ import React from 'react'
 import { WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
 
 interface IFeeEstimateProps {
-  eth: number;
+  eth: string;
   usd?: number;
   className?: string;
 }
 
-export default function FeeEstimate(props: IFeeEstimateProps) {
+export default function FeeEstimate({eth=String(process.env.NEXT_PUBLIC_CLUB_DEPOSIT),...props}: IFeeEstimateProps) {
   return (
     <div className={`flex flex-row items-start px-4 py-3 gap-4 bg-primary-200 border border-primary-300 rounded-8 ${props.className}`}>
           {/* Estimated fee icons and title */}
@@ -21,10 +21,10 @@ export default function FeeEstimate(props: IFeeEstimateProps) {
           <div className="flex flex-row gap-2">
             {/* TODO: render the estimated ETH price and USD equivalent */}
             <p className="text-primary-800 text-base leading-6 font-semibold">
-              {props.eth} ETH
+              {eth} ETH
             </p>
             <p className="text-primary-500 text-base leading-6 font-semibold">
-              {props.usd ? props.usd : props.eth} USD
+              {props.usd ? props.usd : eth} USD
             </p>
           </div>
         </div>
