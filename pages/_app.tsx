@@ -19,7 +19,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   firebaseClient;
   const getLayout = Component.getLayout ?? ((page) => page);
   return (
-    <main className={montserrat.className}>
+    <main className={montserrat.className} style={{height: '100%', width: '100%'}}>
       <AuthProvider>{getLayout(<Component {...pageProps} />)}</AuthProvider>
     </main>
   );
