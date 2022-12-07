@@ -40,7 +40,7 @@ router
   })
   // First step: Create club record with name, description, symbol and deposited?
   .post(async (req: MulterRequest, res: NextApiResponse, next) => {
-    let profileImgPath = 'club_profile/default_profile.png';
+    let profileImgPath = 'club_profile/default_club.png';
     console.log(req.body, req.file);
     try {
       const { id } = await adminFirestore
