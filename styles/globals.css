@@ -63,7 +63,7 @@
   }
 
   body {
-    @apply bg-secondary-100 font-medium w-screen h-screen text-gray-800
+    @apply bg-secondary-100 font-medium w-screen h-screen text-gray-800 leading-7
   }
 
   html {
