@@ -10,33 +10,26 @@ import ImageUpload from "../components/ImageUpload/ImageUpload";
 import Step from "../components/Stepper/Step";
 import Stepper from "../components/Stepper/Stepper";
 import Spinner from "../components/Spinner/Spinner";
+import { initWallet } from "../lib/ethereum";
+import { doc, getDoc } from "firebase/firestore";
+import { clientFireStore } from "../firebase/firebaseClient";
 
 const Home: NextPage = () => {
-  const formRef = useRef<FormHandles>(null);
-  const handleFormSubmit: SubmitHandler<FormData> = async (data: any) => {
-    try {
-      const schema = Yup.object().shape({
-        email: Yup.string().required(),
-        name: Yup.string().required(),
-      });
-
-      await schema.validate(data, {
-        abortEarly: false,
-      });
-    } catch (err) {
-      const validationErrors: { [key: string]: any } = {};
-      if (err instanceof Yup.ValidationError) {
-        err.inner.forEach((error) => {
-          validationErrors[error.path!] = error.message;
-        });
-
-        formRef.current!.setErrors(validationErrors);
-      }
-    }
-    console.log(data);
+  const getWalletBackend = (clubId: string) => {
+    fetch("/api/create/wallet", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ clubId: clubId }),
+    }).then((response) => console.log(response));
   };
 
-  const [loading, setLoading] = useState(true);
+  const fetchClubWallet = async (clubId: string) => {
+    const docSnap = await getDoc(doc(clientFireStore, 'clubs', clubId));
+    console.log(docSnap.data());
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <Head>
@@ -48,34 +41,12 @@ const Home: NextPage = () => {
         <h1 className="text-6xl font-bold text-primary-600 mb-8">
           Welcome to frens
         </h1>
-        <Form
-          ref={formRef}
-          onSubmit={handleFormSubmit}
-          initialData={{ name: "John Doe" }}
-          className=" flex flex-col gap-4 w-full justify-center my-6"
-        >
-          <InputField
-            name="email"
-            label="Email"
-            placeholder="www.example.com"
-            description="Each member will receive club tokens to represent their ownership of the club."
-          />
-          <InputField
-            name="name"
-            label="Name"
-            placeholder="John Smith"
-            type="text-area"
-          />
-          <InputField
-            name="description"
-            label="Club description"
-            placeholder="Something about your investment club"
-            type="text-area"
-          />
-          <Button type="submit" className=" w-[120px]">
-            <h3>Submit</h3>
-          </Button>
-        </Form>
+        <Button onClick={() => getWalletBackend("fQ26ccd2ptW3924T0qcy")}>
+          <h3>Initialize wallet</h3>
+        </Button>
+        <Button onClick={() => fetchClubWallet("fQ26ccd2ptW3924T0qcy")}>
+          <h3>Fetch wallet on FE</h3>
+        </Button>
       </main>
     </div>
   );

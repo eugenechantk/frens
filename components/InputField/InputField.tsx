@@ -134,6 +134,8 @@ const inputFieldStruc = clsx(
   "w-full px-4 py-5",
   // rounded
   "rounded-8",
+  // font leading
+  "leading-7"
 );
 
 const defaultFieldSkin = clsx(

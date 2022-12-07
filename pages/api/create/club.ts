@@ -40,7 +40,7 @@ router
   })
   // First step: Create club record with name, description, symbol and deposited?
   .post(async (req: MulterRequest, res: NextApiResponse, next) => {
-    let profileImgPath = 'club_profile/default_profile.png';
+    let profileImgPath = 'club_profile/default_club.png';
     console.log(req.body, req.file);
     try {
       const { id } = await adminFirestore
@@ -61,7 +61,7 @@ router
         console.log('trying to upload profile')
         console.log(req.file.club_image.filepath)
         const options = {
-          destination: `club_profile/${uid}/${req.file.club_image.newFilename}`,
+          destination: `club_profile/${req.file.club_image.newFilename}`,
           contentType: req.file.club_image.mimetype
         }
         const uploadResult = await adminStorage.upload(req.file.club_image.filepath, options);
@@ -86,13 +86,6 @@ router
       res.end();
     }
   });
-  // 
-  // .use(async (req: MulterRequest, res, next) => {
-  //   if (req.body.club_image) {
-  //     upload.single("club_image");
-  //   }
-  //   res.status(200).send({file: req.file});
-  // });
 
 // Create a nextConnect router, with error checks as first middlewares
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
 
 interface IFeeEstimateProps {
-  eth: number;
+  eth: string;
   usd?: number;
   className?: string;
 }

@@ -17,6 +17,7 @@ interface ButtonProps {
   children?: React.ReactNode;
   type?: "button" | "reset" | "submit";
   loading?: boolean;
+  spinnerColor?: string;
 }
 
 export const Button = ({
@@ -47,7 +48,7 @@ export const Button = ({
       onClick={props.onClick}
       disabled={props.disabled || loading}
     >
-      {loading ? <Spinner size={24}/> : props.children}
+      {loading ? <Spinner size={24} color={props.spinnerColor}/> : props.children}
     </button>
   );
 };
