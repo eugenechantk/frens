@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { createRouter } from "next-connect";
 import formidable from "formidable";
 import { adminFirestore, adminStorage } from "../../../firebase/firebaseAdmin";
+import { getDownloadURL, ref } from "firebase/storage";
+import { clientStorage } from "../../../firebase/firebaseClient";
 
 interface MulterRequest extends NextApiRequest {
   body: any;
@@ -40,7 +42,7 @@ router
   })
   // First step: Create club record with name, description, symbol and deposited?
   .post(async (req: MulterRequest, res: NextApiResponse, next) => {
-    let profileImgPath = 'club_profile/default_club.png';
+    let profileImgPath;
     console.log(req.body, req.file);
     try {
       const { id } = await adminFirestore
@@ -66,11 +68,14 @@ router
         }
         const uploadResult = await adminStorage.upload(req.file.club_image.filepath, options);
         console.log(uploadResult);
-        profileImgPath = uploadResult[0].metadata.name;
+        // profileImgPath = uploadResult[0].metadata.name;
+        profileImgPath = await getDownloadURL(ref(clientStorage, uploadResult[0].metadata.name))
       } catch (error) {
         res.status(501).send({ error: `error: ${error}` });
         res.end();
       }
+    } else {
+      profileImgPath = await getDownloadURL(ref(clientStorage, 'club_profile/default_club.png'))
     }
     // Third step: update profile image field of the club
     try {

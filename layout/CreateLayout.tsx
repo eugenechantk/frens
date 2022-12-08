@@ -34,7 +34,7 @@ export default function CreateLayout({
           p-4 z-10"
         >
           <h3 className=" leading-8 font-bold md:order-1 order-2 grow ">Create your club</h3>
-          <Button variant="secondary-outline" className="md:order-2 order-1" onClick={() => router.push('/dashboard')}>
+          <Button variant="secondary-outline" className="md:order-2 order-1" onClick={() => router.push('/clubs')}>
             <XMarkIcon className="w-5"/>
           </Button>
         </div>

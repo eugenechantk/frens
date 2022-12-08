@@ -7,6 +7,7 @@ import { signInMessage } from "../../lib/ethereum";
 import { signInWithCustomToken } from "firebase/auth";
 import { firebaseClientAuth } from "../../firebase/firebaseClient";
 import { useAuth } from "../../lib/auth";
+import { useRouter } from "next/router";
 
 interface IAccountButtonProps {
   onClick?: (e: any) => void;
@@ -20,6 +21,7 @@ export default function AccountButton({
 }: IAccountButtonProps) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
@@ -68,6 +70,7 @@ export default function AccountButton({
     try {
       const userCred = await signInWithCustomToken(firebaseClientAuth, token);
       setLoading(false);
+      router.push('/clubs')
     } catch (err) {
       console.log(err);
       setLoading(false);
