@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { getAuth, User } from "firebase/auth";
+import { User } from "firebase/auth";
 import nookies from "nookies";
-import { firebaseClient, firebaseClientAuth } from "../firebase/firebaseClient";
+import { firebaseClientAuth } from "../firebase/firebaseClient";
 
 const AuthContext = createContext<{ user: User | null }>({
   user: null,
@@ -30,6 +30,16 @@ export function AuthProvider({ children }: any) {
       nookies.set(null, "token", token, {path: '/'});
     });
   },[]);
+
+  useEffect(() => {
+    const handle = setInterval(async () => {
+      const user = firebaseClientAuth.currentUser;
+      if (user) await user.getIdToken(true);
+    }, 10 * 60 * 1000);
+
+    // clean up setInterval
+    return () => clearInterval(handle);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
