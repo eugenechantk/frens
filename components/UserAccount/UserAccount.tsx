@@ -10,7 +10,6 @@ import { signOut } from "firebase/auth";
 import { firebaseClientAuth } from "../../firebase/firebaseClient";
 import defaultProfilePic from '../../public/default_avatar.png'
 import { StaticImageData } from "next/image";
-import { useRouter } from "next/router";
 
 export default function UserAccount() {
   const { user } = useAuth();
@@ -18,7 +17,6 @@ export default function UserAccount() {
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [profilePicUrl, setProfilePicUrl] = useState<string | StaticImageData>(defaultProfilePic);
   const [tooltip, setTooltip] = useState("Copy wallet address");
-  const router = useRouter();
 
   useEffect(() => {
     if (user) {
@@ -43,7 +41,6 @@ export default function UserAccount() {
         throw err;
       }
       setExpand(false);
-      router.push('/clubs');
     });
   };
 
