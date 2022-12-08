@@ -17,7 +17,7 @@ const Home: NextPage = () => {
         <h1 className="text-6xl font-bold text-primary-600 mb-8">
           Welcome to frens
         </h1>
-        <Button onClick={() => router.push('/create')}>
+        <Button onClick={() => router.push('/clubs')}>
           <h3>Get started</h3>
         </Button>
       </main>
