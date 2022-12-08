@@ -42,7 +42,7 @@ router
   })
   // First step: Create club record with name, description, symbol and deposited?
   .post(async (req: MulterRequest, res: NextApiResponse, next) => {
-    let profileImgPath = 'club_profile/default_club.png';
+    let profileImgPath;
     console.log(req.body, req.file);
     try {
       const { id } = await adminFirestore
@@ -74,6 +74,8 @@ router
         res.status(501).send({ error: `error: ${error}` });
         res.end();
       }
+    } else {
+      profileImgPath = await getDownloadURL(ref(clientStorage, 'club_profile/default_club.png'))
     }
     // Third step: update profile image field of the club
     try {
