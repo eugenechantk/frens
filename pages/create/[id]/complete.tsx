@@ -67,7 +67,7 @@ const StepComplete: NextPageWithLayout<any> = (
           In your club, you can raise money from your friends and invest
           together in cryptocurrencies
         </p>
-        <Button className="w-[245px]" onClick={() => router.push(`/${id}`)}>
+        <Button className="w-[245px]" onClick={() => router.push(`/clubs/${id}`)}>
           <h3>Go to club</h3>
         </Button>
       </div>
