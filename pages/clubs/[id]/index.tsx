@@ -38,7 +38,7 @@ export const getServerSideProps = async (context: any) => {
 };
 
 const Dashboard: NextPageWithLayout<any> = (serverProps: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  console.log(serverProps)
+  // console.log(serverProps)
   const user = useAuth();
   const router = useRouter();
   // console.log(user && user.user)
