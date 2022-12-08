@@ -1,11 +1,10 @@
-import React, { ReactElement, useEffect } from "react";
+import React, { ReactElement } from "react";
 import AppLayout from "../../layout/AppLayout";
 import { useRouter } from "next/router";
 import { useAuth } from "../../lib/auth";
 import { NextPageWithLayout } from "../_app";
 import { Button } from "../../components/Button/Button";
 import ClubCard from "../../components/ClubCard/ClubCard";
-import defaultImg from "../../public/default_club.png";
 import nookies from "nookies";
 import { firebaseAdmin } from "../../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
@@ -113,44 +112,40 @@ const ClubList: NextPageWithLayout<any> = (
   return (
     <div className="h-full w-full py-8 md:py-12 px-4 md:px-6">
       <div className="flex flex-col gap-6 md:gap-8 max-w-[1000px] mx-auto">
-        {user.user ? (
-          <>
-            {/* Title and create button for desktop */}
-            <div className="flex flex-row items-start justify-between w-full">
-              <h1>My clubs</h1>
+        {/* Title and create button for desktop */}
+        <div className="flex flex-row items-start justify-between w-full">
+          <h1>My clubs</h1>
+          <Button
+            className="w-[218px] hidden md:block"
+            onClick={() => router.push("/create")}
+          >
+            <h3>Create new club</h3>
+          </Button>
+        </div>
+        {/* Club cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 w-full justify-items-center">
+          {serverProps.clubData && (
+            <>
+              {serverProps.clubData.map((club, index) => {
+                return (
+                  <ClubCard
+                    key={index}
+                    clubName={club.club_name}
+                    clubDes={club.club_description}
+                    profileImgUrl={club.club_image}
+                    onClick={() => router.push(`/clubs/${club.club_id}`)}
+                  />
+                );
+              })}
               <Button
-                className="w-[218px] hidden md:block"
+                className="w-[218px] block md:hidden mb-6"
                 onClick={() => router.push("/create")}
               >
                 <h3>Create new club</h3>
               </Button>
-            </div>
-            {/* Club cards */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 w-full justify-items-center">
-              {serverProps.clubData && (
-                <>
-                  {serverProps.clubData.map((club, index) => {
-                    return (
-                      <ClubCard
-                        key={index}
-                        clubName={club.club_name}
-                        clubDes={club.club_description}
-                        profileImgUrl={club.club_image}
-                        onClick={() => router.push(`/clubs/${club.club_id}`)}
-                      />
-                    );
-                  })}
-                  <Button
-                    className="w-[218px] block md:hidden mb-6"
-                    onClick={() => router.push("/create")}
-                  >
-                    <h3>Create new club</h3>
-                  </Button>
-                </>
-              )}
-            </div>
-          </>
-        ) : <h3>You need to login to see all your clubs</h3>}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
