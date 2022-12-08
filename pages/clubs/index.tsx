@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useEffect } from "react";
 import AppLayout from "../../layout/AppLayout";
 import { useRouter } from "next/router";
 import { useAuth } from "../../lib/auth";
