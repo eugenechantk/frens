@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { lazy, ReactElement, Suspense } from "react";
 import AppLayout from "../../../layout/AppLayout";
 import { NextPageWithLayout } from "../../_app";
 import { useAuth } from "../../../lib/auth";
@@ -9,7 +9,13 @@ import ClubDetails from "../../../components/ClubDetails/ClubDetails";
 import ClubMembers from "../../../components/ClubMembers/ClubMembers";
 import ClubBalance from "../../../components/ClubBalance/ClubBalance";
 import Portfolio from "../../../components/Portfolio/Portfolio";
-
+import { Theme, SwapWidget } from "@uniswap/widgets";
+import { provider } from "../../../lib/provider";
+import { getChainData } from "./../../../lib/chains";
+import LoadingTradeAsset from "../../../components/TradeAsset/LoadingTradeAsset";
+const TradeAsset = lazy(
+  () => import("../../../components/TradeAsset/TradeAsset")
+);
 
 // export const getServerSideProps = async (context: any) => {
 //   const { id } = context.params;
@@ -58,14 +64,14 @@ const Dashboard: NextPageWithLayout<any> = () => {
         </div>
         {/* Balance */}
         {/* TODO: have a global state setting for whether to show club or me balance */}
-        <ClubBalance/>
+        <ClubBalance />
         {/* Portfolio */}
         <Portfolio />
       </div>
       {/* Right panel */}
-      <p className="w-full md:w-[376px] h-[505px] bg-gray-200 shrink-0 rounded-20 p-6">
-        Widget area
-      </p>
+      <Suspense fallback={<LoadingTradeAsset/>}>
+        <TradeAsset />
+      </Suspense>
     </div>
   );
 };
