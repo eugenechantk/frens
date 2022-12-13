@@ -8,6 +8,7 @@ import { InferGetServerSidePropsType } from "next";
 import ClubDetails from "../../../components/ClubDetails/ClubDetails";
 import ClubMembers from "../../../components/ClubMembers/ClubMembers";
 import ClubBalance from "../../../components/ClubBalance/ClubBalance";
+import Portfolio from "../../../components/Portfolio/Portfolio";
 
 
 // export const getServerSideProps = async (context: any) => {
@@ -59,6 +60,7 @@ const Dashboard: NextPageWithLayout<any> = () => {
         {/* TODO: have a global state setting for whether to show club or me balance */}
         <ClubBalance/>
         {/* Portfolio */}
+        <Portfolio />
       </div>
       {/* Right panel */}
       <p className="w-full md:w-[376px] h-[505px] bg-gray-200 shrink-0 rounded-20 p-6">
