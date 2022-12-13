@@ -23,7 +23,7 @@ export default function AssetStatus({ variant, value, className }: IAssetStatusP
       )}
     >
       <p>{variant === "change" ? "Profit and loss" : "total assets"}</p>
-      <div className="flex flex-row items-center gap-1">
+      <div className="flex flex-row items-center gap-1 w-full">
         {variant === "change" && (
           <div className="w-6 h-6">
             <Image
@@ -32,7 +32,7 @@ export default function AssetStatus({ variant, value, className }: IAssetStatusP
             />
           </div>
         )}
-        <h3 className="">{`$${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}</h3>
+        <h3 className="min-w-0 text-clip overflow-hidden">{`$${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`}</h3>
       </div>
     </div>
   );
