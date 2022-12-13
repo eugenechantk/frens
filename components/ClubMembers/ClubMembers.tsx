@@ -17,10 +17,9 @@ export default function ClubMembers() {
       <div className="flex flex-row">
         {members.map((member, index) => {
           return (
-            <>
+            <div key={index} className="first:ml-0 -ml-1">
               <div
-                className="w-8 h-8 rounded-full outline-2 outline-secondary-600 relative first:ml-0 -ml-1"
-                key={index}
+                className="w-8 h-8 rounded-full outline-2 outline-secondary-600 relative"
                 id={`member-${index}`}
                 data-for={`member-${index}-tooltip`}
                 data-tip={member.startsWith('0x') ? `${member.slice(0, 6)}...${member.slice(-4)}` : member}
@@ -33,7 +32,7 @@ export default function ClubMembers() {
                 effect="solid"
                 className="rounded-8"
               />
-            </>
+            </div>
           );
         })}
       </div>
