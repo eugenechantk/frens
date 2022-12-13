@@ -19,7 +19,7 @@ const swapWidgetTheme: Theme = {
 
 export default function TradeAsset() {
   return (
-    <div className="w-full md:w-[376px] border border-secondary-300 shrink-0 rounded-20 p-2 flex flex-col items-start gap-2">
+    <>
       <h3 className="mt-[6px] ml-3">Invest in club assets</h3>
       <SwapWidget
         provider={provider}
@@ -27,6 +27,6 @@ export default function TradeAsset() {
         width="100%"
         theme={swapWidgetTheme}
       />
-    </div>
+    </>
   );
 }

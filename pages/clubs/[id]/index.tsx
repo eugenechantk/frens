@@ -12,10 +12,10 @@ import Portfolio from "../../../components/Portfolio/Portfolio";
 import { Theme, SwapWidget } from "@uniswap/widgets";
 import { provider } from "../../../lib/provider";
 import { getChainData } from "./../../../lib/chains";
-import LoadingTradeAsset from "../../../components/TradeAsset/LoadingTradeAsset";
-const TradeAsset = lazy(
-  () => import("../../../components/TradeAsset/TradeAsset")
-);
+import LoadingTradeAsset from "../../../components/Widgets/LoadingWidget";
+import Toggle from "../../../components/Widgets/Toggle";
+import WidgetSection from "../../../components/Widgets/WidgetSection";
+const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
 
 // export const getServerSideProps = async (context: any) => {
 //   const { id } = context.params;
@@ -69,9 +69,7 @@ const Dashboard: NextPageWithLayout<any> = () => {
         <Portfolio />
       </div>
       {/* Right panel */}
-      <Suspense fallback={<LoadingTradeAsset/>}>
-        <TradeAsset />
-      </Suspense>
+      <WidgetSection/>
     </div>
   );
 };
