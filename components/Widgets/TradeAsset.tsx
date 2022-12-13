@@ -14,7 +14,6 @@ const swapWidgetTheme: Theme = {
   module: "#EAE7E1",
   interactive: "#D7D4CD",
   dialog: "#F2F0EB",
-  fontFamily: "Montserrat",
 };
 
 export default function TradeAsset() {

@@ -9,5 +9,4 @@ module.exports = {
       }
     ]
   },
-  optimizeFonts: false,
 }
