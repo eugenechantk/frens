@@ -70,7 +70,7 @@ export default function UserAccount() {
           flex flex-col items-start p-6 gap-4 
           border border-secondary-300 
           bg-secondary-200 
-          rounded-20 w-[279px]"
+          rounded-20 w-[279px] z-10"
           >
             <div className="flex flex-col items-start gap-0">
               <p className=" text-sm font-bold text-secondary-600 uppercase">
