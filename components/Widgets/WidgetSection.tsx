@@ -1,6 +1,6 @@
 import React, { lazy, useState, Suspense } from "react";
 import LoadingWidget from "./LoadingWidget";
-import WidgetToggle from "./Toggle";
+import WidgetToggle from "./WidgetToggle";
 const TradeAsset = lazy(() => import("./TradeAsset"));
 const BuyIn = lazy(() => import("./BuyInWidget"));
 

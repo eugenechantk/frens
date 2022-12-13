@@ -9,11 +9,6 @@ import ClubDetails from "../../../components/ClubDetails/ClubDetails";
 import ClubMembers from "../../../components/ClubMembers/ClubMembers";
 import ClubBalance from "../../../components/ClubBalance/ClubBalance";
 import Portfolio from "../../../components/Portfolio/Portfolio";
-import { Theme, SwapWidget } from "@uniswap/widgets";
-import { provider } from "../../../lib/provider";
-import { getChainData } from "./../../../lib/chains";
-import LoadingTradeAsset from "../../../components/Widgets/LoadingWidget";
-import Toggle from "../../../components/Widgets/Toggle";
 import WidgetSection from "../../../components/Widgets/WidgetSection";
 const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
 
@@ -56,7 +51,7 @@ const Dashboard: NextPageWithLayout<any> = () => {
   return (
     <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
       {/* Left panel */}
-      <div className="flex flex-col items-start gap-8">
+      <div className="flex flex-col items-start gap-8 w-full">
         {/* Club details and members */}
         <div className="flex flex-col items-start gap-4 w-full">
           <ClubDetails />
