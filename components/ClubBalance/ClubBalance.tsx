@@ -9,7 +9,7 @@ export default function ClubBalance() {
             <AssetStatus variant="change" value={7531.21} className="grow" />
             <AssetStatus variant="total" value={2347682.12} className="grow" />
           </div>
-          <div className=" order-1 md:order-2 shrink-0 md:w-[150px]">
+          <div className=" order-1 md:order-2 shrink-0 w-7/12 min-w-[150px] md:w-[150px]">
             <Toggle/>
           </div>
         </div>
