@@ -12,39 +12,71 @@ import Portfolio from "../../../components/Portfolio/Portfolio";
 import WidgetSection from "../../../components/Widgets/WidgetSection";
 const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
 
-// export const getServerSideProps = async (context: any) => {
-//   const { id } = context.params;
-//   const clubInfo = await firebaseAdmin
-//     .firestore()
-//     .collection("clubs")
-//     .doc(id)
-//     .get()
-//     .then((doc) => {
-//       if(!doc.exists) {
-//         return {
-//           notFound: true,
-//         };
-//       }
-//       return doc.data()
-//     }).then((data) => {
-//       return {
-//         props: {
-//           ...data
-//         }
-//       }
-//     }).catch((err) => {
-//       console.log(err);
-//       return {
-//         notFound: true,
-//       };
-//     });
-//   return {
-//     ...clubInfo
-//   };
-// };
+type ClubInfo = {
+  club_description: string;
+  club_image: string;
+  club_name: string;
+  club_token_sym: string;
+  club_wallet_address: string;
+  club_wallet_mnemonic: string;
+  deposited: boolean;
+  club_members: string[];
+};
 
-const Dashboard: NextPageWithLayout<any> = () => {
-  // console.log(serverProps)
+const fetchClubInfo = async (id: string) => {
+  try {
+    const _clubInfo = await firebaseAdmin
+    .firestore()
+    .collection("clubs")
+    .doc(id)
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        throw new Error('club does not exist in database')
+      }
+      return doc.data() as ClubInfo;
+    })
+    .then((data) => {
+      const { club_name, club_description, club_image, club_members, club_wallet_address } = data!;
+      return {
+        club_name,
+        club_description,
+        club_image,
+        club_members,
+        club_wallet_address,
+      };
+    })
+    return _clubInfo
+  } catch (err) {
+    throw err
+  }
+};
+
+const fetchPortfolio = async (address: string) => {
+  
+}
+
+export const getServerSideProps = async (context: any) => {
+  const { id } = context.params;
+  console.log(id);
+  try {
+    const clubInfo = await fetchClubInfo(id);
+    console.log(clubInfo)
+  } catch (err) {
+    console.log(err)
+  }
+  
+  
+  return {
+    props: {
+    },
+  };
+};
+
+const Dashboard: NextPageWithLayout<any> = ({
+  ...serverProps
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  console.log(serverProps);
   const user = useAuth();
   const router = useRouter();
   // console.log(user && user.user)
@@ -64,7 +96,7 @@ const Dashboard: NextPageWithLayout<any> = () => {
         <Portfolio />
       </div>
       {/* Right panel */}
-      <WidgetSection/>
+      <WidgetSection />
     </div>
   );
 };
