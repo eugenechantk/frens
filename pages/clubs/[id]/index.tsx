@@ -26,7 +26,7 @@ export interface IClubInfo {
   club_wallet_mnemonic?: string;
   deposited?: boolean;
   club_members: string[];
-};
+}
 
 export type THoldingsData = {
   token_address: string;
@@ -49,7 +49,13 @@ export const getServerSideProps = async (context: any) => {
   const cookies = nookies.get(context);
   // console.log(cookies)
   // console.log(id);
-
+  if (!cookies.token) {
+    return {
+      props: {
+        error: "user not authed",
+      },
+    };
+  }
   // Fetch function for club information
   const fetchClubInfo = async (id: string) => {
     try {
@@ -95,10 +101,12 @@ export const getServerSideProps = async (context: any) => {
         memberInfo.push({
           display_name: _memberInfo.displayName!,
           profile_image: _memberInfo.photoURL!,
-          uid: _memberInfo.uid
+          uid: _memberInfo.uid,
         });
       })
-    ).catch((err) => {throw err});
+    ).catch((err) => {
+      throw err;
+    });
     return memberInfo;
   };
 
@@ -168,9 +176,9 @@ export const getServerSideProps = async (context: any) => {
   if (!cookies.token) {
     return {
       props: {
-        error: 'Not authed'
-      }
-    }
+        error: "Not authed",
+      },
+    };
   } else {
     try {
       const clubInfo: IClubInfo = await fetchClubInfo(id);
@@ -191,8 +199,8 @@ export const getServerSideProps = async (context: any) => {
       console.log(err);
       return {
         props: {
-          error: err
-        }
+          error: err,
+        },
       };
     }
   }
@@ -205,23 +213,27 @@ const Dashboard: NextPageWithLayout<any> = ({
   // console.log(user && user.user)
   return (
     <>
-    {!serverProps.error ? (<div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
-      {/* Left panel */}
-      <div className="flex flex-col items-start gap-8 w-full">
-        {/* Club details and members */}
-        <div className="flex flex-col items-start gap-4 w-full">
-          <ClubDetails data={serverProps.clubInfo!} />
-          <ClubMembers data={serverProps.members!} />
+      {!serverProps.error ? (
+        <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
+          {/* Left panel */}
+          <div className="flex flex-col items-start gap-8 w-full">
+            {/* Club details and members */}
+            <div className="flex flex-col items-start gap-4 w-full">
+              <ClubDetails data={serverProps.clubInfo!} />
+              <ClubMembers data={serverProps.members!} />
+            </div>
+            {/* Balance */}
+            {/* TODO: have a global state setting for whether to show club or me balance */}
+            <ClubBalance />
+            {/* Portfolio */}
+            <Portfolio data={serverProps.balance!} />
+          </div>
+          {/* Right panel */}
+          <WidgetSection />
         </div>
-        {/* Balance */}
-        {/* TODO: have a global state setting for whether to show club or me balance */}
-        <ClubBalance />
-        {/* Portfolio */}
-        <Portfolio data={serverProps.balance!}/>
-      </div>
-      {/* Right panel */}
-      <WidgetSection />
-    </div>) : <NotAuthed />}
+      ) : (
+        <NotAuthed />
+      )}
     </>
   );
 };
