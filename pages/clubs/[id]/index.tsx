@@ -16,7 +16,7 @@ import _ from "lodash";
 const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
 
 export type TClubInfo = {
-  club_description?: string;
+  club_description: string;
   club_image: string;
   club_name: string;
   club_token_sym?: string;
@@ -39,7 +39,7 @@ export type THoldingsData = {
 export type TMemberInfoData = {
   display_name: string;
   profile_image: string;
-  uid?: string;
+  uid: string;
 };
 
 export const getServerSideProps = async (context: any) => {
@@ -91,6 +91,7 @@ export const getServerSideProps = async (context: any) => {
         memberInfo.push({
           display_name: _memberInfo.displayName!,
           profile_image: _memberInfo.photoURL!,
+          uid: _memberInfo.uid
         });
       })
     );
@@ -166,25 +167,23 @@ export const getServerSideProps = async (context: any) => {
     const balance: THoldingsData[] = await fetchPortfolio(
       clubInfo.club_wallet_address
     );
-    const memberInfo = await fetchMemberInfo(clubInfo.club_members);
+    const memberInfo: TMemberInfoData[] = await fetchMemberInfo(
+      clubInfo.club_members
+    );
     return {
       props: {
         clubInfo: {
-          ...clubInfo
+          ...clubInfo,
         },
-        balance: {
-          ...balance
-        },
-        members: {
-          ...memberInfo
-        }
-      }
-    }
+        balance: balance,
+        members: memberInfo,
+      },
+    };
   } catch (err) {
     console.log(err);
     return {
-      notFound:true
-    }
+      notFound: true,
+    };
   }
 };
 
@@ -201,8 +200,8 @@ const Dashboard: NextPageWithLayout<any> = ({
       <div className="flex flex-col items-start gap-8 w-full">
         {/* Club details and members */}
         <div className="flex flex-col items-start gap-4 w-full">
-          <ClubDetails />
-          <ClubMembers />
+          <ClubDetails data={serverProps.clubInfo} />
+          <ClubMembers data={serverProps.members} />
         </div>
         {/* Balance */}
         {/* TODO: have a global state setting for whether to show club or me balance */}
