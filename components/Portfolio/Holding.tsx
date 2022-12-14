@@ -1,40 +1,87 @@
-import React from 'react'
-import defaultIcon from '../../public/default_avatar.png'
-import Image from 'next/image'
-import _ from 'lodash'
-import { BigNumber, ethers } from 'ethers'
-import { THoldingsData } from '../../pages/clubs/[id]'
+import React, { useEffect, useState } from "react";
+import defaultIcon from "../../public/default_avatar.png";
+import Image from "next/image";
+import _ from "lodash";
+import { BigNumber, ethers } from "ethers";
+import { THoldingsData } from "../../pages/clubs/[id]";
+import axios from "axios";
+import { getChainData } from "../../lib/chains";
 
-export default function Holding({data}: {data: THoldingsData}) {
+export default function Holding({ data }: { data: THoldingsData }) {
+  const [usd, setUsd] = useState(0)
+  useEffect(() => {
+    const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
+    const getUsdPrice = async () =>
+      await axios
+        .request({
+          method: "GET",
+          url: `https://min-api.cryptocompare.com/data/price?fsym=${data.symbol.toUpperCase()}&tsyms=USD
+      `,
+        })
+        .then((response) => response.data.USD)
+        .catch(() => 0);
+    getUsdPrice()
+      .then((usdPrice) => {
+        setUsd(
+          usdPrice *
+          Number(
+            ethers.utils.formatUnits(
+              BigNumber.from(data.balance),
+              data.decimals
+            )
+          ));
+      })
+      .catch(() => 0);
+  }, []);
+  console.log(usd)
   return (
-    <div className='flex flex-row items-start pt-6 gap-3 w-full'>
+    <div className="flex flex-row items-start pt-6 gap-3 w-full">
       {/* Icon */}
-      <div className=' w-10 h-10 border border-secondary-300 rounded-8 flex flex-col items-center'>
-        <Image src={`https://cryptoicons.org/api/color/${data.symbol.toLowerCase()}/24`} alt={`${data.name} icon`} width={24} height={24} className="mx-auto my-auto"/>
+      <div className=" w-10 h-10 border border-secondary-300 rounded-8 flex flex-col items-center">
+        <Image
+          src={`https://cryptoicons.org/api/color/${data.symbol.toLowerCase()}/24`}
+          alt={`${data.name} icon`}
+          width={24}
+          height={24}
+          className="mx-auto my-auto"
+        />
       </div>
       {/* Holding details */}
-      <div className='flex flex-col items-start pb-5 grow gap-1 border-b border-b-secondary-300'>
+      <div className="flex flex-col items-start pb-5 grow gap-1 border-b border-b-secondary-300">
         {/* First line */}
-        <div className='flex flex-row justify-between items-start w-full'>
+        <div className="flex flex-row justify-between items-start w-full">
           {/* Token full name */}
           <h5>{_.upperFirst(data.name)}</h5>
           {/* USD value */}
-          <div className='flex flex-row items-start gap-1'>
-            <h5>{"12345678".toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</h5>
-            <h5 className='text-gray-400'>US$</h5>
+          <div className="flex flex-row items-start gap-1">
+            <h5>
+              {String(usd.toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+            </h5>
+            <h5 className="text-gray-400">US$</h5>
           </div>
         </div>
         {/* Second line */}
-        <div className='flex flex-row justify-between items-start w-full'>
+        <div className="flex flex-row justify-between items-start w-full">
           {/* Token symbol */}
-          <p className='text-sm font-medium text-gray-400'>{_.upperCase(data.symbol)}</p>
+          <p className="text-sm font-medium text-gray-400">
+            {_.upperCase(data.symbol)}
+          </p>
           {/* Balance */}
-          <div className='flex flex-row items-start gap-1'>
-            <p className='text-sm font-medium text-gray-400'>{Number(ethers.utils.formatUnits(BigNumber.from(data.balance),data.decimals)).toFixed(5)}</p>
-            <p className='text-sm font-medium text-gray-400'>{_.upperCase(data.symbol)}</p>
+          <div className="flex flex-row items-start gap-1">
+            <p className="text-sm font-medium text-gray-400">
+              {Number(
+                ethers.utils.formatUnits(
+                  BigNumber.from(data.balance),
+                  data.decimals
+                )
+              ).toFixed(5)}
+            </p>
+            <p className="text-sm font-medium text-gray-400">
+              {_.upperCase(data.symbol)}
+            </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
