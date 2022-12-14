@@ -49,13 +49,6 @@ export const getServerSideProps = async (context: any) => {
   const cookies = nookies.get(context);
   // console.log(cookies)
   // console.log(id);
-  if (!cookies.token) {
-    return {
-      props: {
-        error: "user not authed",
-      },
-    };
-  }
   // Fetch function for club information
   const fetchClubInfo = async (id: string) => {
     try {
@@ -173,6 +166,7 @@ export const getServerSideProps = async (context: any) => {
       throw err;
     }
   };
+  
   if (!cookies.token) {
     return {
       props: {
