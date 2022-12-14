@@ -83,7 +83,7 @@ const CreateClub: NextPageWithLayout<any> = ({
     formData.append("club_image", clubProfileFile);
     formData.append("user_id", user.user?.uid!);
 
-    console.log(formData);
+    // console.log(formData);
     // Make a post request to /api/create/club endpoint
     const config = {
       headers: { "content-type": "multipart/form-data" },

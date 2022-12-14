@@ -50,7 +50,7 @@ export const getServerSideProps = async (context: any) => {
 const StepComplete: NextPageWithLayout<any> = (
   serverProps: InferGetServerSidePropsType<typeof getServerSideProps>
 ) => {
-  console.log(serverProps);
+  // console.log(serverProps);
   const router = useRouter();
   const { id } = router.query;
   return (
