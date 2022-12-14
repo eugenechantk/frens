@@ -11,8 +11,28 @@ import { provider } from "../../../lib/provider";
 import { clientFireStore } from "../../../firebase/firebaseClient";
 import { doc, DocumentData, getDoc, updateDoc } from "firebase/firestore";
 import { ethers } from "ethers";
+import nookies from "nookies";
+import { InferGetServerSidePropsType } from "next";
+import NotAuthed from "../../../components/NotAuthed/NotAuthed";
 
-const StepTwo: NextPageWithLayout<any> = () => {
+export const getServerSideProps = async (context: any) => {
+  const cookies = nookies.get(context);
+  if (!cookies.token) {
+    return {
+      props: {
+        error: "user not authed",
+      },
+    };
+  } else {
+    return {
+      props: {},
+    };
+  }
+};
+
+const StepTwo: NextPageWithLayout<any> = ({
+  ...serverProps
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<any>();
@@ -25,6 +45,7 @@ const StepTwo: NextPageWithLayout<any> = () => {
 
   const initClubWallet = async () => {
     console.log("Initializing club wallet");
+    setError(null);
     setLoading(true);
     // Step 1: get the address of the club wallet
     await handleClubWalletCreate()
@@ -110,56 +131,62 @@ const StepTwo: NextPageWithLayout<any> = () => {
   };
 
   return (
-    <div className="grow flex flex-col items-center gap-4 w-full">
-      <Spinner success={success} error={error} />
-      {success ? (
-        <>
-          <h3 className="text-center">Creation fee received</h3>
-          <p className="text-center">
-            Next, we will create your club that allows you to raise fund and
-            invest together with your friends
-          </p>
-        </>
-      ) : error ? (
-        <>
-          <h3 className="text-center">Fail to receive fee</h3>
-          <p className="text-center">
-            {/* TODO: Change the ETH amount in the text */}
-            We have difficulty receiving the creation fee. Make sure your wallet
-            has at least {process.env.NEXT_PUBLIC_CLUB_DEPOSIT} ETH before
-            trying again
-          </p>
-          <Button
-            className="w-[245px]"
-            onClick={(e) => {
-              e.preventDefault();
-              initClubWallet();
-            }}
-            loading={loading}
-          >
-            <h3>Initiate payment again</h3>
-          </Button>
-        </>
+    <>
+      {!serverProps.error ? (
+        <div className="grow flex flex-col items-center gap-4 w-full">
+          <Spinner success={success} error={error} />
+          {success ? (
+            <>
+              <h3 className="text-center">Creation fee received</h3>
+              <p className="text-center">
+                Next, we will create your club that allows you to raise fund and
+                invest together with your friends
+              </p>
+            </>
+          ) : error ? (
+            <>
+              <h3 className="text-center">Fail to receive fee</h3>
+              <p className="text-center">
+                {/* TODO: Change the ETH amount in the text */}
+                We have difficulty receiving the creation fee. Make sure your
+                wallet has at least {process.env.NEXT_PUBLIC_CLUB_DEPOSIT} ETH
+                before trying again
+              </p>
+              <Button
+                className="w-[245px]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  initClubWallet();
+                }}
+                loading={loading}
+              >
+                <h3>Initiate payment again</h3>
+              </Button>
+            </>
+          ) : (
+            <>
+              <h3 className="text-center">Receiving creation fee...</h3>
+              <p className="text-center">
+                If you do not receive a notification for payment in 30 seconds,
+                press the “Initiate payment again” button below
+              </p>
+              <Button
+                variant="secondary"
+                className="w-[245px]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  initClubWallet();
+                }}
+              >
+                <h3>Initiate payment again</h3>
+              </Button>
+            </>
+          )}
+        </div>
       ) : (
-        <>
-          <h3 className="text-center">Receiving creation fee...</h3>
-          <p className="text-center">
-            If you do not receive a notification for payment in 30 seconds,
-            press the “Initiate payment again” button below
-          </p>
-          <Button
-            variant="secondary"
-            className="w-[245px]"
-            onClick={(e) => {
-              e.preventDefault();
-              initClubWallet();
-            }}
-          >
-            <h3>Initiate payment again</h3>
-          </Button>
-        </>
+        <NotAuthed />
       )}
-    </div>
+    </>
   );
 };
 

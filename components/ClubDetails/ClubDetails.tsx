@@ -2,9 +2,9 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "../Button/Button";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
-import { TClubInfo } from "../../pages/clubs/[id]";
+import { IClubInfo } from "../../pages/clubs/[id]";
 
-export default function ClubDetails({data}:{data: TClubInfo}) {
+export default function ClubDetails({data}:{data: IClubInfo}) {
   // console.log('data parsed into ClubDetails', data);
   return (
     <div className="flex flex-col items-start gap-3 w-full">

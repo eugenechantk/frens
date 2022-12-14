@@ -3,11 +3,12 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { adminFirestore } from "../../../firebase/firebaseAdmin";
 import { createRouter } from "next-connect";
 import bodyParser from "body-parser";
+import { IClubInfo } from "../../clubs/[id]";
 
 interface IWalletApiRequest extends NextApiRequest {
   body: {
     clubId: string;
-  }
+  };
 }
 
 const router = createRouter<IWalletApiRequest, NextApiResponse>();
@@ -16,6 +17,23 @@ router
   .use(bodyParser.json())
   .post(async (req: IWalletApiRequest, res: NextApiResponse) => {
     try {
+      // Step 0: check if the club already has a wallet initiated
+      const clubInfo = await adminFirestore
+        .collection("clubs")
+        .doc(req.body.clubId)
+        .get()
+        .then((doc) => doc.data() as IClubInfo);
+      console.log(clubInfo);
+      if (clubInfo.club_wallet_address && clubInfo.club_wallet_mnemonic) {
+        res.status(201);
+        res.send({
+          address: clubInfo.club_wallet_address,
+          mnemonic: clubInfo.club_wallet_mnemonic,
+          firestoreResult: clubInfo,
+        });
+        res.end();
+        return;
+      }
       // Step 1: Create ethers wallet
       const genEntropy = ethers.utils.hexlify(ethers.utils.randomBytes(16));
       const genMnemonic = ethers.utils.entropyToMnemonic(genEntropy);

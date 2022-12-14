@@ -13,9 +13,11 @@ import WidgetSection from "../../../components/Widgets/WidgetSection";
 import { getChainData } from "../../../lib/chains";
 import axios from "axios";
 import _ from "lodash";
+import nookies from "nookies";
+import NotAuthed from "../../../components/NotAuthed/NotAuthed";
 const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
 
-export type TClubInfo = {
+export interface IClubInfo {
   club_description: string;
   club_image: string;
   club_name: string;
@@ -24,7 +26,7 @@ export type TClubInfo = {
   club_wallet_mnemonic?: string;
   deposited?: boolean;
   club_members: string[];
-};
+}
 
 export type THoldingsData = {
   token_address: string;
@@ -44,8 +46,9 @@ export type TMemberInfoData = {
 
 export const getServerSideProps = async (context: any) => {
   const { id } = context.params;
+  const cookies = nookies.get(context);
+  // console.log(cookies)
   // console.log(id);
-
   // Fetch function for club information
   const fetchClubInfo = async (id: string) => {
     try {
@@ -58,7 +61,7 @@ export const getServerSideProps = async (context: any) => {
           if (!doc.exists) {
             throw new Error("club does not exist in database");
           }
-          return doc.data() as TClubInfo;
+          return doc.data() as IClubInfo;
         })
         .then((data) => {
           const {
@@ -91,10 +94,12 @@ export const getServerSideProps = async (context: any) => {
         memberInfo.push({
           display_name: _memberInfo.displayName!,
           profile_image: _memberInfo.photoURL!,
-          uid: _memberInfo.uid
+          uid: _memberInfo.uid,
         });
       })
-    );
+    ).catch((err) => {
+      throw err;
+    });
     return memberInfo;
   };
 
@@ -161,55 +166,67 @@ export const getServerSideProps = async (context: any) => {
       throw err;
     }
   };
-
-  try {
-    const clubInfo: TClubInfo = await fetchClubInfo(id);
-    const balance: THoldingsData[] = await fetchPortfolio(
-      clubInfo.club_wallet_address
-    );
-    const memberInfo: TMemberInfoData[] = await fetchMemberInfo(
-      clubInfo.club_members
-    );
+  
+  if (!cookies.token) {
     return {
       props: {
-        clubInfo: clubInfo,
-        balance: balance,
-        members: memberInfo,
+        error: "Not authed",
       },
     };
-  } catch (err) {
-    console.log(err);
-    return {
-      notFound: true,
-    };
+  } else {
+    try {
+      const clubInfo: IClubInfo = await fetchClubInfo(id);
+      const balance: THoldingsData[] = await fetchPortfolio(
+        clubInfo.club_wallet_address
+      );
+      const memberInfo: TMemberInfoData[] = await fetchMemberInfo(
+        clubInfo.club_members
+      );
+      return {
+        props: {
+          clubInfo: clubInfo,
+          balance: balance,
+          members: memberInfo,
+        },
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        props: {
+          error: err,
+        },
+      };
+    }
   }
 };
 
 const Dashboard: NextPageWithLayout<any> = ({
   ...serverProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  // console.log(serverProps);
-  const user = useAuth();
-  const router = useRouter();
-  // console.log(user && user.user)
   return (
-    <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
-      {/* Left panel */}
-      <div className="flex flex-col items-start gap-8 w-full">
-        {/* Club details and members */}
-        <div className="flex flex-col items-start gap-4 w-full">
-          <ClubDetails data={serverProps.clubInfo} />
-          <ClubMembers data={serverProps.members} />
+    <>
+      {!serverProps.error ? (
+        <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
+          {/* Left panel */}
+          <div className="flex flex-col items-start gap-8 w-full">
+            {/* Club details and members */}
+            <div className="flex flex-col items-start gap-4 w-full">
+              <ClubDetails data={serverProps.clubInfo!} />
+              <ClubMembers data={serverProps.members!} />
+            </div>
+            {/* Balance */}
+            {/* TODO: have a global state setting for whether to show club or me balance */}
+            <ClubBalance />
+            {/* Portfolio */}
+            <Portfolio data={serverProps.balance!} />
+          </div>
+          {/* Right panel */}
+          <WidgetSection />
         </div>
-        {/* Balance */}
-        {/* TODO: have a global state setting for whether to show club or me balance */}
-        <ClubBalance />
-        {/* Portfolio */}
-        <Portfolio data={serverProps.balance}/>
-      </div>
-      {/* Right panel */}
-      <WidgetSection />
-    </div>
+      ) : (
+        <NotAuthed />
+      )}
+    </>
   );
 };
 
