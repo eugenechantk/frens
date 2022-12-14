@@ -209,8 +209,7 @@ export const getServerSideProps = async (context: any) => {
 const Dashboard: NextPageWithLayout<any> = ({
   ...serverProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  // console.log(serverProps);
-  // console.log(user && user.user)
+  console.log(serverProps);
   return (
     <>
       {!serverProps.error ? (
