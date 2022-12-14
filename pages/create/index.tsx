@@ -11,6 +11,7 @@ import axios from 'axios';
 import { useRouter } from "next/router";
 import * as Yup from 'yup';
 import { SubmitHandler, FormHandles } from "@unform/core";
+import { useAuth } from "../../lib/auth";
 
 interface IClubInfoData {
   clubName: string;
@@ -24,6 +25,7 @@ const CreateClub: NextPageWithLayout<any> = () => {
   const [clubName, setClubName] = useState("");
   const [clubProfileFile, setClubProfileFile] = useState<any>();
   const [createLoading, setCreateLoading] = useState(false);
+  const user = useAuth();
 
   const handleFormSubmit = async (data: IClubInfoData) => {
     // TODO: implement form handle logic for creating a club
@@ -58,7 +60,9 @@ const CreateClub: NextPageWithLayout<any> = () => {
     formData.append('club_description', data.clubDesc);
     formData.append('club_token_sym', data.tokenSym.toUpperCase());
     formData.append('club_image', clubProfileFile);
+    formData.append('user_id', user.user?.uid!);
 
+    console.log(formData)
     // Make a post request to /api/create/club endpoint
     const config = {
       headers: { 'content-type': 'multipart/form-data' },
