@@ -172,9 +172,7 @@ export const getServerSideProps = async (context: any) => {
     );
     return {
       props: {
-        clubInfo: {
-          ...clubInfo,
-        },
+        clubInfo: clubInfo,
         balance: balance,
         members: memberInfo,
       },
