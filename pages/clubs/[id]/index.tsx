@@ -44,7 +44,7 @@ export type TMemberInfoData = {
 
 export const getServerSideProps = async (context: any) => {
   const { id } = context.params;
-  console.log(id);
+  // console.log(id);
 
   // Fetch function for club information
   const fetchClubInfo = async (id: string) => {
@@ -188,7 +188,7 @@ export const getServerSideProps = async (context: any) => {
 const Dashboard: NextPageWithLayout<any> = ({
   ...serverProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  console.log(serverProps);
+  // console.log(serverProps);
   const user = useAuth();
   const router = useRouter();
   // console.log(user && user.user)

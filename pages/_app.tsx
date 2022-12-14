@@ -16,7 +16,6 @@ type AppPropsWithLayout = AppProps & {
 const montserrat = Montserrat({ subsets: ['latin'] })
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-  firebaseClient;
   const getLayout = Component.getLayout ?? ((page) => page);
   return (
     <main className={montserrat.className} style={{height: '100%', width: '100%'}}>

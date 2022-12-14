@@ -33,7 +33,7 @@ export default function Holding({ data }: { data: THoldingsData }) {
       })
       .catch(() => 0);
   }, []);
-  console.log(usd)
+  // console.log(usd)
   return (
     <div className="flex flex-row items-start pt-6 gap-3 w-full">
       {/* Icon */}
