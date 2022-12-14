@@ -207,7 +207,7 @@ const Dashboard: NextPageWithLayout<any> = ({
         {/* TODO: have a global state setting for whether to show club or me balance */}
         <ClubBalance />
         {/* Portfolio */}
-        <Portfolio />
+        <Portfolio data={serverProps.balance}/>
       </div>
       {/* Right panel */}
       <WidgetSection />
