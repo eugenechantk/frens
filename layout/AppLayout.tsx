@@ -12,7 +12,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="h-full w-full flex flex-col">
       <NavBar />
-      <main className="grow overflow-scroll">
+      <main className="grow">
         {user.user ? (
           children
         ) : (
