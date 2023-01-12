@@ -33,7 +33,6 @@ const StepThree: NextPageWithLayout<any> = ({
   const [error, setError] = useState<any>();
   const router = useRouter();
   const { id } = router.query;
-  const user = useAuth();
 
   const handleTokenCreation = async () => {
     await fetch("/api/create/token", {
@@ -43,7 +42,6 @@ const StepThree: NextPageWithLayout<any> = ({
       },
       body: JSON.stringify({
         clubId: String(id),
-        userId: String(user.user?.uid),
       }),
     })
       .then(() => {
