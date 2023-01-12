@@ -41,7 +41,6 @@ router
         club_name: req.body.club_name,
         club_description: req.body.club_description,
         club_token_sym: req.body.club_token_sym,
-        club_image: req.body.club_image,
         club_members: [],
         deposited: false,
       });
