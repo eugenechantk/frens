@@ -10,6 +10,8 @@ import { useAuth } from "../../../lib/auth";
 import nookies from "nookies";
 import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
+import axios from "axios";
+import { string } from "yup/lib/locale";
 
 export const getServerSideProps = async (context: any) => {
   const cookies = nookies.get(context);
@@ -35,20 +37,15 @@ const StepThree: NextPageWithLayout<any> = ({
   const { id } = router.query;
 
   const handleTokenCreation = async () => {
-    await fetch("/api/create/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        clubId: String(id),
-      }),
-    })
-      .then(() => {
+    setError(null);
+    await axios.post("/api/create/token", {clubId: String(id)})
+      .then((response) => {
+        console.log(response.status)
         setSuccess(true);
         setTimeout(() => router.push(`/create/${id}/complete`), 1500);
       })
       .catch((err) => {
+        console.log(err)
         setError(err);
       });
   };
@@ -76,7 +73,7 @@ const StepThree: NextPageWithLayout<any> = ({
                 We have received the creation fee but have difficulty creating
                 the club. You can try creating your club again.
               </p>
-              <Button className="w-[245px]">
+              <Button className="w-[245px]" onClick={handleTokenCreation}>
                 <h3>Create club again</h3>
               </Button>
             </>
