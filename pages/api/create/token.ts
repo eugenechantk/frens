@@ -25,7 +25,7 @@ export default async function (req: ITokenApiRequest, res: NextApiResponse) {
     return;
   }
   const { clubId } = req.body;
-  // console.log(clubId, userId);
+  console.log('ClubId: ', clubId);
 
   if (!clubId) {
     res.status(400).send(`clubId is not provided`);
@@ -64,27 +64,27 @@ export default async function (req: ITokenApiRequest, res: NextApiResponse) {
       description: clubInfo.club_description,
       symbol: clubInfo.club_token_sym,
       image: clubInfo.club_image,
+    })
+    .then((response) => {
+      console.log(
+        "✅ Successfully deployed token module, address:",
+        response
+      );
+      return response;
     });
-    // .then((response) => {
-    //   console.log(
-    //     "✅ Successfully deployed token module, address:",
-    //     response
-    //   );
-    //   return response;
-    // });
 
     // Step 4: set initial claim condition for the club token
     const clubTokenContract = sdk.getContract(clubTokenContractAddress!);
     await (
       await clubTokenContract
-    ).erc20.claimConditions.set(initialClaimCondition);
-    // .then((result) => console.log("Claim condition set: ", result));
+    ).erc20.claimConditions.set(initialClaimCondition)
+    .then((result) => console.log("Claim condition set: ", result));
 
     // Step 5: add the club token address to the club record for future use
     await adminFirestore.collection("clubs").doc(clubId).update({
       club_token_address: clubTokenContractAddress,
-    });
-    // .then((result) => console.log(result));
+    })
+    .then((result) => console.log(result));
 
     res.status(200);
     res.end();
