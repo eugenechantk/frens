@@ -1,9 +1,7 @@
 import { ThirdwebSDK, ClaimConditionInput } from "@thirdweb-dev/sdk";
-import axios from "axios";
 import { ethers } from "ethers";
-import { getStorage, ref } from "firebase/storage";
 import { NextApiRequest, NextApiResponse } from "next";
-import { adminFirestore, adminStorage } from "../../../firebase/firebaseAdmin";
+import { adminFirestore } from "../../../firebase/firebaseAdmin";
 import { getChainData } from "../../../lib/chains";
 import { IClubInfo } from "../../clubs/[id]";
 
@@ -20,11 +18,6 @@ const initialClaimCondition: ClaimConditionInput[] = [
   },
 ];
 
-const setClaimCondition = async (tokenAddress: string, conditions:ClaimConditionInput[], sdk:ThirdwebSDK) => {
-  const clubTokenContract = await sdk.getContract(tokenAddress);
-
-}
-
 export default async function (req: ITokenApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     res.status(400).send(`Method ${req.method} not accepted`);
@@ -40,46 +33,65 @@ export default async function (req: ITokenApiRequest, res: NextApiResponse) {
     return;
   }
 
-  // Step 1: Initiate a ethers wallet based on club wallet mnemonic
-  const clubInfo = await adminFirestore
-    .collection("clubs")
-    .doc(clubId)
-    .get()
-    .then((doc) => doc.data() as IClubInfo);
+  try {
+    const clubInfo = await adminFirestore
+      .collection("clubs")
+      .doc(clubId)
+      .get()
+      .then((doc) => doc.data() as IClubInfo);
 
-  const path = `${process.env.NEXT_PUBLIC_ETH_STANDARD_PATH}/${process.env.NEXT_PUBLIC_DEFAULT_ACTIVE_INDEX}`;
-  const chainId = parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!);
-  const provider = new ethers.providers.JsonRpcProvider(
-    getChainData(chainId).rpc_url
-  );
-  const clubWallet = ethers.Wallet.fromMnemonic(
-    clubInfo.club_wallet_mnemonic!,
-    path
-  ).connect(provider);
-  console.log(clubWallet.privateKey);
+    // Step 1: Initiate a ethers wallet based on club wallet mnemonic
+    const path = `${process.env.NEXT_PUBLIC_ETH_STANDARD_PATH}/${process.env.NEXT_PUBLIC_DEFAULT_ACTIVE_INDEX}`;
+    const chainId = parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!);
+    const provider = new ethers.providers.JsonRpcProvider(
+      getChainData(chainId).rpc_url
+    );
+    const clubWallet = ethers.Wallet.fromMnemonic(
+      clubInfo.club_wallet_mnemonic!,
+      path
+    ).connect(provider);
+    console.log("Club wallet private key: ", clubWallet.privateKey);
 
-  // Step 2: Initiate a ThirdWebSDK with the club wallet
-  const sdk = new ThirdwebSDK(clubWallet);
-  const address = await sdk.getSigner()!.getAddress();
-  console.log("SDK is initiated using address: ", address);
+    // Step 2: Initiate a ThirdWebSDK with the club wallet
+    const sdk = new ThirdwebSDK(clubWallet);
+    const address = await sdk.getSigner()!.getAddress();
+    // console.log("SDK is initiated using address: ", address);
 
-  // Step 3: Deploy a token drop contract for the club
-  const clubTokenContractAddress = await sdk.deployer
-    .deployTokenDrop({
+    // Step 3: Deploy a token drop contract for the club
+    const clubTokenContractAddress = await sdk.deployer.deployTokenDrop({
       name: clubInfo.club_name,
       primary_sale_recipient: address,
       description: clubInfo.club_description,
       symbol: clubInfo.club_token_sym,
       image: clubInfo.club_image,
-    })
-    .then((response) => {
-      console.log("✅ Successfully deployed token module, address:", response);
-      return response
-    })
-    .catch((err) => console.log(err));
+    });
+    // .then((response) => {
+    //   console.log(
+    //     "✅ Successfully deployed token module, address:",
+    //     response
+    //   );
+    //   return response;
+    // });
 
-  const clubTokenContract = sdk.getContract(clubTokenContractAddress!);
-  await (await clubTokenContract).erc20.claimConditions.set(initialClaimCondition).then(result => console.log(result));
+    // Step 4: set initial claim condition for the club token
+    const clubTokenContract = sdk.getContract(clubTokenContractAddress!);
+    await (
+      await clubTokenContract
+    ).erc20.claimConditions.set(initialClaimCondition);
+    // .then((result) => console.log("Claim condition set: ", result));
+
+    // Step 5: add the club token address to the club record for future use
+    await adminFirestore.collection("clubs").doc(clubId).update({
+      club_token_address: clubTokenContractAddress,
+    });
+    // .then((result) => console.log(result));
+
+    res.status(200);
+    res.end();
+  } catch (err) {
+    res.status(501).send({ error: err });
+    res.end();
+  }
 
   // DEPRICATED: adding a record of the user to the roles collection to show the club
   // // Check if the user already created a club before
@@ -117,5 +129,4 @@ export default async function (req: ITokenApiRequest, res: NextApiResponse) {
   //     })
   //     .catch((err) => res.status(501).send({ error: err }));
   // }
-  res.end();
 }
