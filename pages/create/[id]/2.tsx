@@ -47,6 +47,7 @@ const StepTwo: NextPageWithLayout<any> = ({
 
   const initClubWallet = async () => {
     console.log("Initializing club wallet");
+    setTransactionHash("")
     setError(null);
     setLoading(true);
     try {
@@ -125,6 +126,7 @@ const StepTwo: NextPageWithLayout<any> = ({
 
   // Only move on if the deposit is in the club wallet
   useEffect(() => {
+    provider?.removeAllListeners()
     if (transactionHash) {
       console.log('transaction pending')
       provider?.on(transactionHash, async (transaction) => {
