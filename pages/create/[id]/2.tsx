@@ -35,9 +35,11 @@ const StepTwo: NextPageWithLayout<any> = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [transactionHash, setTransactionHash] = useState<string>("");
   const [error, setError] = useState<any>();
   const router = useRouter();
   const clubId = router.query.id;
+  let transaction: any;
 
   useEffect(() => {
     initClubWallet();
@@ -47,24 +49,15 @@ const StepTwo: NextPageWithLayout<any> = ({
     console.log("Initializing club wallet");
     setError(null);
     setLoading(true);
-    // Step 1: get the address of the club wallet
-    await handleClubWalletCreate()
+    try {
+      // Step 1: get the address of the club wallet
+      await handleClubWalletCreate();
       // Step 2: send fee from the user wallet to the club wallet
-      .then(async () => await sendFeeToClubWallet())
-      // Step 3: change the deposited field of the club in DB to true
-      .then(
-        async () =>
-          await updateDoc(doc(clientFireStore, "clubs", String(clubId)), {
-            deposited: true,
-          })
-      )
-      // Step 4: Redirect to next step
-      .then(() => setTimeout(() => router.push(`/create/${clubId}/3`), 1500))
-      .catch((err) => {
-        setLoading(false);
-        setError(err);
-        // console.log(err);
-      });
+      await sendFeeToClubWallet();
+    } catch (err) {
+      setLoading(false);
+      setError(err);
+    }
   };
 
   const handleClubWalletCreate = async () => {
@@ -124,11 +117,28 @@ const StepTwo: NextPageWithLayout<any> = ({
     // console.log(_gasPrice, _signer, clubWalletAddress, userAddress, _nonce);
 
     // send the transaction using user's wallet
-    const transaction = await _signer.sendTransaction(tx);
-    setLoading(false);
-    setSuccess(true);
-    setError({});
+    const _transaction: ethers.providers.TransactionResponse =
+      await _signer.sendTransaction(tx);
+
+    setTransactionHash(_transaction.hash);
   };
+
+  // Only move on if the deposit is in the club wallet
+  useEffect(() => {
+    if (transactionHash) {
+      console.log('transaction pending')
+      provider?.on(transactionHash, async (transaction) => {
+        console.log(transaction);
+        setLoading(false);
+        setSuccess(true);
+        setError({});
+        await updateDoc(doc(clientFireStore, "clubs", String(clubId)), {
+          deposited: true,
+        });
+        setTimeout(() => router.push(`/create/${clubId}/3`), 1500);
+      });
+    }
+  }, [transactionHash]);
 
   return (
     <>
