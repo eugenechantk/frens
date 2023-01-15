@@ -19,6 +19,7 @@ const initialClaimCondition: ClaimConditionInput[] = [
 ];
 
 export default async function (req: ITokenApiRequest, res: NextApiResponse) {
+  const start = Date.now()
   if (req.method !== "POST") {
     res.status(400).send(`Method ${req.method} not accepted`);
     res.end();
@@ -55,7 +56,7 @@ export default async function (req: ITokenApiRequest, res: NextApiResponse) {
     // Step 2: Initiate a ThirdWebSDK with the club wallet
     const sdk = new ThirdwebSDK(clubWallet);
     const address = await sdk.getSigner()!.getAddress();
-    // console.log("SDK is initiated using address: ", address);
+    console.log("SDK is initiated using address: ", address);
 
     // Step 3: Deploy a token drop contract for the club
     const clubTokenContractAddress = await sdk.deployer.deployTokenDrop({
@@ -86,6 +87,8 @@ export default async function (req: ITokenApiRequest, res: NextApiResponse) {
     })
     .then((result) => console.log(result));
 
+    const end = Date.now()
+    console.log('API time spent: ', (end-start)/1000);
     res.status(200);
     res.end();
   } catch (err) {
