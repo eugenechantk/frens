@@ -2,7 +2,7 @@ import { CameraIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import React, { useRef, useState, useEffect } from "react";
 import defaultClubProfile from "../../public/default_club.png";
-import { useField } from '@unform/core'
+import { useField } from "@unform/core";
 
 interface IImageUploadProps {
   width?: number;
@@ -20,6 +20,7 @@ export default function ImageUpload({
   const [renderImage, setRenderImage] = useState(
     imageSrc ? imageSrc : defaultClubProfile
   );
+  const [error, setError] = useState<string>();
   const inputRef = useRef(null);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -31,19 +32,23 @@ export default function ImageUpload({
     if (!e.target.files!.length) {
       return;
     }
-    // render the uploaded photo in the component
-    const src = URL.createObjectURL(e.target.files![0]);
-    setRenderImage(src);
+    if (e.target.files![0].size >= 4400000) {
+      setError("File size too big. It must be smaller than 4.4 MB");
+    } else {
+      // render the uploaded photo in the component
+      const src = URL.createObjectURL(e.target.files![0]);
+      setRenderImage(src);
 
-    // send the image file back to the form
-    setImage(e.target.files![0]);
+      // send the image file back to the form
+      setImage(e.target.files![0]);
+    }
   };
 
   return (
     <>
       <button
         className="border-2 border-secondary-300 rounded-10 relative overflow-hidden"
-        style={{ width: "100%", aspectRatio: 1 / 1 }}
+        style={{ width: "94px", aspectRatio: 1 / 1 }}
         onMouseOver={() => setShowHover(true)}
         onMouseLeave={() => setShowHover(false)}
         onClick={handleClick}
@@ -71,6 +76,9 @@ export default function ImageUpload({
         accept="image/*"
         onChange={handleOnChange}
       />
+      {error && (
+        <p className="w-full text-sm leading-5 text-gray-400 mt-2">{error}</p>
+      )}
     </>
   );
 }

@@ -86,7 +86,9 @@ const CreateClub: NextPageWithLayout<any> = ({
     // console.log(formData);
     // Make a post request to /api/create/club endpoint
     const config = {
-      headers: { "content-type": "multipart/form-data" },
+      headers: {
+        "content-type": "multipart/form-data" 
+      },
     };
 
     try {
@@ -118,7 +120,7 @@ const CreateClub: NextPageWithLayout<any> = ({
             </p>
             <div className="md:flex md:flex-row md:items-start md:gap-8 flex flex-col items-start gap-4 w-full">
               {/* Image upload field */}
-              <div className="flex flex-col items-start gap-2 w-[94px] md:min-w-[94px]">
+              <div className="flex flex-col items-start gap-2 w-full">
                 <p className="text-sm text-gray-800 font-semibold leading-5 md:grow">
                   Profile photo
                 </p>
