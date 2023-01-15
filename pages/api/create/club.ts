@@ -109,6 +109,8 @@ export default router.handler({
 
 export const config = {
   api: {
-    bodyParser: '50mb', // Disallow body parsing, consume as stream
+    bodyParser: {
+      sizeLimit: '50mb',
+    },
   },
 };
