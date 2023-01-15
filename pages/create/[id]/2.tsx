@@ -137,6 +137,7 @@ const StepTwo: NextPageWithLayout<any> = ({
         await updateDoc(doc(clientFireStore, "clubs", String(clubId)), {
           deposited: true,
         });
+        provider?.removeAllListeners();
         setTimeout(() => router.push(`/create/${clubId}/3`), 1500);
       });
     }
