@@ -10,6 +10,15 @@ import { useAuth } from "../../../lib/auth";
 import nookies from "nookies";
 import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
+import axios from "axios";
+import { string } from "yup/lib/locale";
+import { adminFirestore } from "../../../firebase/firebaseAdmin";
+import { IClubInfo } from "../../clubs/[id]";
+import { clientFireStore } from "../../../firebase/firebaseClient";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { ethers } from "ethers";
+import { getChainData } from "../../../lib/chains";
+import { ClaimConditionInput, ThirdwebSDK } from "@thirdweb-dev/sdk";
 
 export const getServerSideProps = async (context: any) => {
   const cookies = nookies.get(context);
@@ -33,28 +42,74 @@ const StepThree: NextPageWithLayout<any> = ({
   const [error, setError] = useState<any>();
   const router = useRouter();
   const { id } = router.query;
-  const user = useAuth();
+
+  const initialClaimCondition: ClaimConditionInput[] = [
+    {
+      startTime: new Date(),
+      price: parseFloat(process.env.NEXT_PUBLIC_CLAIM_ETH_PRICE!),
+    },
+  ];
 
   const handleTokenCreation = async () => {
-    await fetch("/api/create/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        clubId: String(id),
-        userId: String(user.user?.uid),
-      }),
-    })
-      .then(() => {
-        setSuccess(true);
-        setTimeout(() => router.push(`/create/${id}/complete`), 1500);
-      })
-      .catch((err) => {
-        setError(err);
-      });
-  };
+    setError(null);
+    setSuccess(false);
+    try {
+      const clubDocRef = doc(clientFireStore, "clubs", String(id));
+      const clubInfo = await getDoc(clubDocRef).then(
+        (doc) => doc.data() as IClubInfo
+      );
+      // console.log(clubInfo);
 
+      // Step 1: Initiate a ethers wallet based on club wallet mnemonic
+      const path = `${process.env.NEXT_PUBLIC_ETH_STANDARD_PATH}/${process.env.NEXT_PUBLIC_DEFAULT_ACTIVE_INDEX}`;
+      const chainId = parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!);
+      const provider = new ethers.providers.JsonRpcProvider(
+        getChainData(chainId).rpc_url
+      );
+      const clubWallet = ethers.Wallet.fromMnemonic(
+        clubInfo.club_wallet_mnemonic!,
+        path
+      ).connect(provider);
+      // console.log("Club wallet private key: ", clubWallet.privateKey);
+
+      // Step 2: Initiate a ThirdWebSDK with the club wallet
+      const sdk = new ThirdwebSDK(clubWallet);
+      const address = await sdk.getSigner()!.getAddress();
+      // console.log("SDK is initiated using address: ", address);
+
+      // Step 3: Deploy a token drop contract for the club
+      const clubTokenContractAddress = await sdk.deployer.deployTokenDrop({
+        name: clubInfo.club_name,
+        primary_sale_recipient: address,
+        description: clubInfo.club_description,
+        symbol: clubInfo.club_token_sym,
+        image: clubInfo.club_image,
+      });
+      // console.log(
+      //   "✅ Successfully deployed token module, address:",
+      //   clubTokenContractAddress
+      // );
+
+      // Step 4: set initial claim condition for the club token
+      const clubTokenContract = sdk.getContract(clubTokenContractAddress!);
+      await (
+        await clubTokenContract
+      ).erc20.claimConditions.set(initialClaimCondition);
+      // console.log("Claim condition set for: ", clubTokenContractAddress));
+
+      // Step 5: add the club token address to the club record for future use
+      await updateDoc(clubDocRef, {
+        club_token_address: clubTokenContractAddress,
+      });
+      // console.log('Club token address updated to: ',clubTokenContractAddress);
+
+      setSuccess(true);
+      setTimeout(() => router.push(`/create/${id}/complete`), 1500);
+    } catch (err) {
+      // console.log(err);
+      setError(err);
+    }
+  };
   useEffect(() => {
     handleTokenCreation();
   }, []);
@@ -78,7 +133,7 @@ const StepThree: NextPageWithLayout<any> = ({
                 We have received the creation fee but have difficulty creating
                 the club. You can try creating your club again.
               </p>
-              <Button className="w-[245px]">
+              <Button className="w-[245px]" onClick={handleTokenCreation}>
                 <h3>Create club again</h3>
               </Button>
             </>

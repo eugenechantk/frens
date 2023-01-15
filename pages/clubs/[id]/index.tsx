@@ -25,7 +25,6 @@ export interface IClubInfo {
   club_wallet_address: string;
   club_wallet_mnemonic?: string;
   deposited?: boolean;
-  club_members: string[];
 }
 
 export type THoldingsData = {
@@ -68,14 +67,12 @@ export const getServerSideProps = async (context: any) => {
             club_name,
             club_description,
             club_image,
-            club_members,
             club_wallet_address,
           } = data!;
           return {
             club_name,
             club_description,
             club_image,
-            club_members,
             club_wallet_address,
           };
         });
@@ -86,22 +83,23 @@ export const getServerSideProps = async (context: any) => {
   };
 
   // Fetch function for member info
-  const fetchMemberInfo = async (members: string[]) => {
-    let memberInfo = [] as TMemberInfoData[];
-    await Promise.all(
-      members.map(async (id) => {
-        const _memberInfo = await firebaseAdmin.auth().getUser(id);
-        memberInfo.push({
-          display_name: _memberInfo.displayName!,
-          profile_image: _memberInfo.photoURL!,
-          uid: _memberInfo.uid,
-        });
-      })
-    ).catch((err) => {
-      throw err;
-    });
-    return memberInfo;
-  };
+  // DEPRICATED: can't fetch member info like this anymore
+  // const fetchMemberInfo = async (members: string[]) => {
+  //   let memberInfo = [] as TMemberInfoData[];
+  //   await Promise.all(
+  //     members.map(async (id) => {
+  //       const _memberInfo = await firebaseAdmin.auth().getUser(id);
+  //       memberInfo.push({
+  //         display_name: _memberInfo.displayName!,
+  //         profile_image: _memberInfo.photoURL!,
+  //         uid: _memberInfo.uid,
+  //       });
+  //     })
+  //   ).catch((err) => {
+  //     throw err;
+  //   });
+  //   return memberInfo;
+  // };
 
   // Fetcher function for club members
   const fetchPortfolio = async (address: string) => {
@@ -179,21 +177,21 @@ export const getServerSideProps = async (context: any) => {
       const balance: THoldingsData[] = await fetchPortfolio(
         clubInfo.club_wallet_address
       );
-      const memberInfo: TMemberInfoData[] = await fetchMemberInfo(
-        clubInfo.club_members
-      );
+      // const memberInfo: TMemberInfoData[] = await fetchMemberInfo(
+      //   clubInfo.club_members
+      // );
       return {
         props: {
           clubInfo: clubInfo,
           balance: balance,
-          members: memberInfo,
+          // members: memberInfo,
         },
       };
     } catch (err) {
       console.log(err);
       return {
         props: {
-          error: err,
+          error: JSON.parse(JSON.stringify(err)),
         },
       };
     }
@@ -212,7 +210,7 @@ const Dashboard: NextPageWithLayout<any> = ({
             {/* Club details and members */}
             <div className="flex flex-col items-start gap-4 w-full">
               <ClubDetails data={serverProps.clubInfo!} />
-              <ClubMembers data={serverProps.members!} />
+              {/* <ClubMembers data={serverProps.members!} /> */}
             </div>
             {/* Balance */}
             {/* TODO: have a global state setting for whether to show club or me balance */}
