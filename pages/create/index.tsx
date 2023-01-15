@@ -120,7 +120,7 @@ const CreateClub: NextPageWithLayout<any> = ({
             </p>
             <div className="md:flex md:flex-row md:items-start md:gap-8 flex flex-col items-start gap-4 w-full">
               {/* Image upload field */}
-              <div className="flex flex-col items-start gap-2 w-full">
+              <div className="flex flex-col items-start gap-2 w-full md:w-[94px]">
                 <p className="text-sm text-gray-800 font-semibold leading-5 md:grow">
                   Profile photo
                 </p>
