@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { createRouter } from "next-connect";
+import { createRouter, expressWrapper } from "next-connect";
 import formidable from "formidable";
 import { adminFirestore, adminStorage } from "../../../firebase/firebaseAdmin";
 import { getDownloadURL, ref } from "firebase/storage";
@@ -107,10 +107,10 @@ export default router.handler({
   },
 });
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '50mb',
-    },
-  },
-};
+// export const config = {
+//   api: {
+//     bodyParser: {
+//       sizeLimit: '10mb'
+//     }
+//   },
+// };
