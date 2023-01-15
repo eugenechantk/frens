@@ -52,13 +52,13 @@ const StepThree: NextPageWithLayout<any> = ({
 
   const handleTokenCreation = async () => {
     setError(null);
-    setSuccess(false)
+    setSuccess(false);
     try {
       const clubDocRef = doc(clientFireStore, "clubs", String(id));
       const clubInfo = await getDoc(clubDocRef).then(
         (doc) => doc.data() as IClubInfo
       );
-      console.log(clubInfo);
+      // console.log(clubInfo);
 
       // Step 1: Initiate a ethers wallet based on club wallet mnemonic
       const path = `${process.env.NEXT_PUBLIC_ETH_STANDARD_PATH}/${process.env.NEXT_PUBLIC_DEFAULT_ACTIVE_INDEX}`;
@@ -70,46 +70,43 @@ const StepThree: NextPageWithLayout<any> = ({
         clubInfo.club_wallet_mnemonic!,
         path
       ).connect(provider);
-      console.log("Club wallet private key: ", clubWallet.privateKey);
+      // console.log("Club wallet private key: ", clubWallet.privateKey);
 
       // Step 2: Initiate a ThirdWebSDK with the club wallet
       const sdk = new ThirdwebSDK(clubWallet);
       const address = await sdk.getSigner()!.getAddress();
-      console.log("SDK is initiated using address: ", address);
+      // console.log("SDK is initiated using address: ", address);
 
       // Step 3: Deploy a token drop contract for the club
-      const clubTokenContractAddress = await sdk.deployer
-        .deployTokenDrop({
-          name: clubInfo.club_name,
-          primary_sale_recipient: address,
-          description: clubInfo.club_description,
-          symbol: clubInfo.club_token_sym,
-          image: clubInfo.club_image,
-        })
-        // .then((response) => {
-        //   console.log(
-        //     "✅ Successfully deployed token module, address:",
-        //     response
-        //   );
-        //   return response;
-        // });
+      const clubTokenContractAddress = await sdk.deployer.deployTokenDrop({
+        name: clubInfo.club_name,
+        primary_sale_recipient: address,
+        description: clubInfo.club_description,
+        symbol: clubInfo.club_token_sym,
+        image: clubInfo.club_image,
+      });
+      // console.log(
+      //   "✅ Successfully deployed token module, address:",
+      //   clubTokenContractAddress
+      // );
 
       // Step 4: set initial claim condition for the club token
       const clubTokenContract = sdk.getContract(clubTokenContractAddress!);
-      await (await clubTokenContract).erc20.claimConditions
-        .set(initialClaimCondition)
-        // .then((result) => console.log("Claim condition set: ", result));
+      await (
+        await clubTokenContract
+      ).erc20.claimConditions.set(initialClaimCondition);
+      // console.log("Claim condition set for: ", clubTokenContractAddress));
 
       // Step 5: add the club token address to the club record for future use
       await updateDoc(clubDocRef, {
         club_token_address: clubTokenContractAddress,
-      })
-      // .then((result) => console.log('Club token address updated: ', result));
+      });
+      // console.log('Club token address updated to: ',clubTokenContractAddress);
 
       setSuccess(true);
       setTimeout(() => router.push(`/create/${id}/complete`), 1500);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       setError(err);
     }
   };

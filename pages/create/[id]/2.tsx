@@ -46,7 +46,7 @@ const StepTwo: NextPageWithLayout<any> = ({
   }, [router.query.id]);
 
   const initClubWallet = async () => {
-    console.log("Initializing club wallet");
+    // console.log("Initializing club wallet");
     setTransactionHash("")
     setError(null);
     setLoading(true);
@@ -128,9 +128,9 @@ const StepTwo: NextPageWithLayout<any> = ({
   useEffect(() => {
     provider?.removeAllListeners()
     if (transactionHash) {
-      console.log('transaction pending')
+      // console.log('transaction pending')
       provider?.on(transactionHash, async (transaction) => {
-        console.log(transaction);
+        // console.log(transaction);
         setLoading(false);
         setSuccess(true);
         setError({});
