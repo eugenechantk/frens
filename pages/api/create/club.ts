@@ -11,15 +11,6 @@ import bodyParser, { json } from "body-parser";
 import PersistentFile from "formidable/PersistentFile";
 import { withAuth } from "../middleware";
 
-interface MulterRequest extends NextApiRequest {
-  body: any;
-  file: any;
-}
-
-const serviceAccount = JSON.parse(
-  process.env.NEXT_PUBLIC_FIREBASE_ADMIN_SECRET as string
-);
-
 let uid: string;
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
