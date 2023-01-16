@@ -11,7 +11,7 @@ import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
 import { IClubInfo } from "../../clubs/[id]";
 import { clientFireStore } from "../../../firebase/firebaseClient";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { ethers } from "ethers";
 import { getChainData } from "../../../lib/chains";
 import { ClaimConditionInput, ThirdwebSDK } from "@thirdweb-dev/sdk";
@@ -98,6 +98,9 @@ const StepThree: NextPageWithLayout<any> = ({
         club_token_address: clubTokenContractAddress,
       });
       // console.log('Club token address updated to: ',clubTokenContractAddress);
+
+      // Step 6: create a new club token doc in the clubToken collection
+      await setDoc(doc(clientFireStore, "clubTokens", clubTokenContractAddress), {});
 
       setSuccess(true);
       setTimeout(() => router.push(`/create/${id}/complete`), 1500);
