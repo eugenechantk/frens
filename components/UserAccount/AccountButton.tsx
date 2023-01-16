@@ -49,7 +49,7 @@ export default function AccountButton({
     }
 
     // const recoveredAddress = ethers.utils.recoverAddress(msgHashBytes, sig!);
-    const { token, new_user } = await fetch("/api/auth/login", {
+    const { token } = await fetch("/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export default function AccountButton({
         return;
       });
     try {
-      const userCred = await signInWithCustomToken(firebaseClientAuth, token);
+      await signInWithCustomToken(firebaseClientAuth, token);
       setLoading(false);
       router.replace({ pathname: router.pathname, query: router.query })
     } catch (err) {
