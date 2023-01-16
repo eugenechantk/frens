@@ -10,6 +10,9 @@ import { firebaseAdmin } from "../../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../components/NotAuthed/NotAuthed";
 import { IClubInfo } from "./[id]";
+import { getChainData } from "../../lib/chains";
+import axios from "axios";
+import _ from "lodash";
 
 interface IClubData extends IClubInfo {
   club_id: string;
@@ -26,42 +29,67 @@ export const getServerSideProps = async (context: any) => {
     };
   } else {
     try {
-      const user = await firebaseAdmin.auth().verifyIdToken(cookies.token).catch(() => {throw Error('user not authed')})
-      const docSnap = await firebaseAdmin.firestore().collection('roles').doc(user.uid).get()
-      if (!docSnap.exists) {
-        throw Error('user is not in roles collection')
-      }
-      if (!docSnap.data()) {
-        throw Error('clubs not found')
-      }
-      const _clubs = docSnap.data()!.clubs;
-      const _fetchClubDataPromise = await Promise.allSettled(_clubs.map(async (clubId: string):Promise<IClubData> => {
-        const clubData = await firebaseAdmin
+      // Step 1: Fetch all ERC20 token holdings of users
+      const userAddress = await firebaseAdmin
+        .auth()
+        .verifyIdToken(cookies.token)
+        .then((decodedToken) => decodedToken.uid);
+      // console.log(userAddress);
+      const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
+      const tokensOptions = {
+        method: "GET",
+        url: "https://deep-index.moralis.io/api/v2/%address%/erc20".replace(
+          "%address%",
+          userAddress
+        ),
+        params: {
+          chain: getChainData(
+            parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
+          ).network,
+        },
+        headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
+      };
+      const erc20Tokens: any[] = await axios
+        .request(tokensOptions)
+        .then((response) => {
+          return response.data;
+        })
+        .then((data) => data.map((token: any) => token.token_address));
+      // console.log(erc20Tokens);
+
+      // Step 2: query the club collection to find matching clubs with the same token address
+      // for using in query, we need to make sure that each query only has 10 token addresses
+      const balanceChunk = _.chunk(erc20Tokens, 10);
+      // console.log(balanceChunk[0])
+      let userClubs: IClubData[] = [];
+
+      for await (const balances of balanceChunk) {
+        // console.log(balances)
+        const snapshot = await firebaseAdmin
           .firestore()
           .collection("clubs")
-          .doc(clubId)
-          .get()
-          .then((doc) => {
-            return doc.data() as IClubData;
-          }).catch((err) => {throw err});
-        console.log(clubData)
-        return {
-          ...clubData,
-          club_id: clubId,
+          .where("club_token_address", "in", balances)
+          .get();
+        if (!snapshot.empty) {
+          snapshot.forEach((doc) => {
+            let clubInfo = doc.data()
+            clubInfo['club_id'] = doc.id
+            userClubs.push(clubInfo as IClubData)
+          });
         }
-      }));
-      const response = (_fetchClubDataPromise.filter((res) => res.status === "fulfilled" && res.value !== undefined) as PromiseFulfilledResult<IClubData>[]).map((club) => club.value)
+      }
+      // console.log(userClubs)
       return {
         props: {
-          clubData: response
-        }
+          clubData: userClubs,
+        },
       };
     } catch (err: any) {
       return {
         props: {
-          error: err.message
-        }
-      }
+          error: err.message,
+        },
+      };
     }
   }
 };
