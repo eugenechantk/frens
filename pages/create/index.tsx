@@ -48,8 +48,6 @@ const CreateClub: NextPageWithLayout<any> = ({
   const user = useAuth();
 
   const handleFormSubmit = async (data: IClubInfoData) => {
-    // TODO: implement form handle logic for creating a club
-
     setCreateLoading(true);
 
     try {
@@ -87,7 +85,8 @@ const CreateClub: NextPageWithLayout<any> = ({
     // Make a post request to /api/create/club endpoint
     const config = {
       headers: {
-        "content-type": "multipart/form-data" 
+        "content-type": "multipart/form-data",
+        "authorization": "Bearer " + (await user.user?.getIdToken())
       },
     };
 
