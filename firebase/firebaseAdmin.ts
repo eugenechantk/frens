@@ -16,6 +16,7 @@ if (!firebaseAdmin.apps.length) {
     databaseURL: `https://${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebaseio.com`,
     storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
   });
+  console.log('Firebase admin initiated')
 }
 
 const adminFirestore = firebaseAdmin.firestore();

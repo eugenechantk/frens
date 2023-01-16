@@ -14,6 +14,7 @@ import { ethers } from "ethers";
 import nookies from "nookies";
 import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
+import { useAuth } from "../../../lib/auth";
 
 export const getServerSideProps = async (context: any) => {
   const cookies = nookies.get(context);
@@ -39,7 +40,7 @@ const StepTwo: NextPageWithLayout<any> = ({
   const [error, setError] = useState<any>();
   const router = useRouter();
   const clubId = router.query.id;
-  let transaction: any;
+  const user = useAuth();
 
   useEffect(() => {
     initClubWallet();
@@ -52,26 +53,25 @@ const StepTwo: NextPageWithLayout<any> = ({
     setLoading(true);
     try {
       // Step 1: get the address of the club wallet
-      await handleClubWalletCreate();
+      const getAddress = await handleClubWalletCreate();
       // Step 2: send fee from the user wallet to the club wallet
-      await sendFeeToClubWallet();
+      const getWallet = await sendFeeToClubWallet();
     } catch (err) {
       setLoading(false);
+      setSuccess(false);
       setError(err);
     }
   };
 
   const handleClubWalletCreate = async () => {
     const data = await axios
-      .post("/api/create/wallet", { clubId: clubId })
+      .post("/api/create/wallet", { clubId: clubId }, {headers: {
+        "authorization": 'Bearer ' + await user.user?.getIdToken(),
+        "content-type": 'application/json'
+      }})
       .then((res) => {
         return res.data;
       })
-      .catch((err) => {
-        setLoading(false);
-        setSuccess(false);
-        setError(err);
-      });
     return { ...data };
   };
 
