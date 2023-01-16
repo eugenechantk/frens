@@ -63,6 +63,7 @@ export const getServerSideProps = async (context: any) => {
       // console.log(balanceChunk[0])
       let userClubs: IClubData[] = [];
 
+      // querying all the clubs that matches with user's token holdings
       for await (const balances of balanceChunk) {
         // console.log(balances)
         const snapshot = await firebaseAdmin
