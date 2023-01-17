@@ -15,6 +15,8 @@ import axios from "axios";
 import _ from "lodash";
 import nookies from "nookies";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
+import { getAllHolders, verifyClubHolding } from "../../../lib/ethereum";
+import NotVerified from "../../../components/NotVerified/NotVerified";
 const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
 
 export interface IClubInfo {
@@ -25,6 +27,10 @@ export interface IClubInfo {
   club_wallet_address: string;
   club_wallet_mnemonic?: string;
   deposited?: boolean;
+}
+
+interface IClubDetails extends IClubInfo {
+  club_token_address: string;
 }
 
 export type THoldingsData = {
@@ -48,6 +54,7 @@ export const getServerSideProps = async (context: any) => {
   const cookies = nookies.get(context);
   // console.log(cookies)
   // console.log(id);
+
   // Fetch function for club information
   const fetchClubInfo = async (id: string) => {
     try {
@@ -60,7 +67,7 @@ export const getServerSideProps = async (context: any) => {
           if (!doc.exists) {
             throw new Error("club does not exist in database");
           }
-          return doc.data() as IClubInfo;
+          return doc.data() as IClubDetails;
         })
         .then((data) => {
           const {
@@ -68,12 +75,14 @@ export const getServerSideProps = async (context: any) => {
             club_description,
             club_image,
             club_wallet_address,
+            club_token_address,
           } = data!;
           return {
             club_name,
             club_description,
             club_image,
             club_wallet_address,
+            club_token_address,
           };
         });
       return _clubInfo;
@@ -82,26 +91,7 @@ export const getServerSideProps = async (context: any) => {
     }
   };
 
-  // Fetch function for member info
-  // DEPRICATED: can't fetch member info like this anymore
-  // const fetchMemberInfo = async (members: string[]) => {
-  //   let memberInfo = [] as TMemberInfoData[];
-  //   await Promise.all(
-  //     members.map(async (id) => {
-  //       const _memberInfo = await firebaseAdmin.auth().getUser(id);
-  //       memberInfo.push({
-  //         display_name: _memberInfo.displayName!,
-  //         profile_image: _memberInfo.photoURL!,
-  //         uid: _memberInfo.uid,
-  //       });
-  //     })
-  //   ).catch((err) => {
-  //     throw err;
-  //   });
-  //   return memberInfo;
-  // };
-
-  // Fetcher function for club members
+  // Fetcher function for club portfolio
   const fetchPortfolio = async (address: string) => {
     let balance = [] as THoldingsData[];
     const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
@@ -164,7 +154,12 @@ export const getServerSideProps = async (context: any) => {
       throw err;
     }
   };
-  
+
+  const fetchMemberInfo = async (clubTokenAddress: string) => {
+    const result = await getAllHolders(clubTokenAddress)
+    return result
+  }
+
   if (!cookies.token) {
     return {
       props: {
@@ -173,13 +168,29 @@ export const getServerSideProps = async (context: any) => {
     };
   } else {
     try {
-      const clubInfo: IClubInfo = await fetchClubInfo(id);
+      const userAddress = await firebaseAdmin
+        .auth()
+        .verifyIdToken(cookies.token)
+        .then((decodedToken) => decodedToken.uid);
+      const clubInfo: IClubDetails = await fetchClubInfo(id);
+      
+      // Step 1: Check if the user has club tokens to access this club
+      const verify = await verifyClubHolding(
+        userAddress,
+        clubInfo.club_token_address
+      );
+      // console.log(verify)
+      if (!verify) {
+        throw Error("Not verified");
+      }
+
+      const holders = await fetchMemberInfo(clubInfo.club_token_address)
+
+      // Step 3: Fetch porfolio of the club
       const balance: THoldingsData[] = await fetchPortfolio(
         clubInfo.club_wallet_address
       );
-      // const memberInfo: TMemberInfoData[] = await fetchMemberInfo(
-      //   clubInfo.club_members
-      // );
+      
       return {
         props: {
           clubInfo: clubInfo,
@@ -221,8 +232,10 @@ const Dashboard: NextPageWithLayout<any> = ({
           {/* Right panel */}
           <WidgetSection />
         </div>
-      ) : (
+      ) : serverProps.error === "Not authed" ? (
         <NotAuthed />
+      ) : (
+        <NotVerified />
       )}
     </>
   );

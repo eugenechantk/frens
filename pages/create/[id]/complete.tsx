@@ -63,6 +63,7 @@ const StepComplete: NextPageWithLayout<any> = (
                 src={serverProps.profileImgUrl}
                 alt={`Profile image for ${serverProps.clubName}`}
                 fill
+                style={{'objectFit': 'cover'}}
               />
             </div>
             {/* TODO: render name of the club created */}

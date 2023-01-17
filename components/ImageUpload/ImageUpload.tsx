@@ -59,6 +59,7 @@ export default function ImageUpload({
           alt="Club profile photo"
           fill
           className="z-0 absolute top-0 left-0"
+          style={{'objectFit': 'cover'}}
         />
         {showHover && (
           <div

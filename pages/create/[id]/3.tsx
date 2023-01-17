@@ -11,10 +11,12 @@ import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
 import { IClubInfo } from "../../clubs/[id]";
 import { clientFireStore } from "../../../firebase/firebaseClient";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { ethers } from "ethers";
 import { getChainData } from "../../../lib/chains";
 import { ClaimConditionInput, ThirdwebSDK } from "@thirdweb-dev/sdk";
+import { useAuth } from "../../../lib/auth";
+import _ from "lodash";
 
 export const getServerSideProps = async (context: any) => {
   const cookies = nookies.get(context);
@@ -38,6 +40,7 @@ const StepThree: NextPageWithLayout<any> = ({
   const [error, setError] = useState<any>();
   const router = useRouter();
   const { id } = router.query;
+  const user = useAuth();
 
   const initialClaimCondition: ClaimConditionInput[] = [
     {
@@ -86,23 +89,46 @@ const StepThree: NextPageWithLayout<any> = ({
       //   clubTokenContractAddress
       // );
 
-      // Step 4: set initial claim condition for the club token
-      const clubTokenContract = sdk.getContract(clubTokenContractAddress!);
-      await (
-        await clubTokenContract
-      ).erc20.claimConditions.set(initialClaimCondition);
-      // console.log("Claim condition set for: ", clubTokenContractAddress));
+      const clubTokenContract = await sdk.getContract(
+        clubTokenContractAddress!,
+        "token-drop"
+      );
 
-      // Step 5: add the club token address to the club record for future use
-      await updateDoc(clubDocRef, {
-        club_token_address: clubTokenContractAddress,
+      // Step 4: mint initial token to creator
+      const zeroETHClaimResult = await clubTokenContract.claimConditions.set([
+        {
+          startTime: new Date(),
+          price: 0,
+        },
+      ]);
+      // console.log("0 ETH claim condition set: ,", zeroETHClaimResult);
+      // console.log("dropping token to creator");
+      // console.log("creator address: ", user.user?.uid);
+      const claimQty =
+        parseFloat(process.env.NEXT_PUBLIC_CLUB_DEPOSIT as string) /
+        parseFloat(process.env.NEXT_PUBLIC_CLAIM_ETH_PRICE as string);
+      const tx = await (
+        await clubTokenContract
+      ).claimTo(user.user?.uid as string, claimQty);
+      // console.log(tx.receipt);
+
+      // Step 5: set initial claim condition for the club token
+      const setClaimCondition =
+        await clubTokenContract.erc20.claimConditions.set(
+          initialClaimCondition
+        );
+      // console.log("Claim condition set for: ", setClaimCondition);
+
+      // Step 6: add the club token address to the club record for future use
+      const updateResult = await updateDoc(clubDocRef, {
+        club_token_address: clubTokenContractAddress.toLowerCase(),
       });
-      // console.log('Club token address updated to: ',clubTokenContractAddress);
+      // console.log("Club token address updated to: ", updateResult);
 
       setSuccess(true);
       setTimeout(() => router.push(`/create/${id}/complete`), 1500);
     } catch (err) {
-      // console.log(err);
+      console.log(err);
       setError(err);
     }
   };

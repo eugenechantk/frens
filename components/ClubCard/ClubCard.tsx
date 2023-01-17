@@ -19,13 +19,15 @@ export default function ClubCard({
       className="flex flex-col justify-between items-start p-6 h-[212px] bg-white rounded-20 w-full cursor-pointer border-[3px] border-white hover:border-primary-600"
       onClick={props.onClick}
     >
+      <div className="w-[52px] h-[52px] relative">
       <Image
         src={profileImgUrl}
         alt={`Profile image of ${clubName}`}
-        width={52}
-        height={52}
+        fill
         className="rounded-10"
+        style={{'objectFit': 'cover'}}
       />
+      </div>
       <div className="flex flex-col gap-1 items-start w-full">
         <h3>{clubName}</h3>
         {clubDes && (
