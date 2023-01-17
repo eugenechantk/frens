@@ -9,7 +9,7 @@ export default function ClubDetails({data}:{data: IClubInfo}) {
   return (
     <div className="flex flex-col items-start gap-3 w-full">
       <div className="w-[60px] md:w-[52px] h-[60px] md:h-[52px] relative rounded-10 border-2 border-secondary-300 overflow-hidden">
-        <Image src={data.club_image} alt={`Profile image for the club`} fill />
+        <Image src={data.club_image} alt={`Profile image for the club`} fill style={{'objectFit': 'cover'}}/>
       </div>
       {/* Club name and settings button */}
       <div className="flex flex-row items-center gap-4">
