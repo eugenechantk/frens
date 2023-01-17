@@ -1,8 +1,7 @@
-
-
 // TODO: fix the line break of the sign in message
 export const signInMessage =
   "Welcome to frens!\n\nYou are one step away from investing cryptocurrencies with your friends.\n\nClick to sign in and accept the frens Terms of Service\n\nThis request will not trigger a blockchain transaction or cost any gas fees.";
+import axios from "axios";
 import { ethers } from "ethers";
 import { getChainData } from "./chains";
 
@@ -55,4 +54,25 @@ export async function sendTransaction(transaction: any, wallet: ethers.Wallet) {
   return null;
 }
 
-
+export async function getUserHoldings(userAddress: string):Promise<string[]> {
+  const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
+  const tokensOptions = {
+    method: "GET",
+    url: "https://deep-index.moralis.io/api/v2/%address%/erc20".replace(
+      "%address%",
+      userAddress
+    ),
+    params: {
+      chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
+        .network,
+    },
+    headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
+  };
+  const erc20Tokens: any[] = await axios
+    .request(tokensOptions)
+    .then((response) => {
+      return response.data;
+    })
+    .then((data) => data.map((token: any) => token.token_address));
+  return erc20Tokens
+}
