@@ -13,6 +13,7 @@ import { IClubInfo } from "./[id]";
 import { getChainData } from "../../lib/chains";
 import axios from "axios";
 import _ from "lodash";
+import { getUserHoldings } from "../../lib/ethereum";
 
 interface IClubData extends IClubInfo {
   club_id: string;
@@ -35,26 +36,7 @@ export const getServerSideProps = async (context: any) => {
         .verifyIdToken(cookies.token)
         .then((decodedToken) => decodedToken.uid);
       // console.log(userAddress);
-      const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
-      const tokensOptions = {
-        method: "GET",
-        url: "https://deep-index.moralis.io/api/v2/%address%/erc20".replace(
-          "%address%",
-          userAddress
-        ),
-        params: {
-          chain: getChainData(
-            parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
-          ).network,
-        },
-        headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-      };
-      const erc20Tokens: any[] = await axios
-        .request(tokensOptions)
-        .then((response) => {
-          return response.data;
-        })
-        .then((data) => data.map((token: any) => token.token_address));
+      const erc20Tokens = await getUserHoldings(userAddress)
       // console.log(erc20Tokens);
 
       // Step 2: query the club collection to find matching clubs with the same token address
