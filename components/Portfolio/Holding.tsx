@@ -44,6 +44,7 @@ export default function Holding({ data }: { data: THoldingsData }) {
           width={24}
           height={24}
           className="mx-auto my-auto"
+          style={{'objectFit': 'cover'}}
         />
       </div>
       {/* Holding details */}
