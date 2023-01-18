@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { getAnalytics } from "firebase/analytics";
-import { initializeApp } from 'firebase/app'
+import { FirebaseOptions, getApp, initializeApp } from 'firebase/app'
 import { getPerformance } from "firebase/performance";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
@@ -24,8 +24,15 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-export const firebaseClient = initializeApp(firebaseConfig);
-console.log('Firebase client initialized');
+function createFirebaseApp (config: FirebaseOptions) {
+  try {
+    return getApp();
+  } catch {
+    console.log('Initializing firebase client app');
+    return initializeApp(config)
+  }
+}
+const firebaseClient = createFirebaseApp(firebaseConfig);
 // Initialize Firebase Authentication and get a reference to the service
 export const firebaseClientAuth = getAuth(firebaseClient);
 // Only setup emulator in development mode
