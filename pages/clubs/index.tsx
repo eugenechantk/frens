@@ -10,8 +10,6 @@ import { adminAuth, adminFirestore} from "../../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../components/NotAuthed/NotAuthed";
 import { IClubInfo } from "./[id]";
-import { getChainData } from "../../lib/chains";
-import axios from "axios";
 import _ from "lodash";
 import { getUserHoldings } from "../../lib/ethereum";
 
