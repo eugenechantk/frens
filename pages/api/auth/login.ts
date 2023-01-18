@@ -1,6 +1,6 @@
 import { FirebaseError } from "@firebase/util";
 import { NextApiRequest, NextApiResponse } from "next";
-import { firebaseAdmin } from "../../../firebase/firebaseAdmin";
+import { adminAuth, firebaseAdmin } from "../../../firebase/firebaseAdmin";
 import { clientStorage } from "../../../firebase/firebaseClient";
 import { verifyAddress } from "../../../lib/ethereum";
 import generate from "project-name-generator";
@@ -25,6 +25,7 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
   }
 
   const { address, sig } = req.body;
+  const userAddress = address.toLowerCase();
 
   // STEP 1: CHECK IF THE INCOMING USER IS LEGIT BY ITS SIGNATURE
   // verify if the message is really signed by the user
@@ -32,21 +33,20 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
 
   if (verified) {
     // STEP 2: CREATE CUSTOM TOKEN USING USER'S ADDRESS AS UID
-    const customToken = await firebaseAdmin.auth().createCustomToken(address);
+    const customToken = await adminAuth.createCustomToken(userAddress);
     let newUser = true;
 
     // STEP 2: CREATE NEW USER IN FIREBASE AUTH
     // Check if there is an existing user in firebase auth
     try {
-      await firebaseAdmin
-        .auth()
-        .getUser(address)
+      await adminAuth
+        .getUser(userAddress)
         .then(() => (newUser = false));
     } catch (err: FirebaseError | any) {
       // if there is no existing user in firebase auth, create a new user in firebase auth
       if (err.code === "auth/user-not-found") {
-        const _userCreated = await firebaseAdmin.auth().createUser({
-          uid: address,
+        const _userCreated = await adminAuth.createUser({
+          uid: userAddress,
         });
         const _displayName = _.upperFirst(generate().spaced);
         const _profileImg = _.random(1, 8);
@@ -55,9 +55,8 @@ export default async function (req: ILoginApiRequest, res: NextApiResponse) {
           `default_avatars/${_profileImg}.png`
         );
         const _profilePicUrl = await getDownloadURL(_profilePicStorageRef);
-        await firebaseAdmin
-          .auth()
-          .updateUser(address, {
+        await adminAuth
+          .updateUser(userAddress, {
             displayName: _displayName,
             photoURL: _profilePicUrl,
           });
