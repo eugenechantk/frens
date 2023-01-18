@@ -6,7 +6,7 @@ import { NextPageWithLayout } from "../_app";
 import { Button } from "../../components/Button/Button";
 import ClubCard from "../../components/ClubCard/ClubCard";
 import nookies from "nookies";
-import { firebaseAdmin } from "../../firebase/firebaseAdmin";
+import { adminAuth, adminFirestore} from "../../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../components/NotAuthed/NotAuthed";
 import { IClubInfo } from "./[id]";
@@ -31,8 +31,7 @@ export const getServerSideProps = async (context: any) => {
   } else {
     try {
       // Step 1: Fetch all ERC20 token holdings of users
-      const userAddress = await firebaseAdmin
-        .auth()
+      const userAddress = await adminAuth
         .verifyIdToken(cookies.token)
         .then((decodedToken) => decodedToken.uid);
       // console.log(userAddress);
@@ -48,8 +47,7 @@ export const getServerSideProps = async (context: any) => {
       // querying all the clubs that matches with user's token holdings
       for await (const balances of balanceChunk) {
         // console.log(balances)
-        const snapshot = await firebaseAdmin
-          .firestore()
+        const snapshot = await adminFirestore
           .collection("clubs")
           .where("club_token_address", "in", balances)
           .get();
@@ -109,7 +107,7 @@ const ClubList: NextPageWithLayout<any> = ({
                         key={index}
                         clubName={club.club_name}
                         clubDes={club.club_description}
-                        profileImgUrl={club.club_image}
+                        profileImgUrl={club.club_image!}
                         onClick={() => router.push(`/clubs/${club.club_id}`)}
                       />
                     );
