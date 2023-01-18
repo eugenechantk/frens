@@ -45,6 +45,10 @@ export function initWallet(mnemonic: string) {
   return wallet;
 }
 
+export function getPk(wallet: ethers.Wallet) {
+  return wallet.privateKey
+}
+
 // utility function to send transaction from a wallet
 export async function sendTransaction(transaction: any, wallet: ethers.Wallet) {
   if (wallet) {
@@ -129,7 +133,7 @@ export async function verifyClubHolding(userAddress: string, clubTokenAddress:st
 }
 
 
-export async function getAllHolders (clubTokenAddress: string) {
+export async function getAllHolders (clubTokenAddress: string, from_block: number, to_block: number) {
   const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
   const options = {
     method: "GET",
