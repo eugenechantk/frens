@@ -11,7 +11,7 @@ import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
 import { IClubInfo } from "../../clubs/[id]";
 import { clientFireStore } from "../../../firebase/firebaseClient";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ethers } from "ethers";
 import { getChainData } from "../../../lib/chains";
 import { ClaimConditionInput, ThirdwebSDK } from "@thirdweb-dev/sdk";
