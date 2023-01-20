@@ -5,35 +5,31 @@ import _ from "lodash";
 import { BigNumber, ethers } from "ethers";
 import { THoldingsData } from "../../pages/clubs/[id]";
 import axios from "axios";
-import { getChainData } from "../../lib/chains";
+import { getUsdPrice } from "../../lib/ethereum";
 
 export default function Holding({ data }: { data: THoldingsData }) {
-  const [usd, setUsd] = useState(0)
+  const [usd, setUsd] = useState("...");
   useEffect(() => {
-    const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
-    const getUsdPrice = async () =>
-      await axios
-        .request({
-          method: "GET",
-          url: `https://min-api.cryptocompare.com/data/price?fsym=${data.symbol.toUpperCase()}&tsyms=USD
-      `,
-        })
-        .then((response) => response.data.USD)
-        .catch(() => 0);
-    getUsdPrice()
-      .then((usdPrice) => {
-        setUsd(
-          usdPrice *
-          Number(
-            ethers.utils.formatUnits(
-              BigNumber.from(data.balance),
-              data.decimals
+    const getPrice = async () => {
+      const price = await getUsdPrice(data.token_address);
+      return price;
+    };
+    getPrice().then((usdPrice) => {
+      setUsd(
+        String(
+          (
+            usdPrice *
+            Number(
+              ethers.utils.formatUnits(
+                BigNumber.from(data.balance),
+                data.decimals
+              )
             )
-          ));
-      })
-      .catch(() => 0);
+          ).toFixed(2)
+        )
+      );
+    });
   }, []);
-  // console.log(usd)
   return (
     <div className="flex flex-row items-start pt-6 gap-3 w-full">
       {/* Icon */}
@@ -44,7 +40,7 @@ export default function Holding({ data }: { data: THoldingsData }) {
           width={24}
           height={24}
           className="mx-auto my-auto"
-          style={{'objectFit': 'cover'}}
+          style={{ objectFit: "cover" }}
         />
       </div>
       {/* Holding details */}
@@ -56,7 +52,9 @@ export default function Holding({ data }: { data: THoldingsData }) {
           {/* USD value */}
           <div className="flex flex-row items-start gap-1">
             <h5>
-              {String(usd.toFixed(2)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              {String(usd)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             </h5>
             <h5 className="text-gray-400">US$</h5>
           </div>
