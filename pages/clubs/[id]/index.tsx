@@ -171,10 +171,11 @@ export const getServerSideProps = async (context: any) => {
     }
 
     // STEP 2: Get the transfer events ellapsed from last time the club is retrieved
-    const currentBlock = await ethers
-      .getDefaultProvider(
-        parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
-      )
+    const rpcUrl = getChainData(
+      parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
+    ).rpc_url;
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const currentBlock = await provider
       .getBlockNumber();
     // console.log(`Querying transactions from ${clubInfo.last_retrieved_block} to ${currentBlock}`);
     const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;

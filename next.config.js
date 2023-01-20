@@ -10,6 +10,10 @@ module.exports = {
       {
         protocol:'https',
         hostname:'cryptoicons.org'
+      },
+      {
+        protocol:'https',
+        hostname:'coinicons-api.vercel.app'
       }
     ],
   },

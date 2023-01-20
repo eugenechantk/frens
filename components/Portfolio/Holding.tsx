@@ -9,6 +9,7 @@ import { getUsdPrice } from "../../lib/ethereum";
 
 export default function Holding({ data }: { data: THoldingsData }) {
   const [usd, setUsd] = useState("...");
+  const [icon, setIcon] = useState();
   useEffect(() => {
     const getPrice = async () => {
       const price = await getUsdPrice(data.token_address);
@@ -35,7 +36,7 @@ export default function Holding({ data }: { data: THoldingsData }) {
       {/* Icon */}
       <div className=" w-10 h-10 border border-secondary-300 rounded-8 flex flex-col items-center">
         <Image
-          src={`https://cryptoicons.org/api/color/${data.symbol.toLowerCase()}/24`}
+          src={`https://coinicons-api.vercel.app/api/icon/${data.symbol.toLowerCase()}`}
           alt={`${data.name} icon`}
           width={24}
           height={24}
