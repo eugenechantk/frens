@@ -1,5 +1,5 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { firebaseAdmin } from "../../firebase/firebaseAdmin";
+import { adminAuth, firebaseAdmin } from "../../firebase/firebaseAdmin";
 
 export function withAuth(handler: NextApiHandler) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
@@ -11,7 +11,7 @@ export function withAuth(handler: NextApiHandler) {
     const token = authHeader.split(" ")[1];
     let decodedToken;
     try {
-      decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+      decodedToken = await adminAuth.verifyIdToken(token);
       if (!decodedToken || !decodedToken.uid)
         return res.status(401).end("Not authenticated");
     } catch (error: any) {
