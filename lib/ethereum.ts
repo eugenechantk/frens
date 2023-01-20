@@ -45,6 +45,10 @@ export function initWallet(mnemonic: string) {
   return wallet;
 }
 
+export function getPk(wallet: ethers.Wallet) {
+  return wallet.privateKey
+}
+
 // utility function to send transaction from a wallet
 export async function sendTransaction(transaction: any, wallet: ethers.Wallet) {
   if (wallet) {
@@ -125,43 +129,5 @@ export async function verifyClubHolding(userAddress: string, clubTokenAddress:st
   } catch (err) {
     console.log(err);
     return false
-  }
-}
-
-
-export async function getAllHolders (clubTokenAddress: string) {
-  const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
-  const options = {
-    method: "GET",
-    url: "https://deep-index.moralis.io/api/v2/erc20/%address%/transfers".replace(
-      "%address%",
-      clubTokenAddress
-    ),
-    params: {
-      chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
-        .network,
-    },
-    headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-  }
-  try {
-    let _holderBalance: {[k: string]: IHolderBalanceInfo}
-    const tranferEvents = await axios.request(options).then(response => response.data).then(data => data.result)
-    tranferEvents.forEach((event: ITransferEvent) => {
-      if (!(event.from_address in _holderBalance)) {
-        _holderBalance[event.from_address] = {
-          balance: BigNumber.from(0),
-        };
-      }
-      if (!(event.to_address in _holderBalance)) {
-        _holderBalance[event.to_address] = {
-          balance: BigNumber.from(0),
-        };
-      }
-      
-    })
-
-
-  } catch (err) {
-    console.log(err)
   }
 }

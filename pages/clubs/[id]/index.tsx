@@ -1,9 +1,10 @@
-import React, { lazy, ReactElement, Suspense } from "react";
+import React, { lazy, ReactElement } from "react";
 import AppLayout from "../../../layout/AppLayout";
 import { NextPageWithLayout } from "../../_app";
-import { useAuth } from "../../../lib/auth";
-import { useRouter } from "next/router";
-import { firebaseAdmin } from "../../../firebase/firebaseAdmin";
+import {
+  adminAuth,
+  adminFirestore,
+} from "../../../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
 import ClubDetails from "../../../components/ClubDetails/ClubDetails";
 import ClubMembers from "../../../components/ClubMembers/ClubMembers";
@@ -15,22 +16,24 @@ import axios from "axios";
 import _ from "lodash";
 import nookies from "nookies";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
-import { getAllHolders, verifyClubHolding } from "../../../lib/ethereum";
+import {
+  verifyClubHolding,
+} from "../../../lib/ethereum";
 import NotVerified from "../../../components/NotVerified/NotVerified";
+import { ethers } from "ethers";
 const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
 
 export interface IClubInfo {
   club_description: string;
-  club_image: string;
+  club_image?: string;
   club_name: string;
-  club_token_sym?: string;
-  club_wallet_address: string;
+  club_token_sym: string;
+  club_wallet_address?: string;
   club_wallet_mnemonic?: string;
+  club_token_address?: string;
   deposited?: boolean;
-}
-
-interface IClubDetails extends IClubInfo {
-  club_token_address: string;
+  club_members?: { [k: string]: number };
+  last_retrieved_block?: number;
 }
 
 export type THoldingsData = {
@@ -43,11 +46,24 @@ export type THoldingsData = {
   balance: string;
 };
 
-export type TMemberInfoData = {
+export interface IMemberInfoData {
   display_name: string;
   profile_image: string;
   uid: string;
-};
+}
+
+interface ITransferEvent {
+  transaction_hash: string;
+  address: string;
+  block_timestamp: string;
+  block_number: string;
+  block_hash: string;
+  to_address: string;
+  from_address: string;
+  value: string;
+  transaction_index: number;
+  log_index: number;
+}
 
 export const getServerSideProps = async (context: any) => {
   const { id } = context.params;
@@ -58,8 +74,7 @@ export const getServerSideProps = async (context: any) => {
   // Fetch function for club information
   const fetchClubInfo = async (id: string) => {
     try {
-      const _clubInfo = await firebaseAdmin
-        .firestore()
+      const _clubInfo = await adminFirestore
         .collection("clubs")
         .doc(id)
         .get()
@@ -67,23 +82,10 @@ export const getServerSideProps = async (context: any) => {
           if (!doc.exists) {
             throw new Error("club does not exist in database");
           }
-          return doc.data() as IClubDetails;
+          return doc.data() as IClubInfo;
         })
         .then((data) => {
-          const {
-            club_name,
-            club_description,
-            club_image,
-            club_wallet_address,
-            club_token_address,
-          } = data!;
-          return {
-            club_name,
-            club_description,
-            club_image,
-            club_wallet_address,
-            club_token_address,
-          };
+          return { ...data };
         });
       return _clubInfo;
     } catch (err) {
@@ -155,10 +157,86 @@ export const getServerSideProps = async (context: any) => {
     }
   };
 
-  const fetchMemberInfo = async (clubTokenAddress: string) => {
-    const result = await getAllHolders(clubTokenAddress)
-    return result
-  }
+  const fetchMemberInfo = async (clubInfo: IClubInfo) => {
+    // STEP 1: Fetch the last updated club member list
+    let _club_members: { [k: string]: number };
+    if (clubInfo.club_members) {
+      _club_members = clubInfo.club_members;
+    } else {
+      _club_members = {
+        "0x0000000000000000000000000000000000000000": 0,
+      };
+    }
+
+    // STEP 2: Get the transfer events ellapsed from last time the club is retrieved
+    const currentBlock = await ethers
+      .getDefaultProvider(
+        getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)).network
+      )
+      .getBlockNumber();
+    // console.log(`Querying transactions from ${clubInfo.last_retrieved_block} to ${currentBlock}`);
+    const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
+    const options = {
+      method: "GET",
+      url: "https://deep-index.moralis.io/api/v2/erc20/%address%/transfers".replace(
+        "%address%",
+        clubInfo.club_token_address!
+      ),
+      params: {
+        chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
+          .network,
+        from_block:
+          clubInfo.last_retrieved_block && clubInfo.last_retrieved_block,
+        to_block: currentBlock,
+      },
+      headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
+    };
+
+    // STEP 3: Update the club member list based on new transfer events
+    const transferEvents = await axios
+      .request(options)
+      .then((response) => response.data)
+      .then((data) => data.result);
+    console.log(transferEvents);
+    transferEvents.forEach((event: ITransferEvent) => {
+      // Create a new member object if the existing club member object does not have the addresses
+      if (!(event.from_address in _club_members)) {
+        _club_members[event.from_address] = 0;
+      }
+      if (!(event.to_address in _club_members)) {
+        _club_members[event.to_address] = 0;
+      }
+      // Update the balance of each club member
+      _club_members[event.from_address] -= parseInt(event.value);
+      _club_members[event.to_address] += parseInt(event.value);
+    });
+    // Purge all addresses with <=0 balance
+    _club_members = _.pickBy(_club_members, function (value) {
+      return value > 0;
+    });
+    // console.log('New club member list: ', _club_members)
+
+    // STEP 4: Replace existing club members with updated club members list
+    const result = await adminFirestore.collection("clubs").doc(id).update({
+      club_members: _club_members,
+      last_retrieved_block: currentBlock,
+    });
+
+    // STEP 5: Fetch club members info
+    let memberInfo = [] as IMemberInfoData[];
+    await Promise.all(
+      Object.keys(_club_members).map(async (uid) => {
+        console.log(uid)
+        const _memberInfo = await adminAuth.getUser(uid);
+        memberInfo.push({
+          display_name: _memberInfo.displayName!,
+          profile_image: _memberInfo.photoURL!,
+          uid: _memberInfo.uid,
+        });
+      })
+    );
+    return memberInfo
+  };
 
   if (!cookies.token) {
     return {
@@ -168,34 +246,37 @@ export const getServerSideProps = async (context: any) => {
     };
   } else {
     try {
-      const userAddress = await firebaseAdmin
-        .auth()
+      // Prereq: get user address and club info
+      const userAddress = await adminAuth
         .verifyIdToken(cookies.token)
         .then((decodedToken) => decodedToken.uid);
-      const clubInfo: IClubDetails = await fetchClubInfo(id);
-      
-      // Step 1: Check if the user has club tokens to access this club
+
+      // Step 1: Get club information
+      const clubInfo: IClubInfo = await fetchClubInfo(id);
+
+      // Step 2: Check if the user has club tokens to access this club
       const verify = await verifyClubHolding(
         userAddress,
-        clubInfo.club_token_address
+        clubInfo.club_token_address!
       );
       // console.log(verify)
       if (!verify) {
         throw Error("Not verified");
       }
 
-      const holders = await fetchMemberInfo(clubInfo.club_token_address)
-
       // Step 3: Fetch porfolio of the club
       const balance: THoldingsData[] = await fetchPortfolio(
-        clubInfo.club_wallet_address
+        clubInfo.club_wallet_address!
       );
-      
+
+      // Step 4: fetch club members
+      const memberInfo = await fetchMemberInfo(clubInfo);
+
       return {
         props: {
           clubInfo: clubInfo,
           balance: balance,
-          // members: memberInfo,
+          members: memberInfo,
         },
       };
     } catch (err) {
@@ -221,7 +302,7 @@ const Dashboard: NextPageWithLayout<any> = ({
             {/* Club details and members */}
             <div className="flex flex-col items-start gap-4 w-full">
               <ClubDetails data={serverProps.clubInfo!} />
-              {/* <ClubMembers data={serverProps.members!} /> */}
+              <ClubMembers data={serverProps.members!} />
             </div>
             {/* Balance */}
             {/* TODO: have a global state setting for whether to show club or me balance */}

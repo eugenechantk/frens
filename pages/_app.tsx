@@ -2,7 +2,6 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import type { NextPage } from "next";
 import { AuthProvider } from "../lib/auth";
-import { firebaseClient } from "../firebase/firebaseClient";
 import { Montserrat } from "@next/font/google";
 
 export type NextPageWithLayout<Props> = NextPage<Props> & {

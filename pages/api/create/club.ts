@@ -1,19 +1,15 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { createRouter, expressWrapper } from "next-connect";
 import formidable from "formidable";
 import { adminFirestore, adminStorage, firebaseAdmin } from "../../../firebase/firebaseAdmin";
 import { getDownloadURL, ref } from "firebase/storage";
 import {
   clientStorage,
 } from "../../../firebase/firebaseClient";
-import { arrayUnion, doc, FieldValue, updateDoc } from "firebase/firestore";
-import bodyParser, { json } from "body-parser";
-import PersistentFile from "formidable/PersistentFile";
 import { withAuth } from "../middleware";
 
 let uid: string;
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler: NextApiHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   const form = formidable({ multiples: false });
   form.parse(req, async (err, fields, file) => {
     console.log(fields, file);

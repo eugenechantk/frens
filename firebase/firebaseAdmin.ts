@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase-admin";
-import { App, cert, getApp, getApps } from "firebase-admin/app";
+import * as admin from "firebase-admin";
+import { App, cert, getApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore"
 import { getStorage } from "firebase-admin/storage"
@@ -11,9 +11,11 @@ const serviceAccount = JSON.parse(
 );
 
 function createFirebaseAdminApp ():App {
-  if (getApps().length === 0) {
+  try {
+    return getApp()
+  } catch {
     console.log('Initializing Firebase admin')
-    return initializeApp({
+    return admin.initializeApp({
       credential: cert({
         privateKey: serviceAccount.private_key,
         clientEmail: serviceAccount.client_email,
@@ -22,8 +24,6 @@ function createFirebaseAdminApp ():App {
       databaseURL: `https://${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebaseio.com`,
       storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
     });
-  } else {
-    return getApp();
   }
 }
 const firebaseAdmin = createFirebaseAdminApp();

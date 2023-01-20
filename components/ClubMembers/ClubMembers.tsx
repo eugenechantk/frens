@@ -1,10 +1,10 @@
 import Image from "next/image";
 import React from "react";
 import ReactTooltip from "react-tooltip";
-import { TMemberInfoData } from "../../pages/clubs/[id]";
+import { IMemberInfoData } from "../../pages/clubs/[id]";
 import { Button } from "../Button/Button";
 
-export default function ClubMembers({data}: {data: TMemberInfoData[]}) {
+export default function ClubMembers({data}: {data: IMemberInfoData[]}) {
   // console.log('data parsed into ClubMembers', data)
   return (
     <div className="flex flex-row items-center justify-center gap-2">
@@ -18,6 +18,7 @@ export default function ClubMembers({data}: {data: TMemberInfoData[]}) {
                 data-for={`member-${index}-tooltip`}
                 // data-tip={member.display_name.startsWith('0x') ? `${member.display_name.slice(0, 6)}...${member.display_name.slice(-4)}` : member.display_name}
                 data-tip={`${member.uid.slice(0, 6)}...${member.uid.slice(-4)}`}
+                // data-tip={member.display_name}
               >
                 <Image src={member.profile_image} alt="Member's profile image" fill style={{'objectFit': 'cover'}}/>
               </div>

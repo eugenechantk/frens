@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { provider } from "../../../lib/provider";
 import { clientFireStore } from "../../../firebase/firebaseClient";
-import { doc, DocumentData, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ethers } from "ethers";
 import nookies from "nookies";
 import { InferGetServerSidePropsType } from "next";
