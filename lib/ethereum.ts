@@ -46,7 +46,7 @@ export function initWallet(mnemonic: string) {
 }
 
 export function getPk(wallet: ethers.Wallet) {
-  return wallet.privateKey
+  return wallet.privateKey;
 }
 
 // utility function to send transaction from a wallet
@@ -78,7 +78,7 @@ export async function sendTransaction(transaction: any, wallet: ethers.Wallet) {
 }
 
 // Get all the token addresses that the user has
-export async function getUserHoldings(userAddress: string):Promise<string[]> {
+export async function getUserHoldings(userAddress: string): Promise<string[]> {
   const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
   const tokensOptions = {
     method: "GET",
@@ -98,11 +98,14 @@ export async function getUserHoldings(userAddress: string):Promise<string[]> {
       return response.data;
     })
     .then((data) => data.map((token: any) => token.token_address));
-  return erc20Tokens
+  return erc20Tokens;
 }
 
 // Return a boolean value if the user's wallet holds a specific club token
-export async function verifyClubHolding(userAddress: string, clubTokenAddress:string): Promise<boolean> {
+export async function verifyClubHolding(
+  userAddress: string,
+  clubTokenAddress: string
+): Promise<boolean> {
   // console.log(userAddress, clubTokenAddress)
   const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
   const options = {
@@ -114,20 +117,60 @@ export async function verifyClubHolding(userAddress: string, clubTokenAddress:st
     params: {
       chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
         .network,
-      token_addresses: clubTokenAddress
+      token_addresses: clubTokenAddress,
     },
     headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-  }
+  };
   try {
-    const result = await axios.request(options).then(response => response.data)
+    const result = await axios
+      .request(options)
+      .then((response) => response.data);
     // console.log(result)
-    if (result.length !== 0){
-      return true
+    if (result.length !== 0) {
+      return true;
     } else {
-      return false
+      return false;
     }
   } catch (err) {
     console.log(err);
-    return false
+    return false;
   }
+}
+
+// Returns USD price of the token
+export async function getUsdPrice(tokenAddress?: string): Promise<number> {
+  const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
+  let usdPrice = 0;
+  const options = {
+    method: "GET",
+    url: "https://deep-index.moralis.io/api/v2/erc20/%address%/price".replace(
+      "%address%",
+      tokenAddress!
+    ),
+    params: {
+      chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
+        .network,
+    },
+    headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
+  };
+  try {
+    if (tokenAddress) {
+      const result = await axios
+        .request(options)
+        .then((response) => response.data);
+      if (result.usdPrice) {
+        usdPrice = result.usdPrice;
+      }
+    } else {
+      usdPrice = await axios
+        .get(
+          "https://min-api.cryptocompare.com/data/pricemulti?fsyms=ETH&tsyms=USD"
+        )
+        .then((response) => response.data)
+        .then((data) => data.ETH.USD);
+    }
+  } catch (err) {
+    console.log("Fetch usd price error: ", err);
+  }
+  return usdPrice;
 }
