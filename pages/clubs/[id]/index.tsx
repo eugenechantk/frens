@@ -17,6 +17,7 @@ import _ from "lodash";
 import nookies from "nookies";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
 import {
+  getUsdPrice,
   verifyClubHolding,
 } from "../../../lib/ethereum";
 import NotVerified from "../../../components/NotVerified/NotVerified";
@@ -44,6 +45,7 @@ export type THoldingsData = {
   thumbnail: string | null;
   decimals: number;
   balance: string;
+  value?: number;
 };
 
 export interface IMemberInfoData {
@@ -95,7 +97,7 @@ export const getServerSideProps = async (context: any) => {
 
   // Fetcher function for club portfolio
   const fetchPortfolio = async (address: string) => {
-    let balance = [] as THoldingsData[];
+    let balances = [] as THoldingsData[];
     const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
     const tokensOptions = {
       method: "GET",
@@ -131,7 +133,7 @@ export const getServerSideProps = async (context: any) => {
             return response.data;
           })
           .then((data: []) =>
-            data.forEach((tokenBalance) => balance.push(tokenBalance))
+            data.forEach((tokenBalance) => balances.push(tokenBalance))
           );
       };
       const nativeBalance = async () => {
@@ -140,7 +142,7 @@ export const getServerSideProps = async (context: any) => {
           .then((response) => {
             return response.data.balance;
           });
-        balance.push({
+        balances.push({
           token_address: "",
           name: "Ethereum",
           symbol: "ETH",
@@ -151,13 +153,13 @@ export const getServerSideProps = async (context: any) => {
         });
       };
       await Promise.all([erc20TokenBalance(), nativeBalance()]);
-      return balance;
+      return balances;
     } catch (err) {
       throw err;
     }
   };
 
-  const fetchMemberInfo = async (clubInfo: IClubInfo) => {
+  const fetchMemberInfo = async (clubInfo: IClubInfo): Promise<IMemberInfoData[]> => {
     // STEP 1: Fetch the last updated club member list
     let _club_members: { [k: string]: number };
     if (clubInfo.club_members) {
@@ -171,7 +173,7 @@ export const getServerSideProps = async (context: any) => {
     // STEP 2: Get the transfer events ellapsed from last time the club is retrieved
     const currentBlock = await ethers
       .getDefaultProvider(
-        getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)).network
+        parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
       )
       .getBlockNumber();
     // console.log(`Querying transactions from ${clubInfo.last_retrieved_block} to ${currentBlock}`);
@@ -197,7 +199,7 @@ export const getServerSideProps = async (context: any) => {
       .request(options)
       .then((response) => response.data)
       .then((data) => data.result);
-    console.log(transferEvents);
+    // console.log(transferEvents);
     transferEvents.forEach((event: ITransferEvent) => {
       // Create a new member object if the existing club member object does not have the addresses
       if (!(event.from_address in _club_members)) {
@@ -226,7 +228,7 @@ export const getServerSideProps = async (context: any) => {
     let memberInfo = [] as IMemberInfoData[];
     await Promise.all(
       Object.keys(_club_members).map(async (uid) => {
-        console.log(uid)
+        // console.log(uid)
         const _memberInfo = await adminAuth.getUser(uid);
         memberInfo.push({
           display_name: _memberInfo.displayName!,
@@ -250,7 +252,7 @@ export const getServerSideProps = async (context: any) => {
       const userAddress = await adminAuth
         .verifyIdToken(cookies.token)
         .then((decodedToken) => decodedToken.uid);
-
+      // console.log(userAddress)
       // Step 1: Get club information
       const clubInfo: IClubInfo = await fetchClubInfo(id);
 
@@ -270,7 +272,12 @@ export const getServerSideProps = async (context: any) => {
       );
 
       // Step 4: fetch club members
-      const memberInfo = await fetchMemberInfo(clubInfo);
+      let memberInfo = [] as IMemberInfoData[]
+      try {
+        memberInfo = await fetchMemberInfo(clubInfo);
+      } catch (err) {
+        console.log(err)
+      }
 
       return {
         props: {
