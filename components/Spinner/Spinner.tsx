@@ -23,7 +23,7 @@ export default function Spinner({
     <div className="relative" style={{ width: size, height: size }}>
       {error ? (
         <Image src={errorImg} alt="successfully loaded" fill />
-      ) : error ? (
+      ) : success ? (
         <Image src={successImg} alt="successfully loaded" fill />
       ) : (
         <div className=" flex flex-row items-center justify-center w-full h-full">
