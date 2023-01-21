@@ -319,7 +319,7 @@ const Dashboard: NextPageWithLayout<any> = ({
             <Portfolio data={serverProps.balance!} clubWalletAddress={serverProps.clubInfo?.club_wallet_address!}/>
           </div>
           {/* Right panel */}
-          <WidgetSection />
+          <WidgetSection data={serverProps.clubInfo!}/>
         </div>
       ) : serverProps.error === "Not authed" ? (
         <NotAuthed />
