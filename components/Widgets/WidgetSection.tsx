@@ -2,7 +2,7 @@ import React, { lazy, useState, Suspense } from "react";
 import LoadingWidget from "./LoadingWidget";
 import WidgetToggle from "./WidgetToggle";
 const TradeAsset = lazy(() => import("./TradeAsset"));
-const BuyIn = lazy(() => import("./BuyInWidget"));
+const BuyInWidgetWrapper = lazy(() => import("./BuyInWidget/BuyInWidgetWrapper"));
 
 export default function WidgetSection() {
   const [selected, setSelected] = useState("invest");
@@ -12,7 +12,7 @@ export default function WidgetSection() {
       <div className="w-full md:w-[376px] border border-secondary-300 shrink-0 rounded-20 p-2 flex flex-col items-start gap-2">
         <Suspense fallback={<LoadingWidget />}>
           {selected === "invest" && <TradeAsset />}
-          {selected === "buyin" && <BuyIn />}
+          {selected === "buyin" && <BuyInWidgetWrapper />}
         </Suspense>
       </div>
     </div>

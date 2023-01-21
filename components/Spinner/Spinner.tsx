@@ -21,10 +21,10 @@ export default function Spinner({
 }: ISpinnerProps) {
   return (
     <div className="relative" style={{ width: size, height: size }}>
-      {success ? (
-        <Image src={successImg} alt="successfully loaded" fill />
-      ) : error ? (
+      {error ? (
         <Image src={errorImg} alt="successfully loaded" fill />
+      ) : success ? (
+        <Image src={successImg} alt="successfully loaded" fill />
       ) : (
         <div className=" flex flex-row items-center justify-center w-full h-full">
           <PulseLoader
