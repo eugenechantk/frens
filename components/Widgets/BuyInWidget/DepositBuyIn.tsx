@@ -3,9 +3,9 @@ import { Button } from "../../Button/Button";
 import Spinner from "../../Spinner/Spinner";
 
 export default function DepositBuyIn() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<any>(false);
+  const [error, setError] = useState<any>();
   return (
     <div className="w-full h-full">
       <div className="flex flex-col gap-4 items-center h-full">
