@@ -10,12 +10,13 @@ import DepositBuyIn from "./DepositBuyIn";
 import InputBuyIn from "./InputBuyIn";
 
 export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
-  const [buyIn, setBuyIn] = useState(0);
+  const [claimAmount, setClaimAmount] = useState(0);
   const [step, setStep] = useState(1);
   const [tokenContract, setTokenContract] = useState<TokenDrop>();
   const [loading, setLoading] = useState(true);
   const [userBalance, setUserBalance] = useState(0);
   const [totalSupply, setTotalSupply] = useState(0);
+  const [ethPrice, setEthPrice] = useState(0);
   // const [userSdk, setUserSdk] = useState<ThirdwebSDK>();
   const userSdk = new ThirdwebSDK(provider?.getSigner()!);
 
@@ -51,14 +52,19 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
           );
         setTotalSupply(supply);
       };
-      await Promise.all([getBalance(), getTotalSupply()])
+      const getEthPrice = async () => {
+        const price = await getUsdPrice();
+        setEthPrice(price);
+      };
+      
+      await Promise.all([getBalance(), getTotalSupply(), getEthPrice()])
       setLoading(false);
     });
   }, []);
 
   useEffect(() => {
-    console.log(buyIn, step);
-  }, [buyIn, step]);
+    console.log(claimAmount, step);
+  }, [claimAmount, step]);
 
   return (
     <>
@@ -74,17 +80,18 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
             <div className="w-full h-full">
               {step === 1 && (
                 <InputBuyIn
-                  onClick={(buyInEth: number) => {
+                  onClick={(buyTokenCount: number) => {
                     setStep(2);
-                    setBuyIn(buyInEth);
+                    setClaimAmount(buyTokenCount);
                   }}
                   data={data}
                   userBalance={userBalance}
                   totalSupply={totalSupply}
+                  ethPrice={ethPrice}
                 />
               )}
               {step === 2 && (
-                <DepositBuyIn userSdk={userSdk} tokenContract={tokenContract} />
+                <DepositBuyIn userSdk={userSdk} tokenContract={tokenContract} claimAmount={claimAmount}/>
               )}
             </div>
           </>
