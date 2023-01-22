@@ -1,33 +1,18 @@
 import { ArrowSmallDownIcon } from "@heroicons/react/24/outline";
-import { ThirdwebSDK, TokenDrop } from "@thirdweb-dev/sdk";
-import { BigNumber, ethers } from "ethers";
-import { formatUnits } from "ethers/lib/utils";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { getUsdPrice } from "../../../lib/ethereum";
 import { IClubInfo } from "../../../pages/clubs/[id]";
 import { Button } from "../../Button/Button";
 
-interface IUserBalance {
-  symbol: string;
-  decimals: number;
-  displayValue: string;
-  name: string;
-  value: BigNumber;
-}
-
 export default function InputBuyIn({
   data,
   onClick,
-  userSdk,
-  tokenContract,
   userBalance,
   totalSupply,
 }: {
   onClick: (buyInEth: number) => void;
   data: IClubInfo;
-  userSdk: ThirdwebSDK | undefined;
-  tokenContract: TokenDrop;
   userBalance: number;
   totalSupply: number;
 }) {
@@ -36,7 +21,7 @@ export default function InputBuyIn({
   const [ethPrice, setEthPrice] = useState(0);
   const [newUserBalance, setNewUserBalance] = useState(userBalance);
   const [newTotalSupply, setNewTotalSupply] = useState(totalSupply);
-  console.log(userBalance, totalSupply)
+  // console.log(userBalance, totalSupply)
 
   useEffect(() => {
     const getEthPrice = async () => {
@@ -54,7 +39,7 @@ export default function InputBuyIn({
     }
   }, [buyInUsd]);
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value) {
       console.log("resetting values");
       setBuyInUsd(0);
@@ -128,11 +113,6 @@ export default function InputBuyIn({
         {/* Center arrow */}
         <div className="absolute border-4 rounded-10 border-primary-100 bg-primary-200 w-12 h-12 flex flex-row justify-center left-[calc(50%-48px/2)] top-[calc(50%-40px/2-32px)]">
           <ArrowSmallDownIcon className=" w-6 text-primary-600" />
-        </div>
-        {/* Processing fee estimation */}
-        <div className="flex flex-row justify-between px-4">
-          <p className="text-sm text-gray-400">Processing fee</p>
-          <p className="text-sm text-gray-400">~0.000265 ETH</p>
         </div>
       </div>
       <Button className="w-[218px]" onClick={() => onClick(buyInEth)}>
