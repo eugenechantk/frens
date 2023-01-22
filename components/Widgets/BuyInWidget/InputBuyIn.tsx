@@ -10,54 +10,39 @@ export default function InputBuyIn({
   onClick,
   userBalance,
   totalSupply,
+  ethPrice
 }: {
   onClick: (buyInEth: number) => void;
   data: IClubInfo;
   userBalance: number;
   totalSupply: number;
+  ethPrice: number;
 }) {
   const [buyInUsd, setBuyInUsd] = useState(0);
   const [buyInEth, setBuyInEth] = useState(0);
-  const [ethPrice, setEthPrice] = useState(0);
+  const [buyTokenCount, setBuyTokenCount] = useState(0)
   const [newUserBalance, setNewUserBalance] = useState(userBalance);
   const [newTotalSupply, setNewTotalSupply] = useState(totalSupply);
   // console.log(userBalance, totalSupply)
 
   useEffect(() => {
-    const getEthPrice = async () => {
-      const price = await getUsdPrice();
-      setEthPrice(price);
-    };
-    getEthPrice(); 
-  }, []);
-
-  useEffect(() => {
-    if (ethPrice === 0) {
-      setBuyInEth(0);
-    } else {
-      setBuyInEth(buyInUsd / ethPrice);
-    }
+    // Display buy in value in ETH
+    setBuyInEth(buyInUsd / ethPrice);
+    // Calculate token count
+    setBuyTokenCount(buyInEth / parseFloat(process.env.NEXT_PUBLIC_CLAIM_ETH_PRICE!));
+    setNewUserBalance(userBalance + buyTokenCount);
+    setNewTotalSupply(totalSupply + buyTokenCount);
   }, [buyInUsd]);
 
   const handleOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.value) {
-      console.log("resetting values");
+      // Reset all states when the input is emptied
       setBuyInUsd(0);
-      setBuyInEth(0);
+      setBuyInEth(0)
+      setBuyTokenCount(0)
     } else {
       setBuyInUsd(parseInt(e.target.value));
-      setBuyInEth(buyInUsd / ethPrice);
     }
-    let buyTokenCount;
-    if (!e.target.value) {
-      buyTokenCount = 0;
-    } else {
-      buyTokenCount =
-        buyInEth / parseFloat(process.env.NEXT_PUBLIC_CLAIM_ETH_PRICE!);
-    }
-    console.log(buyInEth, buyTokenCount);
-    setNewUserBalance(userBalance + buyTokenCount);
-    setNewTotalSupply(totalSupply + buyTokenCount);
   };
 
   return (
@@ -115,7 +100,7 @@ export default function InputBuyIn({
           <ArrowSmallDownIcon className=" w-6 text-primary-600" />
         </div>
       </div>
-      <Button className="w-[218px]" onClick={() => onClick(buyInEth)}>
+      <Button className="w-[218px]" onClick={() => onClick(buyTokenCount)}>
         <h3>Deposit and buy in</h3>
       </Button>
     </div>
