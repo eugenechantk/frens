@@ -17,6 +17,7 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
   const [userBalance, setUserBalance] = useState(0);
   const [totalSupply, setTotalSupply] = useState(0);
   const [ethPrice, setEthPrice] = useState(0);
+  const [resetKey, setResetKey] = useState(0);
   // const [userSdk, setUserSdk] = useState<ThirdwebSDK>();
   const userSdk = new ThirdwebSDK(provider?.getSigner()!);
 
@@ -25,19 +26,11 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
   //   setUserSdk(_userThirdWebSDK);
   // }, []);
 
-  useEffect(() => {
-    const getContract = async () => {
-      const contract = await userSdk.getContract(
-        data.club_token_address!,
-        "token-drop"
-      );
-      setTokenContract(contract);
-      return contract
-    };
-    
-    getContract().then(async (tokenContract) => {
+  const getAllInfo = async (contract = tokenContract) => {
+    setLoading(true);
+    if (contract) {
       const getBalance = async () => {
-        const userTokenCount = await tokenContract
+        const userTokenCount = await contract!
           .balance()
           .then((balance) =>
             parseFloat(formatUnits(balance.value, balance.decimals))
@@ -45,7 +38,7 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
         setUserBalance(userTokenCount);
       };
       const getTotalSupply = async () => {
-        const supply = await tokenContract
+        const supply = await contract!
           .totalSupply()
           .then((supply) =>
             parseFloat(formatUnits(supply.value, supply.decimals))
@@ -56,10 +49,20 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
         const price = await getUsdPrice();
         setEthPrice(price);
       };
-      
-      await Promise.all([getBalance(), getTotalSupply(), getEthPrice()])
-      setLoading(false);
-    });
+      await Promise.all([getBalance(), getTotalSupply(), getEthPrice()]);
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
+    const getContract = async () => {
+      const contract = await userSdk.getContract(
+        data.club_token_address!,
+        "token-drop"
+      );
+      setTokenContract(contract);
+      return contract;
+    };
+    getContract().then(async (contract) => await getAllInfo(contract));
   }, []);
 
   useEffect(() => {
@@ -88,10 +91,20 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
                   userBalance={userBalance}
                   totalSupply={totalSupply}
                   ethPrice={ethPrice}
+                  key={resetKey}
                 />
               )}
               {step === 2 && (
-                <DepositBuyIn userSdk={userSdk} tokenContract={tokenContract} claimAmount={claimAmount}/>
+                <DepositBuyIn
+                  tokenContract={tokenContract}
+                  claimAmount={claimAmount}
+                  onClick={async () => {
+                    setStep(1);
+                    await getAllInfo();
+                    setResetKey(resetKey + 1);
+                    setClaimAmount(0);
+                  }}
+                />
               )}
             </div>
           </>
