@@ -25,13 +25,16 @@ export default function InputBuyIn({
   const [newTotalSupply, setNewTotalSupply] = useState(totalSupply);
   // console.log(userBalance, totalSupply)
 
+  const calcTokenCount = (buyInUsd: number, ethPrice: number) => {
+    return (buyInUsd / ethPrice) / parseFloat(process.env.NEXT_PUBLIC_CLAIM_ETH_PRICE!);
+  }
   useEffect(() => {
     // Display buy in value in ETH
     setBuyInEth(buyInUsd / ethPrice);
     // Calculate token count
-    setBuyTokenCount(buyInEth / parseFloat(process.env.NEXT_PUBLIC_CLAIM_ETH_PRICE!));
-    setNewUserBalance(userBalance + buyTokenCount);
-    setNewTotalSupply(totalSupply + buyTokenCount);
+    setBuyTokenCount(calcTokenCount(buyInUsd, ethPrice));
+    setNewUserBalance(userBalance + calcTokenCount(buyInUsd, ethPrice));
+    setNewTotalSupply(totalSupply + calcTokenCount(buyInUsd, ethPrice));
   }, [buyInUsd]);
 
   const handleOnChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
