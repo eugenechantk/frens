@@ -79,8 +79,6 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
                     setBuyIn(buyInEth);
                   }}
                   data={data}
-                  userSdk={userSdk}
-                  tokenContract={tokenContract!}
                   userBalance={userBalance}
                   totalSupply={totalSupply}
                 />
