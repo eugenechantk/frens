@@ -72,8 +72,7 @@ export default function DepositBuyIn({
             <>
               <h3>Depositing to club...</h3>
               <p className="text-center px-10 md:px-3">
-                If you do not receive a notification for payment, press the
-                “initiate deposit again” button below
+                If you do not receive a notification for payment in 30 seconds, press the  button below
               </p>
             </>
           )}

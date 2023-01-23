@@ -78,7 +78,7 @@ export default function InputBuyIn({
           {/* Live share changes display */}
           <div className="flex flex-col items-start p-4 border border-secondary-300 bg-secondary-100 rounded-10 w-full mb-3">
             <p className=" text-xs uppercase font-bold text-secondary-500">
-              Your share
+              Your new share
             </p>
             <div className="flex flex-row gap-2 items-end w-full">
               <div className="flex flex-row gap-2 grow items-end">
