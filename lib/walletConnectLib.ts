@@ -2,11 +2,15 @@ import SignClient from "@walletconnect/sign-client";
 import LegacySignClient from "@walletconnect/client";
 import { IWalletConnectSession } from "@walletconnect/legacy-types";
 import ModalStore from "../components/WalletConnectModals/ModalStore";
-import { EIP155_SIGNING_METHODS } from "./ethereum";
+import { EIP155_SIGNING_METHODS, initWallet } from "./ethereum";
 import { IClubWallet } from "../components/Widgets/WalletConnect";
-import { useCallback, useEffect } from "react";
+import { getSdkError } from '@walletconnect/utils'
 import { SignClientTypes } from "@walletconnect/types";
 import { IClubInfo } from "../pages/clubs/[id]";
+import { getChainData } from "./chains";
+import { ethers } from "ethers";
+import { getSignParamsMessage, getSignTypedDataParamsData } from "./HelperUtil";
+import { formatJsonRpcError, formatJsonRpcResult } from '@json-rpc-tools/utils'
 
 export let signClient: SignClient;
 export let legacySignClient: LegacySignClient;
@@ -70,6 +74,7 @@ export function createLegacySignClient({
   });
 
   legacySignClient.on("call_request", (error, payload) => {
+    console.log('Received call requests...', payload)
     if (error) {
       throw new Error(`legacySignClient > call_request failed: ${error}`);
     }
@@ -115,10 +120,10 @@ const onLegacyCallRequest = async (payload: {
   switch (payload.method) {
     case EIP155_SIGNING_METHODS.ETH_SIGN:
     case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
-      // return ModalStore.open('LegacySessionSignModal', {
-      //   legacyCallRequestEvent: payload,
-      //   legacyRequestSession: legacySignClient.session
-      // })
+      return ModalStore.open('LegacySessionSignModal', {
+        legacyCallRequestEvent: payload,
+        legacyRequestSession: legacySignClient.session
+      }, clubWallet)
       console.log("request sign on");
 
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
@@ -142,3 +147,57 @@ const onLegacyCallRequest = async (payload: {
       alert(`${payload.method} is not supported for WalletConnect v1`);
   }
 };
+
+/*
+For WC 1.0 sign client
+Handle session requests from legacy sign client requests
+*/
+export async function approveEIP155Request(
+  requestEvent: SignClientTypes.EventArguments['session_request'],
+  clubWalletMnemonic: string
+) {
+  const { params, id } = requestEvent
+  const { chainId, request } = params
+  const wallet = initWallet(clubWalletMnemonic)
+  const rpcUrl = getChainData(
+    parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
+  ).rpc_url;
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+
+  switch (request.method) {
+    case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
+    case EIP155_SIGNING_METHODS.ETH_SIGN:
+      const message = getSignParamsMessage(request.params)
+      const signedMessage = await wallet.signMessage(message)
+      return formatJsonRpcResult(id, signedMessage)
+
+    case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
+    case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
+    case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4:
+      const { domain, types, message: data } = getSignTypedDataParamsData(request.params)
+      // https://github.com/ethers-io/ethers.js/issues/687#issuecomment-714069471
+      delete types.EIP712Domain
+      const signedData = await wallet._signTypedData(domain, types, data)
+      return formatJsonRpcResult(id, signedData)
+
+    case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
+      const sendTransaction = request.params[0]
+      const connectedWallet = wallet.connect(provider)
+      const { hash } = await connectedWallet.sendTransaction(sendTransaction)
+      return formatJsonRpcResult(id, hash)
+
+    case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
+      const signTransaction = request.params[0]
+      const signature = await wallet.signTransaction(signTransaction)
+      return formatJsonRpcResult(id, signature)
+
+    default:
+      throw new Error(getSdkError('INVALID_METHOD').message)
+  }
+}
+
+export function rejectEIP155Request(request: SignClientTypes.EventArguments['session_request']) {
+  const { id } = request
+
+  return formatJsonRpcError(id, getSdkError('USER_REJECTED_METHODS').message)
+}
