@@ -1,7 +1,8 @@
 import { Modal as NextModal } from '@nextui-org/react'
 import { useSnapshot } from 'valtio'
-import ModalStore from '../WalletConnectModals/ModalStore'
-import LegacySessionProposalModal from '../WalletConnectModals/ModalViews/LegacySessionProposalModal'
+import ModalStore from './ModalStore'
+import LegacySessionProposalModal from './ModalViews/LegacySessionProposalModal'
+import SessionProposalModal from './ModalViews/SessionProposalModal'
 
 export default function Modal() {
   const { open, view } = useSnapshot(ModalStore.state)
@@ -9,6 +10,7 @@ export default function Modal() {
   return (
     <NextModal blur open={open} style={{ border: '1px solid rgba(139, 139, 139, 0.4)' }}>
       {view === 'LegacySessionProposalModal' && <LegacySessionProposalModal/>}
+      {view === 'SessionProposalModal' && <SessionProposalModal />}
     </NextModal>
   )
 }
