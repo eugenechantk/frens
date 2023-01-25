@@ -19,7 +19,7 @@ interface ModalData {
 }
 
 interface State {
-  open: boolean
+  open: boolean;
   view?:
     | 'SessionProposalModal'
     | 'SessionSignModal'
@@ -36,8 +36,9 @@ interface State {
     | 'LegacySessionSignModal'
     | 'LegacySessionSignTypedDataModal'
     | 'LegacySessionSendTransactionModal'
-  data?: ModalData
-  clubWallet?: IClubWallet
+  data?: ModalData;
+  clubWallet?: IClubWallet;
+  setSession?: (k: any) => void;
 }
 
 /**
@@ -53,11 +54,12 @@ const state = proxy<State>({
 const ModalStore = {
   state,
 
-  open(view: State['view'], data: State['data'], clubWallet: IClubWallet) {
+  open(view: State['view'], data: State['data'], clubWallet: IClubWallet, setSession?: any) {
     state.view = view
     state.data = data
     state.open = true
     state.clubWallet = clubWallet
+    state.setSession = setSession
   },
 
   close() {
