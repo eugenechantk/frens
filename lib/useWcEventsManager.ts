@@ -5,11 +5,11 @@ import ModalStore from "../components/WalletConnectModals/ModalStore";
 import { signClient } from "./walletConnectLib";
 import { EIP155_SIGNING_METHODS } from "./ethereum";
 
-export function useSignClientEventsManager(initialized: boolean, clubWallet: IClubWallet) {
+export function useSignClientEventsManager(initialized: boolean, clubWallet: IClubWallet, setSession: (k: any) => void) {
   const onSessionProposal = useCallback(
     (proposal: SignClientTypes.EventArguments["session_proposal"]) => {
       console.log("Proposal params: ", proposal.params);
-      ModalStore.open("SessionProposalModal", { proposal }, clubWallet);
+      ModalStore.open("SessionProposalModal", { proposal }, clubWallet, setSession);
     },
     []
   );
