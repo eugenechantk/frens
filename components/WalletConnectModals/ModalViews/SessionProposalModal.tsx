@@ -65,6 +65,7 @@ export default function SessionProposalModal() {
         namespaces
       })
       await acknowledged()
+      ModalStore.state.setSession!(signClient.session.values)
     }
     ModalStore.close()
   }
