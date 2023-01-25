@@ -2,6 +2,8 @@ import React, { Suspense } from "react";
 import { Theme, SwapWidget } from "@uniswap/widgets";
 import { provider } from "../../lib/provider";
 import { getChainData } from "../../lib/chains";
+import WalletConnect from "./WalletConnect";
+import { IClubInfo } from "../../pages/clubs/[id]";
 
 const jsonRpcUrlMap = {
   1: [getChainData(1).rpc_url],
@@ -16,16 +18,17 @@ const swapWidgetTheme: Theme = {
   dialog: "#F2F0EB",
 };
 
-export default function TradeAsset() {
+export default function TradeAsset({data}: {data: IClubInfo}) {
   return (
     <>
       <h3 className="mt-[6px] ml-3">Invest in club assets</h3>
-      <SwapWidget
+      {/* <SwapWidget
         provider={provider}
         // jsonRpcUrlMap={jsonRpcUrlMap}
         width="100%"
         theme={swapWidgetTheme}
-      />
+      /> */}
+      <WalletConnect data={data}/>
     </>
   );
 }
