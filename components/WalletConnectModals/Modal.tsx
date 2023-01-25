@@ -6,8 +6,10 @@ import LegacySessionSendTransactionModal from "./ModalViews/LegacySessionSendTra
 import LegacySessionSignModal from "./ModalViews/LegacySessionSignModal";
 import LegacySessionSignTypedDataModal from "./ModalViews/LegacySessionSignTypedDataModal";
 import SessionProposalModal from "./ModalViews/SessionProposalModal";
+import SessionSendTransactionModal from "./ModalViews/SessionSendTransactionModal";
 import SessionSignModal from "./ModalViews/SessionSignModal";
 import SessionSignTypedDataModal from "./ModalViews/SessionSignTypedDataModal";
+import SessionUnsuportedMethodModal from "./ModalViews/SessionUnsupportedMethodModal";
 
 export default function Modal() {
   const { open, view } = useSnapshot(ModalStore.state);
@@ -21,6 +23,8 @@ export default function Modal() {
       {view === "SessionProposalModal" && <SessionProposalModal />}
       {view === 'SessionSignModal' && <SessionSignModal />}
       {view === 'SessionSignTypedDataModal' && <SessionSignTypedDataModal />}
+      {view === 'SessionSendTransactionModal' && <SessionSendTransactionModal />}
+      {view === 'SessionUnsuportedMethodModal' && <SessionUnsuportedMethodModal />}
       {/* Modals for Legacy WC sign clients */}
       {view === "LegacySessionProposalModal" && <LegacySessionProposalModal />}
       {view === "LegacySessionSignModal" && <LegacySessionSignModal />}
