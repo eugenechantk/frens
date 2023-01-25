@@ -1,9 +1,13 @@
+import { SignClientTypes } from '@walletconnect/types'
+import { getSdkError } from '@walletconnect/utils'
+
 // TODO: fix the line break of the sign in message
 export const signInMessage =
   "Welcome to frens!\n\nYou are one step away from investing cryptocurrencies with your friends.\n\nClick to sign in and accept the frens Terms of Service\n\nThis request will not trigger a blockchain transaction or cost any gas fees.";
 import axios from "axios";
 import { BigNumber, ethers } from "ethers";
 import { getChainData } from "./chains";
+import { getSignParamsMessage, getSignTypedDataParamsData } from './HelperUtil';
 
 interface IHolderBalanceInfo {
   balance: BigNumber;
@@ -186,3 +190,4 @@ export async function getUsdPrice(tokenAddress?: string): Promise<number> {
   }
   return usdPrice;
 }
+
