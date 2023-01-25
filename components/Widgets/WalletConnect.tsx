@@ -3,7 +3,9 @@ import { Button } from "../Button/Button";
 import { parseUri } from "@walletconnect/utils";
 import LoadingWidget from "./LoadingWidget";
 import { IClubInfo } from "../../pages/clubs/[id]";
-import { createLegacySignClient, createSignClient, legacySignClient, signClient } from "../../lib/walletconnect";
+import { createLegacySignClient, legacySignClient, signClient} from "../../lib/walletConnectLib";
+import useWcinit from "../../lib/useWcInit";
+import { useSignClientEventsManager } from "../../lib/useWcEventsManager";
 
 export interface IClubWallet {
   club_wallet_address: string;
@@ -12,17 +14,17 @@ export interface IClubWallet {
 
 export default function WalletConnect({ data }: { data: IClubInfo }) {
   const [uri, setUri] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const clubWallet: IClubWallet = {
     club_wallet_address: data.club_wallet_address!,
     club_wallet_mnemonic: data.club_wallet_mnemonic!,
   };
   const [legacySession, setLegacySession] = useState(legacySignClient?.session)
+  const [sessions, setSessions] = useState(signClient?.session?.values)
 
 
-  const initialize = async () => {
-    await createSignClient();
-  };
+  const initalized = useWcinit(data)
+  useSignClientEventsManager(initalized, clubWallet);
 
   const onConnect = async (uri: string) => {
     const { version } = parseUri(uri);
@@ -39,10 +41,7 @@ export default function WalletConnect({ data }: { data: IClubInfo }) {
     }
   };
 
-  useEffect(() => {
-    initialize();
-    setLoading(false);
-  }, []);
+  
 
   return loading ? (
     <LoadingWidget />
