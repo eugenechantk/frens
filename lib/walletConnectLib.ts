@@ -124,24 +124,21 @@ const onLegacyCallRequest = async (payload: {
         legacyCallRequestEvent: payload,
         legacyRequestSession: legacySignClient.session
       }, clubWallet)
-      console.log("request sign on");
 
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4:
-      // return ModalStore.open('LegacySessionSignTypedDataModal', {
-      //   legacyCallRequestEvent: payload,
-      //   legacyRequestSession: legacySignClient.session
-      // })
-      console.log("request typed data signing");
+      return ModalStore.open('LegacySessionSignTypedDataModal', {
+        legacyCallRequestEvent: payload,
+        legacyRequestSession: legacySignClient.session
+      }, clubWallet)
 
     case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
     case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
-      // return ModalStore.open('LegacySessionSendTransactionModal', {
-      //   legacyCallRequestEvent: payload,
-      //   legacyRequestSession: legacySignClient.session
-      // })
-      console.log("request transaction actions");
+      return ModalStore.open('LegacySessionSendTransactionModal', {
+        legacyCallRequestEvent: payload,
+        legacyRequestSession: legacySignClient.session
+      }, clubWallet)
 
     default:
       alert(`${payload.method} is not supported for WalletConnect v1`);
