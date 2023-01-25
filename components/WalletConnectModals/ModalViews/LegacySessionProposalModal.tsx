@@ -1,7 +1,7 @@
 import { Button, Divider, Modal, Text } from '@nextui-org/react'
 import { getSdkError } from '@walletconnect/utils'
 import { Fragment, useState } from 'react'
-import { legacySignClient } from '../../../lib/walletconnect'
+import { legacySignClient } from '../../../lib/walletConnectLib'
 import ProjectInfoCard from '../Components/ProjectInfoCard'
 import ProposalSelectSection from '../Components/ProposalSelectSection'
 import RequestModalContainer from '../Components/RequestModalContainer'

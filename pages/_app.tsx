@@ -4,7 +4,7 @@ import type { NextPage } from "next";
 import { AuthProvider } from "../lib/auth";
 import { Montserrat } from "@next/font/google";
 import { NextUIProvider } from "@nextui-org/react";
-import Modal from "../components/Modal/Modal";
+import Modal from "../components/WalletConnectModals/Modal";
 
 export type NextPageWithLayout<Props> = NextPage<Props> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
