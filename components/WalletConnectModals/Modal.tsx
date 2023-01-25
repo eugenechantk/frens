@@ -3,6 +3,7 @@ import { useSnapshot } from "valtio";
 import ModalStore from "./ModalStore";
 import LegacySessionProposalModal from "./ModalViews/LegacySessionProposalModal";
 import LegacySessionSignModal from "./ModalViews/LegacySessionSignModal";
+import LegacySessionSignTypedDataModal from "./ModalViews/LegacySessionSignTypedDataModal";
 import SessionProposalModal from "./ModalViews/SessionProposalModal";
 import SessionSignModal from "./ModalViews/SessionSignModal";
 
@@ -20,6 +21,7 @@ export default function Modal() {
       {/* Modals for Legacy WC sign clients */}
       {view === "LegacySessionProposalModal" && <LegacySessionProposalModal />}
       {view === "LegacySessionSignModal" && <LegacySessionSignModal />}
+      {view === 'LegacySessionSignTypedDataModal' && <LegacySessionSignTypedDataModal />}
     </NextModal>
   );
 }
