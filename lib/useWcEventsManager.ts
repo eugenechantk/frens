@@ -59,8 +59,8 @@ export function useSignClientEventsManager(initialized: boolean, clubWallet: ICl
   );
   useEffect(() => {
     if (initialized) {
-      signClient.on("session_proposal", onSessionProposal);
-      signClient.on("session_request", onSessionRequest);
+      signClient?.on("session_proposal", onSessionProposal);
+      signClient?.on("session_request", onSessionRequest);
     }
   }, [initialized,onSessionProposal, onSessionRequest]);
 }

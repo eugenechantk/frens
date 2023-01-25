@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 import { Button } from "../Button/Button";
 import { parseUri } from "@walletconnect/utils";
 import LoadingWidget from "./LoadingWidget";
