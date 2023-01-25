@@ -2,6 +2,7 @@ import { Modal as NextModal } from "@nextui-org/react";
 import { useSnapshot } from "valtio";
 import ModalStore from "./ModalStore";
 import LegacySessionProposalModal from "./ModalViews/LegacySessionProposalModal";
+import LegacySessionSendTransactionModal from "./ModalViews/LegacySessionSendTransactionModal";
 import LegacySessionSignModal from "./ModalViews/LegacySessionSignModal";
 import LegacySessionSignTypedDataModal from "./ModalViews/LegacySessionSignTypedDataModal";
 import SessionProposalModal from "./ModalViews/SessionProposalModal";
@@ -24,6 +25,7 @@ export default function Modal() {
       {view === "LegacySessionProposalModal" && <LegacySessionProposalModal />}
       {view === "LegacySessionSignModal" && <LegacySessionSignModal />}
       {view === 'LegacySessionSignTypedDataModal' && <LegacySessionSignTypedDataModal />}
+      {view === 'LegacySessionSendTransactionModal' && <LegacySessionSendTransactionModal/>}
     </NextModal>
   );
 }
