@@ -1,28 +1,26 @@
 import React, { lazy, ReactElement } from "react";
 import AppLayout from "../../../layout/AppLayout";
 import { NextPageWithLayout } from "../../_app";
-import {
-  adminAuth,
-  adminFirestore,
-} from "../../../firebase/firebaseAdmin";
+import { adminAuth, adminFirestore } from "../../../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
 import ClubDetails from "../../../components/ClubDetails/ClubDetails";
 import ClubMembers from "../../../components/ClubMembers/ClubMembers";
 import ClubBalance from "../../../components/ClubBalance/ClubBalance";
 import Portfolio from "../../../components/Portfolio/Portfolio";
 import WidgetSection from "../../../components/Widgets/WidgetSection";
-import { getChainData } from "../../../lib/chains";
-import axios from "axios";
 import _ from "lodash";
 import nookies from "nookies";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
 import {
-  getUsdPrice,
+  fetchPortfolio,
+  getClubMemberBalance,
+  getLatestBlockNumber,
+  IHoldingsData,
   verifyClubHolding,
 } from "../../../lib/ethereum";
 import NotVerified from "../../../components/NotVerified/NotVerified";
-import { ethers } from "ethers";
-const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
+import Splitting from "../../../components/Splitting/Splitting";
+import { useRouter } from "next/router";
 
 export interface IClubInfo {
   club_description: string;
@@ -35,18 +33,8 @@ export interface IClubInfo {
   deposited?: boolean;
   club_members?: { [k: string]: number };
   last_retrieved_block?: number;
+  split_contract_address?: string;
 }
-
-export type THoldingsData = {
-  token_address: string;
-  name: string;
-  symbol: string;
-  logo: string | null;
-  thumbnail: string | null;
-  decimals: number;
-  balance: string;
-  value?: number;
-};
 
 export interface IMemberInfoData {
   display_name: string;
@@ -95,137 +83,21 @@ export const getServerSideProps = async (context: any) => {
     }
   };
 
-  // Fetcher function for club portfolio
-  const fetchPortfolio = async (address: string) => {
-    let balances = [] as THoldingsData[];
-    const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
-    const tokensOptions = {
-      method: "GET",
-      url: "https://deep-index.moralis.io/api/v2/%address%/erc20".replace(
-        "%address%",
-        address
-      ),
-      params: {
-        chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
-          .network,
-      },
-      headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-    };
-
-    const nativeOptions = {
-      method: "GET",
-      url: "https://deep-index.moralis.io/api/v2/%address%/balance".replace(
-        "%address%",
-        address
-      ),
-      params: {
-        chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
-          .network,
-      },
-      headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-    };
-
-    try {
-      const erc20TokenBalance = async () => {
-        await axios
-          .request(tokensOptions)
-          .then((response) => {
-            return response.data;
-          })
-          .then((data: []) =>
-            data.forEach((tokenBalance) => balances.push(tokenBalance))
-          );
-      };
-      const nativeBalance = async () => {
-        const _nativeBalance = await axios
-          .request(nativeOptions)
-          .then((response) => {
-            return response.data.balance;
-          });
-        balances.push({
-          token_address: "",
-          name: "Ethereum",
-          symbol: "ETH",
-          logo: null,
-          thumbnail: null,
-          decimals: 18,
-          balance: String(_nativeBalance),
-        });
-      };
-      await Promise.all([erc20TokenBalance(), nativeBalance()]);
-      return balances;
-    } catch (err) {
-      throw err;
-    }
-  };
-
-  const fetchMemberInfo = async (clubInfo: IClubInfo): Promise<IMemberInfoData[]> => {
-    // STEP 1: Fetch the last updated club member list
-    let _club_members: { [k: string]: number };
-    if (clubInfo.club_members) {
-      _club_members = clubInfo.club_members;
-    } else {
-      _club_members = {
-        "0x0000000000000000000000000000000000000000": 0,
-      };
-    }
-
-    // STEP 2: Get the transfer events ellapsed from last time the club is retrieved
-    const rpcUrl = getChainData(
-      parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
-    ).rpc_url;
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-    const currentBlock = await provider
-      .getBlockNumber();
-    // console.log(`Querying transactions from ${clubInfo.last_retrieved_block} to ${currentBlock}`);
-    const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
-    const options = {
-      method: "GET",
-      url: "https://deep-index.moralis.io/api/v2/erc20/%address%/transfers".replace(
-        "%address%",
-        clubInfo.club_token_address!
-      ),
-      params: {
-        chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
-          .network,
-        from_block:
-          clubInfo.last_retrieved_block && clubInfo.last_retrieved_block,
-        to_block: currentBlock,
-      },
-      headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-    };
-
-    // STEP 3: Update the club member list based on new transfer events
-    const transferEvents = await axios
-      .request(options)
-      .then((response) => response.data)
-      .then((data) => data.result);
-    // console.log(transferEvents);
-    transferEvents.forEach((event: ITransferEvent) => {
-      // Create a new member object if the existing club member object does not have the addresses
-      if (!(event.from_address in _club_members)) {
-        _club_members[event.from_address] = 0;
-      }
-      if (!(event.to_address in _club_members)) {
-        _club_members[event.to_address] = 0;
-      }
-      // Update the balance of each club member
-      _club_members[event.from_address] -= parseInt(event.value);
-      _club_members[event.to_address] += parseInt(event.value);
-    });
-    // Purge all addresses with <=0 balance
-    _club_members = _.pickBy(_club_members, function (value) {
-      return value > 0;
-    });
-    // console.log('New club member list: ', _club_members)
-
-    // STEP 4: Replace existing club members with updated club members list
-    const result = await adminFirestore.collection("clubs").doc(id).update({
+  // Fetcher function for club members
+  const fetchMemberInfo = async (
+    clubInfo: IClubInfo
+  ): Promise<IMemberInfoData[]> => {
+    // STEP 1: Fetch the latest club member list
+    const _club_members = await getClubMemberBalance(clubInfo, id);
+    
+    // STEP 2: Update the club member list
+    const currentBlock = await getLatestBlockNumber()
+    const result = adminFirestore.collection("clubs").doc(id).update({
       club_members: _club_members,
       last_retrieved_block: currentBlock,
     });
 
-    // STEP 5: Fetch club members info
+    // STEP 3: Fetch club members info by the updated club member list
     let memberInfo = [] as IMemberInfoData[];
     await Promise.all(
       Object.keys(_club_members).map(async (uid) => {
@@ -238,7 +110,7 @@ export const getServerSideProps = async (context: any) => {
         });
       })
     );
-    return memberInfo
+    return memberInfo;
   };
 
   if (!cookies.token) {
@@ -268,16 +140,16 @@ export const getServerSideProps = async (context: any) => {
       }
 
       // Step 3: Fetch porfolio of the club
-      const balance: THoldingsData[] = await fetchPortfolio(
+      const balance: IHoldingsData[] = await fetchPortfolio(
         clubInfo.club_wallet_address!
       );
 
       // Step 4: fetch club members
-      let memberInfo = [] as IMemberInfoData[]
+      let memberInfo = [] as IMemberInfoData[];
       try {
         memberInfo = await fetchMemberInfo(clubInfo);
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
 
       return {
@@ -301,6 +173,8 @@ export const getServerSideProps = async (context: any) => {
 const Dashboard: NextPageWithLayout<any> = ({
   ...serverProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter()
+  const {id} = router.query
   return (
     <>
       {!serverProps.error ? (
@@ -316,10 +190,15 @@ const Dashboard: NextPageWithLayout<any> = ({
             {/* TODO: have a global state setting for whether to show club or me balance */}
             <ClubBalance />
             {/* Portfolio */}
-            <Portfolio data={serverProps.balance!} clubWalletAddress={serverProps.clubInfo?.club_wallet_address!}/>
+            <Portfolio
+              data={serverProps.balance!}
+              clubWalletAddress={serverProps.clubInfo?.club_wallet_address!}
+            />
           </div>
           {/* Right panel */}
-          <WidgetSection data={serverProps.clubInfo!}/>
+          <WidgetSection data={serverProps.clubInfo!} />
+          {/* FOR TESTING SPLITTING */}
+          <Splitting data={serverProps.clubInfo!} id={String(id)}/>
         </div>
       ) : serverProps.error === "Not authed" ? (
         <NotAuthed />

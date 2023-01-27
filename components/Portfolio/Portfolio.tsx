@@ -1,10 +1,10 @@
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
 import React from 'react'
-import { THoldingsData } from '../../pages/clubs/[id]'
+import { IHoldingsData } from '../../lib/ethereum'
 import { Button } from '../Button/Button'
 import Holding from './Holding'
 
-export default function Portfolio({data, clubWalletAddress}: {data: THoldingsData[], clubWalletAddress: string}) {
+export default function Portfolio({data, clubWalletAddress}: {data: IHoldingsData[], clubWalletAddress: string}) {
   return (
     <div className='w-full flex flex-col items-start gap-3'>
       {/* Title */}
