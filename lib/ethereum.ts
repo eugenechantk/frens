@@ -6,6 +6,7 @@ export const signInMessage =
   "Welcome to frens!\n\nYou are one step away from investing cryptocurrencies with your friends.\n\nClick to sign in and accept the frens Terms of Service\n\nThis request will not trigger a blockchain transaction or cost any gas fees.";
 import axios from "axios";
 import { BigNumber, ethers, Wallet } from "ethers";
+import { formatUnits } from "ethers/lib/utils";
 import _ from "lodash";
 import { IClubInfo } from "../pages/clubs/[id]";
 import { abi } from "./abi";
@@ -297,77 +298,6 @@ export const getClaimPower = (clubInfo: IClubInfo, _club_members: IClubMemberBal
   return _holderPower
 };
 
-// Send specific token to split contract
-export const sendToken = async (
-  to_address: string,
-  clubWallet: Wallet,
-  send_token_amount?: string,
-  contract_address?: string,
-  _gasForDistribute?: number,
-) => {
-  let wallet = clubWallet
-  let send_abi = abi;
-  let send_account = wallet.getAddress();
-  // Base ethereum transfer gas of 21000 + contract execution gas (usually total up to 27xxx)
-  const _gasLimit = ethers.utils.hexlify(50000);
-
-  const currentGasPrice = await wallet.provider.getGasPrice();
-  let gas_price = ethers.utils.hexlify(parseInt(currentGasPrice.toString()));
-
-  if (contract_address) {
-    console.log(`Sending ${contract_address} to split contract...`)
-    // general token send
-    let contract = new ethers.Contract(contract_address, send_abi, wallet);
-
-    // How many tokens?
-    let numberOfTokens = BigNumber.from(send_token_amount);
-    // Send the tokens
-    try {
-      await contract
-        .transfer(to_address, numberOfTokens)
-        .then(async (transferResult: any) => {
-          // wait until the block is mined
-          await transferResult.wait()
-          // make sure the nounceOffset increases for each transaction
-          // nounceOffset++;
-          console.dir(transferResult);
-          alert("sent token");
-        });
-    } catch (err) {
-      console.log(err);
-      alert(`failed to send token ${contract_address}`);
-    }
-  } // ether send
-  else {
-    console.log(`Sending ETH to split contract`)
-    const _ethLeft = await wallet.provider.getBalance(wallet.address);
-    const _finalValue = _ethLeft
-      .sub(BigNumber.from(gas_price).mul(BigNumber.from(_gasLimit)))
-      .sub(BigNumber.from(gas_price).mul(BigNumber.from(_gasForDistribute)));
-    // make sure it does not return the same nounce even when transactions are called too close to each other
-    // const _nounce = await wallet.provider.getTransactionCount(send_account).then((nounce) => nounce + nounceOffset++)
-    const tx = {
-      from: send_account,
-      to: to_address,
-      value: _finalValue,
-      nonce: wallet.provider.getTransactionCount(send_account, 'latest'),
-      gasLimit: _gasLimit,
-      gasPrice: gas_price,
-    };
-    try {
-      await wallet.sendTransaction(tx).then(async (transaction) => {
-        // wait until the block is mined
-        // await transaction.wait()
-        console.dir(transaction);
-        alert("Send ETH finished!");
-      });
-    } catch (error) {
-      console.log(error);
-      alert("failed to send ETH!!");
-    }
-  }
-};
-
 // Fetch all the assets of an address
 export const fetchPortfolio = async (address: string) => {
   let balances = [] as IHoldingsData[];
@@ -425,10 +355,80 @@ export const fetchPortfolio = async (address: string) => {
         balance: String(_nativeBalance),
       });
     };
-    await Promise.all([erc20TokenBalance(), nativeBalance()]);
+    await erc20TokenBalance().then(async () => await nativeBalance())
     return balances;
   } catch (err) {
     throw err;
+  }
+};
+
+// Send specific token to split contract
+export const sendToken = async (
+  to_address: string,
+  clubWallet: Wallet,
+  send_token_amount?: string,
+  contract_address?: string,
+  _gasForDistribute?: number,
+) => {
+  let wallet = clubWallet
+  let send_abi = abi;
+  let send_account = wallet.getAddress();
+  // Base ethereum transfer gas of 21000 + contract execution gas (usually total up to 27xxx)
+  const _gasLimit = ethers.utils.hexlify(50000);
+
+  const currentGasPrice = await wallet.provider.getGasPrice();
+  console.log(clubWallet, currentGasPrice, _gasLimit);
+
+  if (contract_address) {
+    console.log(`Sending ${contract_address} to split contract...`)
+    // general token send
+    let contract = new ethers.Contract(contract_address, send_abi, wallet);
+
+    // How many tokens?
+    let numberOfTokens = BigNumber.from(send_token_amount);
+    // Send the tokens
+    try {
+      await contract
+        .transfer(to_address, numberOfTokens)
+        .then(async (transferResult: any) => {
+          // wait until the block is mined
+          await transferResult.wait()
+          // make sure the nounceOffset increases for each transaction
+          // nounceOffset++;
+          console.dir(transferResult);
+          alert("sent token");
+        });
+    } catch (err) {
+      console.log(err);
+      alert(`failed to send token ${contract_address}`);
+    }
+  } // ether send
+  else {
+    console.log(`Sending ETH to split contract`)
+    const _ethLeft = await wallet.provider.getBalance(wallet.address);
+    const _finalValue = _ethLeft
+      .sub(currentGasPrice.mul(BigNumber.from(_gasLimit)))
+      .sub(currentGasPrice.mul(BigNumber.from(_gasForDistribute)));
+    // make sure it does not return the same nounce even when transactions are called too close to each other
+    // const _nounce = await wallet.provider.getTransactionCount(send_account).then((nounce) => nounce + nounceOffset++)
+    const tx = {
+      from: send_account,
+      to: to_address,
+      value: _finalValue,
+      nonce: wallet.provider.getTransactionCount(send_account, 'latest'),
+    };
+    console.log(tx)
+    try {
+      await wallet.sendTransaction(tx).then(async (transaction) => {
+        // wait until the block is mined
+        // await transaction.wait()
+        console.dir(transaction);
+        alert("Send ETH finished!");
+      });
+    } catch (error) {
+      console.log(error);
+      alert("failed to send ETH!!");
+    }
   }
 };
 
