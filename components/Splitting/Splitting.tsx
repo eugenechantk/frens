@@ -1,10 +1,7 @@
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
-import { ethers } from "ethers";
 import { doc, updateDoc } from "firebase/firestore";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { clientFireStore } from "../../firebase/firebaseClient";
-import { getChainData } from "../../lib/chains";
 import {
   fetchPortfolio,
   getClaimPower,
@@ -74,12 +71,43 @@ export default function Splitting({
     }
   }
 
+  // STEP 5: Split the assets back to club members
+  const distributeSplit = async () => {
+    const splitBalance = await fetchPortfolio(
+      splitContractAddress!
+    );
+    const splitContract = await sdk.getContract(
+      splitContractAddress!, "split"
+    );
+    for (let token of splitBalance) {
+      if (token.token_address) {
+        try {
+          await splitContract
+          .distributeToken(String(token.token_address))
+          .then((result) => {
+            console.log(result);
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        try {
+          await splitContract.distribute().then((result) => {
+            console.log(result);
+          });
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    }
+  }
+
   return (
     <div>
       <h3 className="mb-3">Splitting</h3>
       <Button className="w-[240px] mb-2" onClick={async () => deploySplitContract()}><h3>Deploy Split Contract</h3></Button>
       {splitContractAddress && <p className="mb-4">Split Contract Address: {splitContractAddress}</p>}
       <Button className="w-[240px] mb-4" onClick={async () => sendAllToSplit()}><h3>Transfer asset to split</h3></Button>
-      <Button className="w-[240px] mb-4"><h3>Split assets</h3></Button>
+      <Button className="w-[240px] mb-4" onClick={async () => distributeSplit()}><h3>Split assets</h3></Button>
     </div>);
 }
