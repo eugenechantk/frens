@@ -61,8 +61,8 @@ export default function Splitting({
       return
     }
     const _walletBalance = await fetchPortfolio(data.club_wallet_address!)
+    console.log(_walletBalance)
     const _gasForDistribute = _walletBalance.length * 250000;
-    console.log(_walletBalance, _gasForDistribute)
     for (let token of _walletBalance) {
       await sendToken(
         splitContractAddress,
