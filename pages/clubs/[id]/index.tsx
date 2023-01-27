@@ -14,13 +14,16 @@ import _ from "lodash";
 import nookies from "nookies";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
 import {
-  getClubMemberAddress,
+  fetchPortfolio,
+  getClubMemberBalance,
   getLatestBlockNumber,
+  IHoldingsData,
   verifyClubHolding,
 } from "../../../lib/ethereum";
 import NotVerified from "../../../components/NotVerified/NotVerified";
 import { ethers } from "ethers";
 import Splitting from "../../../components/Splitting/Splitting";
+import { useRouter } from "next/router";
 const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
 
 export interface IClubInfo {
@@ -34,18 +37,8 @@ export interface IClubInfo {
   deposited?: boolean;
   club_members?: { [k: string]: number };
   last_retrieved_block?: number;
+  split_contract_address?: string;
 }
-
-export type THoldingsData = {
-  token_address: string;
-  name: string;
-  symbol: string;
-  logo: string | null;
-  thumbnail: string | null;
-  decimals: number;
-  balance: string;
-  value?: number;
-};
 
 export interface IMemberInfoData {
   display_name: string;
@@ -94,75 +87,12 @@ export const getServerSideProps = async (context: any) => {
     }
   };
 
-  // Fetcher function for club portfolio
-  const fetchPortfolio = async (address: string) => {
-    let balances = [] as THoldingsData[];
-    const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
-    const tokensOptions = {
-      method: "GET",
-      url: "https://deep-index.moralis.io/api/v2/%address%/erc20".replace(
-        "%address%",
-        address
-      ),
-      params: {
-        chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
-          .network,
-      },
-      headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-    };
-
-    const nativeOptions = {
-      method: "GET",
-      url: "https://deep-index.moralis.io/api/v2/%address%/balance".replace(
-        "%address%",
-        address
-      ),
-      params: {
-        chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
-          .network,
-      },
-      headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-    };
-
-    try {
-      const erc20TokenBalance = async () => {
-        await axios
-          .request(tokensOptions)
-          .then((response) => {
-            return response.data;
-          })
-          .then((data: []) =>
-            data.forEach((tokenBalance) => balances.push(tokenBalance))
-          );
-      };
-      const nativeBalance = async () => {
-        const _nativeBalance = await axios
-          .request(nativeOptions)
-          .then((response) => {
-            return response.data.balance;
-          });
-        balances.push({
-          token_address: "",
-          name: "Ethereum",
-          symbol: "ETH",
-          logo: null,
-          thumbnail: null,
-          decimals: 18,
-          balance: String(_nativeBalance),
-        });
-      };
-      await Promise.all([erc20TokenBalance(), nativeBalance()]);
-      return balances;
-    } catch (err) {
-      throw err;
-    }
-  };
-
+  // Fetcher function for club members
   const fetchMemberInfo = async (
     clubInfo: IClubInfo
   ): Promise<IMemberInfoData[]> => {
     // STEP 1: Fetch the latest club member list
-    const _club_members = await getClubMemberAddress(clubInfo, id);
+    const _club_members = await getClubMemberBalance(clubInfo, id);
     
     // STEP 2: Update the club member list
     const currentBlock = await getLatestBlockNumber()
@@ -214,7 +144,7 @@ export const getServerSideProps = async (context: any) => {
       }
 
       // Step 3: Fetch porfolio of the club
-      const balance: THoldingsData[] = await fetchPortfolio(
+      const balance: IHoldingsData[] = await fetchPortfolio(
         clubInfo.club_wallet_address!
       );
 
@@ -247,6 +177,8 @@ export const getServerSideProps = async (context: any) => {
 const Dashboard: NextPageWithLayout<any> = ({
   ...serverProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter()
+  const {id} = router.query
   return (
     <>
       {!serverProps.error ? (
@@ -270,7 +202,7 @@ const Dashboard: NextPageWithLayout<any> = ({
           {/* Right panel */}
           <WidgetSection data={serverProps.clubInfo!} />
           {/* FOR TESTING SPLITTING */}
-          <Splitting data={serverProps.clubInfo!} />
+          <Splitting data={serverProps.clubInfo!} id={String(id)}/>
         </div>
       ) : serverProps.error === "Not authed" ? (
         <NotAuthed />

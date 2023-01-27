@@ -12,7 +12,7 @@ export default function WidgetSection({data}:{data: IClubInfo}) {
       <WidgetToggle selected={selected} setSelected={setSelected} />
       <div className="w-full md:w-[376px] h-min-[408px] border border-secondary-300 shrink-0 rounded-20 p-2 flex flex-col items-start gap-2">
         <Suspense fallback={<LoadingWidget />}>
-          {selected === "invest" && <TradeAsset />}
+          {selected === "invest" && <h3>Trading assets</h3>}
           {selected === "buyin" && <BuyInWidgetWrapper data={data}/>}
         </Suspense>
       </div>
