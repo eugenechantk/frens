@@ -6,6 +6,11 @@ export const signInMessage =
   "Welcome to frens!\n\nYou are one step away from investing cryptocurrencies with your friends.\n\nClick to sign in and accept the frens Terms of Service\n\nThis request will not trigger a blockchain transaction or cost any gas fees.";
 import axios from "axios";
 import { BigNumber, ethers } from "ethers";
+import { doc, updateDoc } from "firebase/firestore";
+import _ from "lodash";
+import { adminFirestore } from "../firebase/firebaseAdmin";
+import { clientFireStore } from "../firebase/firebaseClient";
+import { IClubInfo } from "../pages/clubs/[id]";
 import { getChainData } from "./chains";
 import { getSignParamsMessage, getSignTypedDataParamsData } from './HelperUtil';
 
@@ -38,6 +43,16 @@ export const EIP155_SIGNING_METHODS = {
   ETH_SIGN_TYPED_DATA_V4: 'eth_signTypedData_v4',
   ETH_SEND_RAW_TRANSACTION: 'eth_sendRawTransaction',
   ETH_SEND_TRANSACTION: 'eth_sendTransaction'
+}
+
+export async function getLatestBlockNumber() {
+  // STEP 2: Get the transfer events ellapsed from last time the club is retrieved
+  const rpcUrl = getChainData(
+    parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
+  ).rpc_url;
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const currentBlock = await provider.getBlockNumber();
+  return currentBlock;
 }
 
 // function to verfiy signature with user address
@@ -190,4 +205,3 @@ export async function getUsdPrice(tokenAddress?: string): Promise<number> {
   }
   return usdPrice;
 }
-
