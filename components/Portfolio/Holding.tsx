@@ -3,13 +3,10 @@ import defaultIcon from "../../public/default_avatar.png";
 import Image from "next/image";
 import _ from "lodash";
 import { BigNumber, ethers } from "ethers";
-import { THoldingsData } from "../../pages/clubs/[id]";
-import axios from "axios";
-import { getUsdPrice } from "../../lib/ethereum";
+import { getUsdPrice, IHoldingsData } from "../../lib/ethereum";
 
-export default function Holding({ data }: { data: THoldingsData }) {
+export default function Holding({ data }: { data: IHoldingsData }) {
   const [usd, setUsd] = useState("...");
-  const [icon, setIcon] = useState();
   useEffect(() => {
     const getPrice = async () => {
       const price = await getUsdPrice(data.token_address);
