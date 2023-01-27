@@ -22,6 +22,7 @@ import {
 } from "../../../lib/ethereum";
 import NotVerified from "../../../components/NotVerified/NotVerified";
 import { ethers } from "ethers";
+import Splitting from "../../../components/Splitting/Splitting";
 const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
 
 export interface IClubInfo {
@@ -320,6 +321,8 @@ const Dashboard: NextPageWithLayout<any> = ({
           </div>
           {/* Right panel */}
           <WidgetSection data={serverProps.clubInfo!}/>
+          {/* FOR TESTING SPLITTING */}
+          <Splitting data={serverProps.clubInfo!} />
         </div>
       ) : serverProps.error === "Not authed" ? (
         <NotAuthed />
