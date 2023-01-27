@@ -8,8 +8,6 @@ import ClubMembers from "../../../components/ClubMembers/ClubMembers";
 import ClubBalance from "../../../components/ClubBalance/ClubBalance";
 import Portfolio from "../../../components/Portfolio/Portfolio";
 import WidgetSection from "../../../components/Widgets/WidgetSection";
-import { getChainData } from "../../../lib/chains";
-import axios from "axios";
 import _ from "lodash";
 import nookies from "nookies";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
@@ -21,10 +19,8 @@ import {
   verifyClubHolding,
 } from "../../../lib/ethereum";
 import NotVerified from "../../../components/NotVerified/NotVerified";
-import { ethers } from "ethers";
 import Splitting from "../../../components/Splitting/Splitting";
 import { useRouter } from "next/router";
-const TradeAsset = lazy(() => import("../../../components/Widgets/TradeAsset"));
 
 export interface IClubInfo {
   club_description: string;
