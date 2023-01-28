@@ -23,11 +23,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       className={montserrat.className}
       style={{ height: "100%", width: "100%" }}
     >
-      <NextUIProvider>
-        <AuthProvider>{getLayout(<Component {...pageProps} />)}</AuthProvider>
-      </NextUIProvider>
+      <AuthProvider>{getLayout(<Component {...pageProps} />)}</AuthProvider>
 
-      <Modal/>
+      <Modal />
     </main>
   );
 }
