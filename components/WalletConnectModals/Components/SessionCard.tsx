@@ -28,24 +28,19 @@ export default function SessionCard({ logo, name, url, onDisconnect }: IProps) {
         width: "100%",
       }}
     >
-      <Card.Body
-        css={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          overflow: "hidden",
-        }}
-      >
-        <Avatar src={logo} />
-        <div style={{ flex: 1 }}>
-          <Text h5 css={{ marginLeft: "$9" }}>
-            {name}
-          </Text>
-          <Link href={url} css={{ marginLeft: "$9" }}>
-            {truncate(url?.split("https://")[1] ?? "Unknown", 24)}
-          </Link>
+      <Card.Body className="md:!flex-row gap-2">
+        <div className="flex flex-row items-center gap-3 grow">
+          <Avatar src={logo} />
+          <div className="grow">
+            <Text h5>
+              {name}
+            </Text>
+            <Link href={url} className="grow">
+              {truncate(url?.split("https://")[1] ?? "Unknown", 24)}
+            </Link>
+          </div>
         </div>
-        <Button auto flat color="error" onClick={onDisconnect}>
+        <Button auto flat color="error" onClick={onDisconnect} className="!w-10">
           Disconnect
         </Button>
       </Card.Body>
