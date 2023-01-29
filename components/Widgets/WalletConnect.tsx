@@ -10,7 +10,8 @@ import {
 } from "../../lib/walletConnectLib";
 import useWcinit from "../../lib/useWcInit";
 import { useSignClientEventsManager } from "../../lib/useWcEventsManager";
-import { getSdkError } from '@walletconnect/utils'
+import { getSdkError } from "@walletconnect/utils";
+import SessionCard from "../WalletConnectModals/Components/SessionCard";
 
 export interface IClubWallet {
   club_wallet_address: string;
@@ -47,7 +48,7 @@ export default function WalletConnect({ data }: { data: IClubInfo }) {
   };
 
   return (
-    <>
+    <div className="w-full">
       <input
         type="text"
         onChange={(e) => setUri(e.target.value)}
@@ -57,43 +58,33 @@ export default function WalletConnect({ data }: { data: IClubInfo }) {
         <h3>Connect</h3>
       </Button>
       {legacySession && (
-        <div className="mt-2">
-          <h5>{legacySession.peerMeta?.name}</h5>
-          <p>{legacySession.peerMeta?.description}</p>
-          <Button
-            size="sm"
-            variant="secondary-outline"
-            className="mt-2"
-            onClick={() => {
-              legacySignClient?.killSession();
-            }}
-          >
-            <h5>Disconnect</h5>
-          </Button>
-        </div>
+        <SessionCard
+          logo={legacySession.peerMeta?.icons[0]}
+          name={legacySession.peerMeta?.name}
+          url={legacySession.peerMeta?.url}
+          onDisconnect={() => legacySignClient?.killSession()}
+        />
       )}
       {sessions?.length &&
         sessions.map((session, key) => {
-          console.log('Session connected: ', session)
-          const { name, description } = session.peer.metadata;
+          console.log("Session connected: ", session);
+          const { name, icons, url } = session.peer.metadata;
           return (
-            <div className="mt-2" key={key}>
-              <h5>{name}</h5>
-              <p>{description}</p>
-              <Button
-                size="sm"
-                variant="secondary-outline"
-                className="mt-2"
-                onClick={async () => {
-                  const result = await signClient.disconnect({topic: session.topic, reason: getSdkError('USER_DISCONNECTED')})
-                  setSessions(signClient.session.values)
-                }}
-              >
-                <h5>Disconnect</h5>
-              </Button>
-            </div>
+            <SessionCard
+              key={key}
+              name={name}
+              logo={icons[0]}
+              url={url}
+              onDisconnect={async () => {
+                const result = await signClient.disconnect({
+                  topic: session.topic,
+                  reason: getSdkError("USER_DISCONNECTED"),
+                });
+                setSessions(signClient.session.values);
+              }}
+            />
           );
         })}
-    </>
+    </div>
   );
 }
