@@ -3,7 +3,7 @@ import { useField } from "@unform/core";
 import clsx from "clsx";
 import _ from "lodash";
 
-interface IInputFieldProps {
+export interface IInputFieldProps {
   // for the input
   name: string;
   type?: "email" | "number" | "password" | "text" | "text-area";
@@ -129,7 +129,7 @@ export default function InputField({
   );
 }
 
-const inputFieldStruc = clsx(
+export const inputFieldStruc = clsx(
   // sizing
   "w-full px-4 py-5",
   // rounded
@@ -138,24 +138,24 @@ const inputFieldStruc = clsx(
   "leading-7"
 );
 
-const defaultFieldSkin = clsx(
+export const defaultFieldSkin = clsx(
   // border
   "border-secondary-300 border",
   // text
   "text-gray-800 text-base leading-5",
 );
 
-const focusFieldSkin = clsx(
+export const focusFieldSkin = clsx(
   // border
   "focus:outline-2 focus:outline-primary-600",
 );
 
-const disabledFieldSkin = clsx(
+export const disabledFieldSkin = clsx(
   // border
   "disabled:border disabled:border-secondary-300 disabled:bg-secondary-300"
 );
 
-const errorFieldSkin = clsx(
+export const errorFieldSkin = clsx(
   // border
   "focus:outline-error focus:outline-2 border-2 border-error text-error",
 );
