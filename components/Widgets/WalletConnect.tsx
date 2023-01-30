@@ -77,7 +77,7 @@ export default function WalletConnect({
             <ChevronDownIcon width={20} height={20} />
             <p>How to connect to other apps</p>
           </Button>
-          {((sessions?.length === 0 || !legacySession)) && (
+          {((sessions?.length === 0 && !legacySession)) && (
             <div className="ml-3 mt-3">
               <div className="flex flex-row gap-[6px] mb-3">
                 <p className="w-[13px] h-[28px]">1.</p>
