@@ -3,7 +3,6 @@ import { getSdkError } from '@walletconnect/utils'
 import { Fragment, useState } from 'react'
 import { legacySignClient } from '../../../lib/walletConnectLib'
 import ProjectInfoCard from '../Components/ProjectInfoCard'
-import ProposalSelectSection from '../Components/ProposalSelectSection'
 import RequestModalContainer from '../Components/RequestModalContainer'
 import ModalStore from '../ModalStore'
 
