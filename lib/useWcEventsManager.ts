@@ -19,7 +19,7 @@ export function useSignClientEventsManager(initialized: boolean, clubWallet: ICl
       console.log("session_request", requestEvent);
       const { topic, params } = requestEvent;
       const { request } = params;
-      const requestSession = signClient.session.get(topic);
+      const requestSession = signClient?.session.get(topic);
 
       switch (request.method) {
         case EIP155_SIGNING_METHODS.ETH_SIGN:

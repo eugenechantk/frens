@@ -21,6 +21,7 @@ import NotVerified from "../../../components/NotVerified/NotVerified";
 import Splitting from "../../../components/Splitting/Splitting";
 import { useRouter } from "next/router";
 import LoadingWidget from "../../../components/Widgets/LoadingWidget";
+import { clearSignClients, legacySignClient, signClient } from "../../../lib/walletConnectLib";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
@@ -178,6 +179,7 @@ const Dashboard: NextPageWithLayout<any> = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { id } = router.query;
+  clearSignClients();
   return (
     <>
       {!serverProps.error ? (

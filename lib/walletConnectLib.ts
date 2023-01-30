@@ -4,30 +4,41 @@ import { IWalletConnectSession } from "@walletconnect/legacy-types";
 import ModalStore from "../components/WalletConnectModals/ModalStore";
 import { EIP155_SIGNING_METHODS, initWallet } from "./ethereum";
 import { IClubWallet } from "../components/Widgets/WalletConnect";
-import { getSdkError } from '@walletconnect/utils'
+import { getSdkError } from "@walletconnect/utils";
 import { SignClientTypes } from "@walletconnect/types";
 import { IClubInfo } from "../pages/clubs/[id]";
 import { getChainData } from "./chains";
 import { ethers } from "ethers";
 import { getSignParamsMessage, getSignTypedDataParamsData } from "./HelperUtil";
-import { formatJsonRpcError, formatJsonRpcResult } from '@json-rpc-tools/utils'
+import { formatJsonRpcError, formatJsonRpcResult } from "@json-rpc-tools/utils";
 
-export let signClient: SignClient;
-export let legacySignClient: LegacySignClient;
+let signClients: { [k: string]: SignClient } = {};
+export let signClient: SignClient | undefined;
+export let legacySignClient: LegacySignClient | undefined;
 export let signClientInitialized: boolean;
 let clubWallet: IClubWallet;
 
+export function clearSignClients () {
+  signClient = undefined;
+  legacySignClient = undefined;
+}
+
 // For sign client
 export async function createSignClient(data: IClubInfo) {
-  signClient = await SignClient.init({
-    logger: "debug",
-    projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
-  });
-  signClientInitialized = true;
-  clubWallet = {
-    club_wallet_address: data?.club_wallet_address!,
-    club_wallet_mnemonic: data?.club_wallet_mnemonic!,
-  };
+  try {
+    signClient = await SignClient.init({
+      logger: "debug",
+      projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
+    });
+    signClientInitialized = true;
+    clubWallet = {
+      club_wallet_address: data?.club_wallet_address!,
+      club_wallet_mnemonic: data?.club_wallet_mnemonic!,
+    };
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
 }
 
 // For legacy sign client
@@ -50,7 +61,7 @@ export function createLegacySignClient({
   } else if (!legacySignClient && getCachedLegacySession(clubId!)) {
     const session = getCachedLegacySession(clubId!);
     legacySignClient = new LegacySignClient({ session });
-    setLegacySession(session)
+    setLegacySession(session);
   } else {
     return;
   }
@@ -69,9 +80,12 @@ export function createLegacySignClient({
 
   legacySignClient.on("connect", () => {
     console.log("legacySignClient > connect");
-    setLegacySession(legacySignClient.session);
-    if(typeof window !== 'undefined') {
-      window.localStorage.setItem(`walletconnect-${clubId}`, JSON.stringify(legacySignClient.session))
+    setLegacySession(legacySignClient?.session);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(
+        `walletconnect-${clubId}`,
+        JSON.stringify(legacySignClient?.session)
+      );
     }
   });
 
@@ -80,7 +94,7 @@ export function createLegacySignClient({
   });
 
   legacySignClient.on("call_request", (error, payload) => {
-    console.log('Received call requests...', payload)
+    console.log("Received call requests...", payload);
     if (error) {
       throw new Error(`legacySignClient > call_request failed: ${error}`);
     }
@@ -95,10 +109,12 @@ export function createLegacySignClient({
   return legacySignClient;
 }
 
-function getCachedLegacySession(clubId: string): IWalletConnectSession | undefined {
+function getCachedLegacySession(
+  clubId: string
+): IWalletConnectSession | undefined {
   if (typeof window === "undefined") return;
 
-  const local = window.localStorage.getItem(`walletconnect-${clubId}`)
+  const local = window.localStorage.getItem(`walletconnect-${clubId}`);
 
   let session = null;
   if (local) {
@@ -124,25 +140,37 @@ const onLegacyCallRequest = async (payload: {
   switch (payload.method) {
     case EIP155_SIGNING_METHODS.ETH_SIGN:
     case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
-      return ModalStore.open('LegacySessionSignModal', {
-        legacyCallRequestEvent: payload,
-        legacyRequestSession: legacySignClient.session
-      }, clubWallet)
+      return ModalStore.open(
+        "LegacySessionSignModal",
+        {
+          legacyCallRequestEvent: payload,
+          legacyRequestSession: legacySignClient?.session,
+        },
+        clubWallet
+      );
 
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4:
-      return ModalStore.open('LegacySessionSignTypedDataModal', {
-        legacyCallRequestEvent: payload,
-        legacyRequestSession: legacySignClient.session
-      }, clubWallet)
+      return ModalStore.open(
+        "LegacySessionSignTypedDataModal",
+        {
+          legacyCallRequestEvent: payload,
+          legacyRequestSession: legacySignClient?.session,
+        },
+        clubWallet
+      );
 
     case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
     case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
-      return ModalStore.open('LegacySessionSendTransactionModal', {
-        legacyCallRequestEvent: payload,
-        legacyRequestSession: legacySignClient.session
-      }, clubWallet)
+      return ModalStore.open(
+        "LegacySessionSendTransactionModal",
+        {
+          legacyCallRequestEvent: payload,
+          legacyRequestSession: legacySignClient?.session,
+        },
+        clubWallet
+      );
 
     default:
       alert(`${payload.method} is not supported for WalletConnect v1`);
@@ -154,12 +182,12 @@ For WC 1.0 sign client
 Handle session requests from legacy sign client requests
 */
 export async function approveEIP155Request(
-  requestEvent: SignClientTypes.EventArguments['session_request'],
+  requestEvent: SignClientTypes.EventArguments["session_request"],
   clubWalletMnemonic: string
 ) {
-  const { params, id } = requestEvent
-  const { chainId, request } = params
-  const wallet = initWallet(clubWalletMnemonic)
+  const { params, id } = requestEvent;
+  const { chainId, request } = params;
+  const wallet = initWallet(clubWalletMnemonic);
   const rpcUrl = getChainData(
     parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
   ).rpc_url;
@@ -168,37 +196,43 @@ export async function approveEIP155Request(
   switch (request.method) {
     case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
     case EIP155_SIGNING_METHODS.ETH_SIGN:
-      const message = getSignParamsMessage(request.params)
-      const signedMessage = await wallet.signMessage(message)
-      return formatJsonRpcResult(id, signedMessage)
+      const message = getSignParamsMessage(request.params);
+      const signedMessage = await wallet.signMessage(message);
+      return formatJsonRpcResult(id, signedMessage);
 
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA:
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V3:
     case EIP155_SIGNING_METHODS.ETH_SIGN_TYPED_DATA_V4:
-      const { domain, types, message: data } = getSignTypedDataParamsData(request.params)
+      const {
+        domain,
+        types,
+        message: data,
+      } = getSignTypedDataParamsData(request.params);
       // https://github.com/ethers-io/ethers.js/issues/687#issuecomment-714069471
-      delete types.EIP712Domain
-      const signedData = await wallet._signTypedData(domain, types, data)
-      return formatJsonRpcResult(id, signedData)
+      delete types.EIP712Domain;
+      const signedData = await wallet._signTypedData(domain, types, data);
+      return formatJsonRpcResult(id, signedData);
 
     case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
-      const sendTransaction = request.params[0]
-      const connectedWallet = wallet.connect(provider)
-      const { hash } = await connectedWallet.sendTransaction(sendTransaction)
-      return formatJsonRpcResult(id, hash)
+      const sendTransaction = request.params[0];
+      const connectedWallet = wallet.connect(provider);
+      const { hash } = await connectedWallet.sendTransaction(sendTransaction);
+      return formatJsonRpcResult(id, hash);
 
     case EIP155_SIGNING_METHODS.ETH_SIGN_TRANSACTION:
-      const signTransaction = request.params[0]
-      const signature = await wallet.signTransaction(signTransaction)
-      return formatJsonRpcResult(id, signature)
+      const signTransaction = request.params[0];
+      const signature = await wallet.signTransaction(signTransaction);
+      return formatJsonRpcResult(id, signature);
 
     default:
-      throw new Error(getSdkError('INVALID_METHOD').message)
+      throw new Error(getSdkError("INVALID_METHOD").message);
   }
 }
 
-export function rejectEIP155Request(request: SignClientTypes.EventArguments['session_request']) {
-  const { id } = request
+export function rejectEIP155Request(
+  request: SignClientTypes.EventArguments["session_request"]
+) {
+  const { id } = request;
 
-  return formatJsonRpcError(id, getSdkError('USER_REJECTED_METHODS').message)
+  return formatJsonRpcError(id, getSdkError("USER_REJECTED_METHODS").message);
 }

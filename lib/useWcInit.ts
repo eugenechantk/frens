@@ -3,22 +3,22 @@ import { IClubInfo } from "../pages/clubs/[id]";
 import { createSignClient } from "./walletConnectLib";
 
 export default function useWcinit(data: IClubInfo) {
-  const [initialized, setInitialized] = useState(false)
+  const [initialized, setInitialized] = useState(false);
 
   const onInit = useCallback(async () => {
     try {
-      await createSignClient(data)
-      setInitialized(true)
+      await createSignClient(data);
+      setInitialized(true);
     } catch (err) {
-      alert(err)
+      alert(err);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    if(!initialized) {
-      onInit()
+    if (!initialized) {
+      onInit();
     }
-  }, [initialized, onInit])
+  }, [initialized, onInit]);
 
-  return initialized
+  return initialized;
 }

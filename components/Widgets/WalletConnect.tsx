@@ -149,11 +149,11 @@ export default function WalletConnect({
                     logo={icons[0]}
                     url={url}
                     onDisconnect={async () => {
-                      const result = await signClient.disconnect({
+                      const result = await signClient?.disconnect({
                         topic: session.topic,
                         reason: getSdkError("USER_DISCONNECTED"),
                       });
-                      setSessions(signClient.session.values);
+                      setSessions(signClient?.session.values!);
                     }}
                   />
                 );

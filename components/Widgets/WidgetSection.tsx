@@ -1,11 +1,16 @@
 import { IClientMeta } from "@walletconnect/legacy-types";
 import { useRouter } from "next/router";
-import React, { lazy, useState, Suspense } from "react";
+import React, { lazy, useState, Suspense, useEffect } from "react";
 import { useSignClientEventsManager } from "../../lib/useWcEventsManager";
 import useWcinit from "../../lib/useWcInit";
-import { createLegacySignClient, legacySignClient, signClient } from "../../lib/walletConnectLib";
+import {
+  createLegacySignClient,
+  legacySignClient,
+  signClient,
+} from "../../lib/walletConnectLib";
 import { IClubInfo } from "../../pages/clubs/[id]";
 import BuyInWidgetWrapper from "./BuyInWidget/BuyInWidgetWrapper";
+import LoadingWidget from "./LoadingWidget";
 import WalletConnect, { IClubWallet } from "./WalletConnect";
 import WidgetToggle from "./WidgetToggle";
 
@@ -25,18 +30,20 @@ export interface ILegacySession {
 
 export default function WidgetSection({ data }: { data: IClubInfo }) {
   const [selected, setSelected] = useState("invest");
-  const [sessions, setSessions] = useState(signClient?.session?.values);
-  const [legacySession, setLegacySession] = useState(legacySignClient?.session);
+  const [sessions, setSessions] = useState(signClient?.session?.values!);
+  const [legacySession, setLegacySession] = useState(legacySignClient?.session!);
   const clubWallet: IClubWallet = {
     club_wallet_address: data.club_wallet_address!,
     club_wallet_mnemonic: data.club_wallet_mnemonic!,
   };
-  const router = useRouter()
-  const {id} = router.query;
+  const router = useRouter();
+  const { id } = router.query;
+
   // Initialize the WalletConnect Sign Client
   const initalized = useWcinit(data);
   useSignClientEventsManager(initalized, clubWallet, setSessions);
-  createLegacySignClient({clubWallet, setLegacySession, clubId:String(id)})
+  createLegacySignClient({ clubWallet, setLegacySession, clubId: String(id) });
+
   return (
     <div className="flex flex-col items-start gap-2">
       <WidgetToggle selected={selected} setSelected={setSelected} />
@@ -44,9 +51,9 @@ export default function WidgetSection({ data }: { data: IClubInfo }) {
         {selected === "invest" && (
           <WalletConnect
             data={data}
-            sessions={sessions}
+            sessions={sessions!}
             setSessions={setSessions}
-            legacySession={legacySession}
+            legacySession={legacySession!}
             setLegacySession={setLegacySession}
           />
         )}
