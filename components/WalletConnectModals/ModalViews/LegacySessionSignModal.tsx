@@ -75,7 +75,7 @@ export default function LegacySessionSignModal() {
         <Row>
           <Col>
             <Text h5>Message</Text>
-            <Text color="$gray400">{message}</Text>
+            <Text color="$gray700">{message}</Text>
           </Col>
         </Row>
 
