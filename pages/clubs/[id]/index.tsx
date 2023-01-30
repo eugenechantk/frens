@@ -21,7 +21,13 @@ import NotVerified from "../../../components/NotVerified/NotVerified";
 import Splitting from "../../../components/Splitting/Splitting";
 import { useRouter } from "next/router";
 import LoadingWidget from "../../../components/Widgets/LoadingWidget";
-import { clearSignClients, legacySignClient, signClient } from "../../../lib/walletConnectLib";
+import {
+  clearSignClients,
+  legacySignClient,
+  signClient,
+} from "../../../lib/walletConnectLib";
+import BuyInWidgetWrapper from "../../../components/Widgets/BuyInWidget/BuyInWidgetWrapper";
+import { Button } from "../../../components/Button/Button";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
@@ -138,10 +144,7 @@ export const getServerSideProps = async (context: any) => {
         userAddress,
         clubInfo.club_token_address!
       );
-      // console.log(verify)
-      if (!verify) {
-        throw Error("Not verified");
-      }
+      console.log(verify);
 
       // Step 3: Fetch porfolio of the club
       const balance: IHoldingsData[] = await fetchPortfolio(
@@ -154,6 +157,15 @@ export const getServerSideProps = async (context: any) => {
         memberInfo = await fetchMemberInfo(clubInfo);
       } catch (err) {
         console.log(err);
+      }
+
+      if (!verify) {
+        return {
+          props: {
+            clubInfo: clubInfo,
+            error: "user not verified",
+          },
+        };
       }
 
       return {
@@ -181,35 +193,49 @@ const Dashboard: NextPageWithLayout<any> = ({
   const { id } = router.query;
   return (
     <>
-      {!serverProps.error ? (
+      {serverProps.error === "Not authed" ? (
+        <NotAuthed />
+      ) : serverProps.error && serverProps.error !== "user not verified" ? (
+        <p>error</p>
+      ) : (
         <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
           {/* Left panel */}
           <div className="flex flex-col items-start gap-8 w-full">
             {/* Club details and members */}
             <div className="flex flex-col items-start gap-4 w-full">
               <ClubDetails data={serverProps.clubInfo!} />
-              <ClubMembers data={serverProps.members!} />
+              <div className="flex flex-row gap-2">
+                {serverProps.error !== "user not verified" && (
+                  <ClubMembers data={serverProps.members!} />
+                )}
+                <Button variant="outline" size="sm">
+                  <h4>Invite</h4>
+                </Button>
+              </div>
             </div>
             {/* Balance */}
             {/* TODO: have a global state setting for whether to show club or me balance */}
-            <ClubBalance />
+            {serverProps.error !== "user not verified" && <ClubBalance />}
             {/* Portfolio */}
-            <Portfolio
-              data={serverProps.balance!}
-              clubWalletAddress={serverProps.clubInfo?.club_wallet_address!}
-            />
+            {serverProps.error !== "user not verified" && (
+              <Portfolio
+                data={serverProps.balance!}
+                clubWalletAddress={serverProps.clubInfo?.club_wallet_address!}
+              />
+            )}
           </div>
           {/* Right panel */}
-          <Suspense fallback={<LoadingWidget />}>
-            <WidgetSection data={serverProps.clubInfo!} />
-          </Suspense>
+          {serverProps.error !== "user not verified" && (
+            <Suspense fallback={<LoadingWidget />}>
+              <WidgetSection data={serverProps.clubInfo!} />
+            </Suspense>
+          )}
+          {serverProps.error === "user not verified" && (
+            <BuyInWidgetWrapper data={serverProps.clubInfo!} />
+          )}
           {/* FOR TESTING SPLITTING */}
           <Splitting data={serverProps.clubInfo!} id={String(id)} />
         </div>
-      ) : serverProps.error === "Not authed" ? (
-        <NotAuthed />
-      ) : (
-        <NotVerified />
       )}
     </>
   );

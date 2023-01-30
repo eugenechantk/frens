@@ -1,3 +1,4 @@
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ThirdwebSDK, TokenDrop } from "@thirdweb-dev/sdk";
 import { formatUnits } from "ethers/lib/utils";
 import Image from "next/image";
@@ -5,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { getUsdPrice } from "../../../lib/ethereum";
 import { provider } from "../../../lib/provider";
 import { IClubInfo } from "../../../pages/clubs/[id]";
+import { Button } from "../../Button/Button";
 import LoadingWidget from "../LoadingWidget";
 import DepositBuyIn from "./DepositBuyIn";
 import InputBuyIn from "./InputBuyIn";
@@ -70,13 +72,17 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
   }, [claimAmount, step]);
 
   return (
-    <>
-      <h3 className="mt-[6px] ml-3 mb-2">Invest in club assets</h3>
-      <div className="bg-white flex flex-col items-center p-3 gap-4 rounded-[16px] h-[408px] w-full border border-secondary-300">
+      <div className="bg-white flex flex-col items-center p-4 gap-4 rounded-[16px] min-h-[444px] w-full border ">
         {loading ? (
           <LoadingWidget />
         ) : (
           <>
+            <div className="flex flex-row items-center justify-between w-full">
+              <h3>Invest in club assets</h3>
+              <Button variant="secondary-outline" className="hidden">
+                <XMarkIcon className=" w-5"/>
+              </Button>
+            </div>
             <p className="w-full">
               Deposit ETH into the club to gain more ownership in club tokens
             </p>
@@ -110,6 +116,5 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
           </>
         )}
       </div>
-    </>
   );
 }
