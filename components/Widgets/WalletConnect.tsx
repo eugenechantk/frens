@@ -14,6 +14,8 @@ import walletConnectIcon from "../../public/walletconnect.png";
 import Image from "next/image";
 import SimpleInputField from "../InputField/SimpleInputField";
 import { SessionTypes } from "@walletconnect/types";
+import { ILegacySession } from "./WidgetSection";
+import { useRouter } from "next/router";
 
 export interface IClubWallet {
   club_wallet_address: string;
@@ -23,19 +25,24 @@ export interface IClubWallet {
 export default function WalletConnect({
   data,
   sessions,
-  setSessions
+  setSessions,
+  legacySession,
+  setLegacySession,
 }: {
   data: IClubInfo;
   sessions: SessionTypes.Struct[];
   setSessions: Dispatch<SetStateAction<SessionTypes.Struct[]>>;
+  legacySession: ILegacySession;
+  setLegacySession: Dispatch<SetStateAction<ILegacySession>>;
 }) {
   const [uri, setUri] = useState("");
   const clubWallet: IClubWallet = {
     club_wallet_address: data.club_wallet_address!,
     club_wallet_mnemonic: data.club_wallet_mnemonic!,
   };
-  const [legacySession, setLegacySession] = useState(legacySignClient?.session);
   const [showDesc, setShowDesc] = useState(true);
+  const router = useRouter();
+  const { id } = router.query;
 
   const onConnect = async (uri: string) => {
     const { version } = parseUri(uri);
@@ -43,7 +50,12 @@ export default function WalletConnect({
       if (version === 1) {
         // Only initalize the legacy sign client if the dApp only supports v1 protocol
         console.log("Connecting with legacy sign client...");
-        createLegacySignClient({ uri, clubWallet, setLegacySession });
+        createLegacySignClient({
+          uri,
+          clubWallet,
+          setLegacySession,
+          clubId: String(id),
+        });
       } else {
         console.log("Connecting with new sign client...");
         await signClient?.pair({ uri });
@@ -141,7 +153,7 @@ export default function WalletConnect({
                         topic: session.topic,
                         reason: getSdkError("USER_DISCONNECTED"),
                       });
-                      setSessions(signClient.session.values)
+                      setSessions(signClient.session.values);
                     }}
                   />
                 );

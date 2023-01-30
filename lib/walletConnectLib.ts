@@ -35,19 +35,22 @@ export function createLegacySignClient({
   uri,
   clubWallet,
   setLegacySession,
+  clubId,
 }: {
   uri?: string;
   clubWallet: IClubWallet;
   setLegacySession: (session: any) => void;
+  clubId: string;
 }) {
   // If URI is passed always create a new session,
   // otherwise fall back to cached session if client isn't already instantiated.
   if (uri) {
-    deleteCachedLegacySession();
+    deleteCachedLegacySession(clubId!);
     legacySignClient = new LegacySignClient({ uri });
-  } else if (!legacySignClient && getCachedLegacySession()) {
-    const session = getCachedLegacySession();
+  } else if (!legacySignClient && getCachedLegacySession(clubId!)) {
+    const session = getCachedLegacySession(clubId!);
     legacySignClient = new LegacySignClient({ session });
+    setLegacySession(session)
   } else {
     return;
   }
@@ -67,6 +70,9 @@ export function createLegacySignClient({
   legacySignClient.on("connect", () => {
     console.log("legacySignClient > connect");
     setLegacySession(legacySignClient.session);
+    if(typeof window !== 'undefined') {
+      window.localStorage.setItem(`walletconnect-${clubId}`, JSON.stringify(legacySignClient.session))
+    }
   });
 
   legacySignClient.on("error", (error) => {
@@ -83,18 +89,16 @@ export function createLegacySignClient({
 
   legacySignClient.on("disconnect", async () => {
     setLegacySession(undefined);
-    deleteCachedLegacySession();
+    deleteCachedLegacySession(clubId!);
   });
 
   return legacySignClient;
 }
 
-function getCachedLegacySession(): IWalletConnectSession | undefined {
+function getCachedLegacySession(clubId: string): IWalletConnectSession | undefined {
   if (typeof window === "undefined") return;
 
-  const local = window.localStorage
-    ? window.localStorage.getItem("walletconnect")
-    : null;
+  const local = window.localStorage.getItem(`walletconnect-${clubId}`)
 
   let session = null;
   if (local) {
@@ -107,9 +111,9 @@ function getCachedLegacySession(): IWalletConnectSession | undefined {
   return session;
 }
 
-function deleteCachedLegacySession(): void {
+function deleteCachedLegacySession(clubId: string): void {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem("walletconnect");
+  window.localStorage.removeItem(`walletconnect-${clubId}`);
 }
 
 const onLegacyCallRequest = async (payload: {
