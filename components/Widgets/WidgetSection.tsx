@@ -10,7 +10,6 @@ import {
 } from "../../lib/walletConnectLib";
 import { IClubInfo } from "../../pages/clubs/[id]";
 import BuyInWidgetWrapper from "./BuyInWidget/BuyInWidgetWrapper";
-import LoadingWidget from "./LoadingWidget";
 import WalletConnect, { IClubWallet } from "./WalletConnect";
 import WidgetToggle from "./WidgetToggle";
 

@@ -1,4 +1,4 @@
-import React, { lazy, ReactElement, Suspense } from "react";
+import React, { lazy, ReactElement, Suspense, useEffect } from "react";
 import AppLayout from "../../../layout/AppLayout";
 import { NextPageWithLayout } from "../../_app";
 import { adminAuth, adminFirestore } from "../../../firebase/firebaseAdmin";
@@ -179,7 +179,6 @@ const Dashboard: NextPageWithLayout<any> = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { id } = router.query;
-  clearSignClients();
   return (
     <>
       {!serverProps.error ? (

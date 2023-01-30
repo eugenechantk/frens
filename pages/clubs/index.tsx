@@ -12,6 +12,7 @@ import NotAuthed from "../../components/NotAuthed/NotAuthed";
 import { IClubInfo } from "./[id]";
 import _ from "lodash";
 import { getUserHoldings } from "../../lib/ethereum";
+import { clearSignClients } from "../../lib/walletConnectLib";
 
 interface IClubData extends IClubInfo {
   club_id: string;
@@ -80,7 +81,7 @@ const ClubList: NextPageWithLayout<any> = ({
   // console.log(serverProps);
   const user = useAuth();
   const router = useRouter();
-  // console.log(user)
+  clearSignClients();
   return (
     <>
       {!serverProps.error ? (

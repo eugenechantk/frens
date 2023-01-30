@@ -11,6 +11,7 @@ import { getChainData } from "./chains";
 import { ethers } from "ethers";
 import { getSignParamsMessage, getSignTypedDataParamsData } from "./HelperUtil";
 import { formatJsonRpcError, formatJsonRpcResult } from "@json-rpc-tools/utils";
+import { SessionTypes } from "@walletconnect/types";
 
 let signClients: { [k: string]: SignClient } = {};
 export let signClient: SignClient | undefined;
@@ -18,9 +19,22 @@ export let legacySignClient: LegacySignClient | undefined;
 export let signClientInitialized: boolean;
 let clubWallet: IClubWallet;
 
-export function clearSignClients () {
+export async function clearSignClients() {
+  // Kill all legacySign sessions
+  legacySignClient?.killSession();
+  // Kill all signClient sessions
+  if (signClient?.session.values) {
+    for await (const session of signClient?.session.values) {
+      console.log("Disconnecting: ", session);
+      await signClient?.disconnect({
+        topic: session.topic,
+        reason: getSdkError("USER_DISCONNECTED"),
+      });
+    }
+  }
   signClient = undefined;
   legacySignClient = undefined;
+  deleteCachedLegacySession();
 }
 
 // For sign client
@@ -101,11 +115,12 @@ export function createLegacySignClient({
   return legacySignClient;
 }
 
-function getCachedLegacySession(
-): IWalletConnectSession | undefined {
+function getCachedLegacySession(): IWalletConnectSession | undefined {
   if (typeof window === "undefined") return;
 
-  const local = window.localStorage ? window.localStorage.getItem('walletconnect') : null
+  const local = window.localStorage
+    ? window.localStorage.getItem("walletconnect")
+    : null;
 
   let session = null;
   if (local) {
@@ -118,7 +133,7 @@ function getCachedLegacySession(
   return session;
 }
 
-function deleteCachedLegacySession(): void {
+export function deleteCachedLegacySession(): void {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(`walletconnect`);
 }
