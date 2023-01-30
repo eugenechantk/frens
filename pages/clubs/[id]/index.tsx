@@ -145,6 +145,14 @@ export const getServerSideProps = async (context: any) => {
         clubInfo.club_token_address!
       );
       console.log(verify);
+      if (!verify) {
+        return {
+          props: {
+            clubInfo: clubInfo,
+            error: "user not verified",
+          },
+        };
+      }
 
       // Step 3: Fetch porfolio of the club
       const balance: IHoldingsData[] = await fetchPortfolio(
@@ -157,15 +165,6 @@ export const getServerSideProps = async (context: any) => {
         memberInfo = await fetchMemberInfo(clubInfo);
       } catch (err) {
         console.log(err);
-      }
-
-      if (!verify) {
-        return {
-          props: {
-            clubInfo: clubInfo,
-            error: "user not verified",
-          },
-        };
       }
 
       return {
@@ -203,15 +202,18 @@ const Dashboard: NextPageWithLayout<any> = ({
           <div className="flex flex-col items-start gap-8 w-full">
             {/* Club details and members */}
             <div className="flex flex-col items-start gap-4 w-full">
-              <ClubDetails data={serverProps.clubInfo!} />
-              <div className="flex flex-row gap-2">
-                {serverProps.error !== "user not verified" && (
+              <ClubDetails
+                data={serverProps.clubInfo!}
+                verified={serverProps.error !== "user not verified"}
+              />
+              {serverProps.error !== "user not verified" && (
+                <div className="flex flex-row gap-2">
                   <ClubMembers data={serverProps.members!} />
-                )}
-                <Button variant="outline" size="sm">
-                  <h4>Invite</h4>
-                </Button>
-              </div>
+                  <Button variant="outline" size="sm">
+                    <h4>Invite</h4>
+                  </Button>
+                </div>
+              )}
             </div>
             {/* Balance */}
             {/* TODO: have a global state setting for whether to show club or me balance */}
@@ -234,7 +236,9 @@ const Dashboard: NextPageWithLayout<any> = ({
             <BuyInWidgetWrapper data={serverProps.clubInfo!} />
           )}
           {/* FOR TESTING SPLITTING */}
-          <Splitting data={serverProps.clubInfo!} id={String(id)} />
+          {serverProps.error !== "user not verified" && (
+            <Splitting data={serverProps.clubInfo!} id={String(id)} />
+          )}
         </div>
       )}
     </>

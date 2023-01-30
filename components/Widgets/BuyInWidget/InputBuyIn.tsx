@@ -83,7 +83,7 @@ export default function InputBuyIn({
             <div className="flex flex-row gap-2 items-end w-full">
               <div className="flex flex-row gap-2 grow items-end">
                 <h1 className="font-normal text-secondary-500">
-                  {userBalance === 0 ? "..." : newUserBalance.toFixed(2)}
+                  {newUserBalance.toFixed(2)}
                 </h1>
                 <p className="text-lg font-semibold text-secondary-500">
                   {data.club_token_sym}
@@ -96,7 +96,7 @@ export default function InputBuyIn({
             <div className="flex flex-row items-end gap-8 w-full">
               <p className="grow text-lg font-semibold text-secondary-400">
                 {newTotalSupply === 0 || newUserBalance === 0
-                  ? "..."
+                  ? "0"
                   : ((newUserBalance / newTotalSupply) * 100).toFixed(2)}
                 %
               </p>
