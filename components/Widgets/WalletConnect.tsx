@@ -1,7 +1,6 @@
-import React, { ReactEventHandler, ReactHTMLElement, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "../Button/Button";
 import { parseUri } from "@walletconnect/utils";
-import LoadingWidget from "./LoadingWidget";
 import { IClubInfo } from "../../pages/clubs/[id]";
 import {
   createLegacySignClient,
@@ -15,9 +14,7 @@ import SessionCard from "../WalletConnectModals/Components/SessionCard";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import walletConnectIcon from "../../public/walletconnect.png";
 import Image from "next/image";
-import InputField from "../InputField/InputField";
 import SimpleInputField from "../InputField/SimpleInputField";
-import { useEffect } from "@storybook/addons";
 
 export interface IClubWallet {
   club_wallet_address: string;
