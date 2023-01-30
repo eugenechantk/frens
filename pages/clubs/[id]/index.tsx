@@ -1,4 +1,10 @@
-import React, { lazy, ReactElement, Suspense, useEffect } from "react";
+import React, {
+  lazy,
+  ReactElement,
+  Suspense,
+  useEffect,
+  useState,
+} from "react";
 import AppLayout from "../../../layout/AppLayout";
 import { NextPageWithLayout } from "../../_app";
 import { adminAuth, adminFirestore } from "../../../firebase/firebaseAdmin";
@@ -28,6 +34,8 @@ import {
 } from "../../../lib/walletConnectLib";
 import BuyInWidgetWrapper from "../../../components/Widgets/BuyInWidget/BuyInWidgetWrapper";
 import { Button } from "../../../components/Button/Button";
+import { Modal } from "@nextui-org/react";
+import { Square2StackIcon } from "@heroicons/react/24/outline";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
@@ -190,6 +198,17 @@ const Dashboard: NextPageWithLayout<any> = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { id } = router.query;
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [copyLinkTooltip, setCopyLinkTooltip] = useState(false);
+
+  const copyLink = () => {
+    setCopyLinkTooltip(true);
+    navigator.clipboard.writeText(`${
+      typeof window !== "undefined" ? window.location.origin : ""
+    }
+    ${router.asPath}`);
+    setTimeout(() => setCopyLinkTooltip(false), 1000);
+  };
   return (
     <>
       {serverProps.error === "Not authed" ? (
@@ -209,7 +228,7 @@ const Dashboard: NextPageWithLayout<any> = ({
               {serverProps.error !== "user not verified" && (
                 <div className="flex flex-row gap-2">
                   <ClubMembers data={serverProps.members!} />
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => setInviteModalOpen(true)}>
                     <h4>Invite</h4>
                   </Button>
                 </div>
@@ -241,6 +260,42 @@ const Dashboard: NextPageWithLayout<any> = ({
           )}
         </div>
       )}
+      <Modal open={inviteModalOpen}>
+        <Modal.Header
+          css={{
+            marginTop: "8px",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "start",
+          }}
+        >
+          <h3>Invite new members</h3>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="flex flex-col gap-4">
+            <p className="text-gray-800">
+              Share this link with others so they can deposit ETH and join your
+              club
+            </p>
+            <div className="flex flex-row gap-1 px-5 py-4 rounded-[6px] border border-secondary-300 items-center">
+              <p className="grow overflow-ellipsis overflow-hidden">
+                {typeof window !== "undefined" ? window.location.origin : ""}
+                {router.asPath}
+              </p>
+              <div className="relative">
+                <Button variant="text-only" onClick={copyLink}>
+                  <Square2StackIcon className="w-5" />
+                </Button>
+                {copyLinkTooltip && (
+                  <p className="absolute -top-8 -left-20 z-10 w-[138px] bg-gray-800 bg-opacity-80 px-3 py-1 rounded-[4px] text-white text-sm">
+                    Copied invite link
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };
