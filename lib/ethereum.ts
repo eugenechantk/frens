@@ -1,9 +1,5 @@
 import { SignClientTypes } from '@walletconnect/types'
 import { getSdkError } from '@walletconnect/utils'
-
-// TODO: fix the line break of the sign in message
-export const signInMessage =
-  "Welcome to frens!\n\nYou are one step away from investing cryptocurrencies with your friends.\n\nClick to sign in and accept the frens Terms of Service\n\nThis request will not trigger a blockchain transaction or cost any gas fees.";
 import axios from "axios";
 import { BigNumber, ethers, Wallet } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
@@ -32,17 +28,9 @@ interface ITransferEvent {
   log_index: number;
 }
 
-// Types of ETH signing methods supported by WalletConnect
-export const EIP155_SIGNING_METHODS = {
-  PERSONAL_SIGN: 'personal_sign',
-  ETH_SIGN: 'eth_sign',
-  ETH_SIGN_TRANSACTION: 'eth_signTransaction',
-  ETH_SIGN_TYPED_DATA: 'eth_signTypedData',
-  ETH_SIGN_TYPED_DATA_V3: 'eth_signTypedData_v3',
-  ETH_SIGN_TYPED_DATA_V4: 'eth_signTypedData_v4',
-  ETH_SEND_RAW_TRANSACTION: 'eth_sendRawTransaction',
-  ETH_SEND_TRANSACTION: 'eth_sendTransaction'
-}
+// TODO: fix the line break of the sign in message
+export const signInMessage =
+  "Welcome to frens!\n\nYou are one step away from investing cryptocurrencies with your friends.\n\nClick to sign in and accept the frens Terms of Service\n\nThis request will not trigger a blockchain transaction or cost any gas fees.";
 
 export interface IClubMemberBalance {
   [member_address: string]: number;
