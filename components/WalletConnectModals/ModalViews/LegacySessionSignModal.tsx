@@ -65,13 +65,6 @@ export default function LegacySessionSignModal() {
 
         <Divider y={2} />
 
-        <RequestDetailsCard
-          chains={['eip155:' + legacySignClient.chainId]}
-          protocol={legacySignClient.protocol}
-        />
-
-        <Divider y={2} />
-
         <Row>
           <Col>
             <Text h5>Message</Text>

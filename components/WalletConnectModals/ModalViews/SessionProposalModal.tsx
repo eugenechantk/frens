@@ -93,7 +93,7 @@ export default function SessionProposalModal() {
         {Object.keys(requiredNamespaces).map(chain => {
           return (
             <Fragment key={chain}>
-              <Text h4 css={{ marginBottom: '$5' }}>{`Review ${chain} permissions`}</Text>
+              <Text h4 css={{ marginBottom: '$5' }}>{`Review permissions`}</Text>
               <SessionProposalChainCard requiredNamespace={requiredNamespaces[chain]} />
               <Divider y={2} />
             </Fragment>

@@ -63,10 +63,6 @@ export default function SessionSendTransactionModal() {
 
         <Divider y={2} />
 
-        <RequestDetailsCard chains={[chainId ?? '']} protocol={requestSession.relay.protocol} />
-
-        <Divider y={2} />
-
         <RequestMethodCard methods={[request.method]} />
       </RequestModalContainer>
 

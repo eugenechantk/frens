@@ -30,15 +30,6 @@ export default function RequestDetailsCard({ chains, protocol }: IProps) {
           </Text>
         </Col>
       </Row>
-
-      <Divider y={2} />
-
-      <Row>
-        <Col>
-          <Text h5>Relay Protocol</Text>
-          <Text color="$gray700">{protocol}</Text>
-        </Col>
-      </Row>
     </Fragment>
   )
 }

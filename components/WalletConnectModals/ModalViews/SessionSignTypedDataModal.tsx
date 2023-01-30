@@ -58,10 +58,6 @@ export default function SessionSignTypedDataModal() {
 
         <Divider y={2} />
 
-        <RequestDetailsCard chains={[chainId ?? '']} protocol={requestSession.relay.protocol} />
-
-        <Divider y={2} />
-
         <RequestDataCard data={data} />
 
         <Divider y={2} />

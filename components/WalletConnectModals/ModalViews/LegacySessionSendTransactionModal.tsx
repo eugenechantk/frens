@@ -73,13 +73,6 @@ export default function LegacySessionSendTransactionModal() {
 
         <Divider y={2} />
 
-        <RequestDetailsCard
-          chains={['eip155:' + legacySignClient.chainId]}
-          protocol={legacySignClient.protocol}
-        />
-
-        <Divider y={2} />
-
         <RequestMethodCard methods={[method]} />
       </RequestModalContainer>
 

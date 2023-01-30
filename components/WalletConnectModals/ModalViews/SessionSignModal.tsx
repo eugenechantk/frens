@@ -57,14 +57,10 @@ export default function SessionSignModal() {
 
         <Divider y={2} />
 
-        <RequestDetailsCard chains={[chainId ?? '']} protocol={requestSession.relay.protocol} />
-
-        <Divider y={2} />
-
         <Row>
           <Col>
             <Text h5>Message</Text>
-            <Text color="$gray400">{message}</Text>
+            <Text color="$gray700">{message}</Text>
           </Col>
         </Row>
 

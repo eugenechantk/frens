@@ -66,13 +66,6 @@ export default function LegacySessionSignTypedDataModal() {
 
         <Divider y={2} />
 
-        <RequestDetailsCard
-          chains={['eip155:' + legacySignClient.chainId]}
-          protocol={legacySignClient.protocol}
-        />
-
-        <Divider y={2} />
-
         <RequestDataCard data={data} />
 
         <Divider y={2} />

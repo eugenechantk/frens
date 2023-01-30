@@ -37,7 +37,7 @@ export default function SessionCard({ logo, name, url, onDisconnect }: IProps) {
             <Text h5>
               {name}
             </Text>
-            <Link href={url!} className="grow">
+            <Link href={url!} className="grow text-primary-600">
               {truncate(url?.split("https://")[1] ?? "Unknown", 24)}
             </Link>
           </div>
