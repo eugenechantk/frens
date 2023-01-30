@@ -34,7 +34,7 @@ export default function LegacySessionSignModal() {
         params: { request: { method, params }, chainId: '1' }
       }, ModalStore.state.clubWallet?.club_wallet_mnemonic!)
 
-      legacySignClient.approveRequest({
+      legacySignClient?.approveRequest({
         id,
         result
       })
@@ -50,7 +50,7 @@ export default function LegacySessionSignModal() {
         topic: '',
         params: { request: { method, params }, chainId: '1' }
       })
-      legacySignClient.rejectRequest({
+      legacySignClient?.rejectRequest({
         id,
         error
       })

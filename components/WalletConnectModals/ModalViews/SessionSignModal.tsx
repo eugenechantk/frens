@@ -30,7 +30,7 @@ export default function SessionSignModal() {
   async function onApprove() {
     if (requestEvent) {
       const response = await approveEIP155Request(requestEvent, clubWalletMnemonic)
-      await signClient.respond({
+      await signClient?.respond({
         topic,
         response
       })
@@ -42,7 +42,7 @@ export default function SessionSignModal() {
   async function onReject() {
     if (requestEvent) {
       const response = rejectEIP155Request(requestEvent)
-      await signClient.respond({
+      await signClient?.respond({
         topic,
         response
       })

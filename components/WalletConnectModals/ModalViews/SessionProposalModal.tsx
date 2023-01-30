@@ -59,13 +59,13 @@ export default function SessionProposalModal() {
         }
       })
 
-      const { acknowledged } = await signClient.approve({
+      const { acknowledged } = await signClient!.approve({
         id,
         relayProtocol: relays[0].protocol,
         namespaces
       })
       await acknowledged()
-      ModalStore.state.setSession!(signClient.session.values)
+      ModalStore.state.setSession!(signClient?.session.values)
     }
     ModalStore.close()
   }
@@ -73,7 +73,7 @@ export default function SessionProposalModal() {
   // Hanlde reject action
   async function onReject() {
     if (proposal) {
-      await signClient.reject({
+      await signClient?.reject({
         id,
         reason: getSdkError('USER_REJECTED_METHODS')
       })

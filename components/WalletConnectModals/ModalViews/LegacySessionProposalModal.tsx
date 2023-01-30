@@ -43,7 +43,7 @@ export default function LegacySessionProposalModal() {
   // Hanlde approve action, construct session namespace
   async function onApprove() {
     if (proposal) {
-      legacySignClient.approveSession({
+      legacySignClient?.approveSession({
         accounts: clubWalletAddress,
         chainId: parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!) ?? 1
       })
@@ -54,7 +54,7 @@ export default function LegacySessionProposalModal() {
   // Handle reject action
   function onReject() {
     if (proposal) {
-      legacySignClient.rejectSession(getSdkError('USER_REJECTED_METHODS'))
+      legacySignClient?.rejectSession(getSdkError('USER_REJECTED_METHODS'))
     }
     ModalStore.close()
   }
