@@ -3,12 +3,11 @@ import { useSignClientEventsManager } from "../../lib/useWcEventsManager";
 import useWcinit from "../../lib/useWcInit";
 import { signClient } from "../../lib/walletConnectLib";
 import { IClubInfo } from "../../pages/clubs/[id]";
-import LoadingWidget from "./LoadingWidget";
+import BuyInWidgetWrapper from "./BuyInWidget/BuyInWidgetWrapper";
 import WalletConnect, { IClubWallet } from "./WalletConnect";
 import WidgetToggle from "./WidgetToggle";
-const BuyInWidgetWrapper = lazy(() => import("./BuyInWidget/BuyInWidgetWrapper"));
 
-export default function WidgetSection({data}:{data: IClubInfo}) {
+export default function WidgetSection({ data }: { data: IClubInfo }) {
   const [selected, setSelected] = useState("invest");
   const [sessions, setSessions] = useState(signClient?.session?.values);
   const clubWallet: IClubWallet = {
@@ -22,10 +21,14 @@ export default function WidgetSection({data}:{data: IClubInfo}) {
     <div className="flex flex-col items-start gap-2">
       <WidgetToggle selected={selected} setSelected={setSelected} />
       <div className="w-full md:w-[376px] h-min-[408px] border border-secondary-300 shrink-0 rounded-20 p-2 flex flex-col items-start gap-2">
-        <Suspense fallback={<LoadingWidget />}>
-          {selected === "invest" && <WalletConnect data={data} sessions={sessions} setSessions={setSessions}/>}
-          {selected === "buyin" && <BuyInWidgetWrapper data={data}/>}
-        </Suspense>
+        {selected === "invest" && (
+          <WalletConnect
+            data={data}
+            sessions={sessions}
+            setSessions={setSessions}
+          />
+        )}
+        {selected === "buyin" && <BuyInWidgetWrapper data={data} />}
       </div>
     </div>
   );

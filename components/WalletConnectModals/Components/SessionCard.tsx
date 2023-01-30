@@ -1,5 +1,4 @@
 import { Avatar, Button, Card, Text } from "@nextui-org/react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { truncate } from "../../../lib/HelperUtil";
