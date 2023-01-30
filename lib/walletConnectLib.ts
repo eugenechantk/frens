@@ -11,9 +11,7 @@ import { getChainData } from "./chains";
 import { ethers } from "ethers";
 import { getSignParamsMessage, getSignTypedDataParamsData } from "./HelperUtil";
 import { formatJsonRpcError, formatJsonRpcResult } from "@json-rpc-tools/utils";
-import { SessionTypes } from "@walletconnect/types";
 
-let signClients: { [k: string]: SignClient } = {};
 export let signClient: SignClient | undefined;
 export let legacySignClient: LegacySignClient | undefined;
 export let signClientInitialized: boolean;

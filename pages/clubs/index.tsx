@@ -1,7 +1,6 @@
 import React, { ReactElement } from "react";
 import AppLayout from "../../layout/AppLayout";
 import { useRouter } from "next/router";
-import { useAuth } from "../../lib/auth";
 import { NextPageWithLayout } from "../_app";
 import { Button } from "../../components/Button/Button";
 import ClubCard from "../../components/ClubCard/ClubCard";
@@ -79,7 +78,6 @@ const ClubList: NextPageWithLayout<any> = ({
   ...serverProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   // console.log(serverProps);
-  const user = useAuth();
   const router = useRouter();
   clearSignClients();
   return (
