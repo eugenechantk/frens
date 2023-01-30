@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { User } from "firebase/auth";
-import nookies from "nookies";
+import { signInWithCustomToken, User } from "firebase/auth";
+import nookies, { parseCookies } from "nookies";
 import { firebaseClientAuth } from "../firebase/firebaseClient";
 
 const AuthContext = createContext<{ user: User | null }>({

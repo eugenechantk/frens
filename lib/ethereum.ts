@@ -172,7 +172,7 @@ export async function verifyClubHolding(
     const result = await axios
       .request(options)
       .then((response) => response.data);
-    console.log(result)
+    // console.log(result)
     if (result.length !== 0) {
       verified = true
     } else {

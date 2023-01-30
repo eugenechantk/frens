@@ -28,7 +28,7 @@ function createFirebaseApp (config: FirebaseOptions) {
   try {
     return getApp();
   } catch {
-    console.log('Initializing firebase client app');
+    // console.log('Initializing firebase client app');
     return initializeApp(config)
   }
 }

@@ -152,7 +152,7 @@ export const getServerSideProps = async (context: any) => {
         userAddress,
         clubInfo.club_token_address!
       );
-      console.log(verify);
+      // console.log(verify);
       if (!verify) {
         return {
           props: {

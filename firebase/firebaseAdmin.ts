@@ -14,7 +14,7 @@ function createFirebaseAdminApp ():App {
   try {
     return getApp()
   } catch {
-    console.log('Initializing Firebase admin')
+    // console.log('Initializing Firebase admin')
     return admin.initializeApp({
       credential: cert({
         privateKey: serviceAccount.private_key,
