@@ -93,9 +93,9 @@ export const getServerSideProps = async (context: any) => {
   ): Promise<IMemberInfoData[]> => {
     // STEP 1: Fetch the latest club member list
     const _club_members = await getClubMemberBalance(clubInfo, id);
-
+    
     // STEP 2: Update the club member list
-    const currentBlock = await getLatestBlockNumber();
+    const currentBlock = await getLatestBlockNumber()
     const result = adminFirestore.collection("clubs").doc(id).update({
       club_members: _club_members,
       last_retrieved_block: currentBlock,
