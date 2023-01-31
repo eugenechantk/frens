@@ -51,15 +51,15 @@ export default function InputBuyIn({
   };
 
   return (
-    <div className="flex flex-col gap-4 items-center h-full">
-      <div className="flex flex-col grow justify-center">
-        <div className="relative w-full">
+    <div className="flex flex-col gap-4 items-center grow w-full">
+      <div className="flex flex-col grow justify-center w-full">
+        <div className="relative">
           {/* USD value input */}
           <div className="flex flex-col pl-4 pr-3 pt-4 pb-3 w-full border border-secondary-300 rounded-8 gap-[2px] mb-3">
-            <div className="flex flex-row gap-1 justify-center">
+            <div className="flex flex-row gap-1 justify-center w-full">
               <input
                 type="number"
-                className="h-10 w-full text-4xl focus:outline-none"
+                className="h-10 text-4xl focus:outline-none w-full"
                 placeholder={String(buyInUsd)}
                 onChange={(e) => handleOnChange(e)}
               ></input>

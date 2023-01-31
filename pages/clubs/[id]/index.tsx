@@ -36,6 +36,7 @@ import BuyInWidgetWrapper from "../../../components/Widgets/BuyInWidget/BuyInWid
 import { Button } from "../../../components/Button/Button";
 import { Modal } from "@nextui-org/react";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
@@ -218,7 +219,10 @@ const Dashboard: NextPageWithLayout<any> = ({
       ) : (
         <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
           {/* Left panel */}
-          <div className="flex flex-col items-start gap-8 w-full">
+          <div className={clsx(
+            "flex flex-col items-start gap-8 w-full md:h-full md:justify-center",
+            serverProps.error === "user not verified" && "md:w-1/2"
+          )}>
             {/* Club details and members */}
             <div className="flex flex-col items-start gap-4 w-full">
               <ClubDetails
@@ -228,7 +232,11 @@ const Dashboard: NextPageWithLayout<any> = ({
               {serverProps.error !== "user not verified" && (
                 <div className="flex flex-row gap-2">
                   <ClubMembers data={serverProps.members!} />
-                  <Button variant="outline" size="sm" onClick={() => setInviteModalOpen(true)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setInviteModalOpen(true)}
+                  >
                     <h4>Invite</h4>
                   </Button>
                 </div>
@@ -252,12 +260,14 @@ const Dashboard: NextPageWithLayout<any> = ({
             </Suspense>
           )}
           {serverProps.error === "user not verified" && (
-            <BuyInWidgetWrapper data={serverProps.clubInfo!} />
+            <div className="md:h-full md:flex md:w-1/2 md:flex-col md:items-center md:justify-center">
+              <BuyInWidgetWrapper data={serverProps.clubInfo!} />
+            </div>
           )}
           {/* FOR TESTING SPLITTING */}
-          {serverProps.error !== "user not verified" && (
+          {/* {serverProps.error !== "user not verified" && (
             <Splitting data={serverProps.clubInfo!} id={String(id)} />
-          )}
+          )} */}
         </div>
       )}
       <Modal open={inviteModalOpen}>
@@ -271,7 +281,7 @@ const Dashboard: NextPageWithLayout<any> = ({
         >
           <h3>Invite new members</h3>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body css={{ marginBottom: "8px" }}>
           <div className="flex flex-col gap-4">
             <p className="text-gray-800">
               Share this link with others so they can deposit ETH and join your

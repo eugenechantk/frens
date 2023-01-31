@@ -72,9 +72,11 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
   }, [claimAmount, step]);
 
   return (
-      <div className="bg-white flex flex-col items-center p-4 gap-4 rounded-[16px] min-h-[444px] w-full border ">
+      <div className="bg-white flex flex-col items-center p-4 gap-4 rounded-[16px] min-h-[444px] w-full border">
         {loading ? (
-          <LoadingWidget />
+          <div className="w-full grow flex flex-col justify-center">
+            <LoadingWidget />
+          </div>
         ) : (
           <>
             <div className="flex flex-row items-center justify-between w-full">
@@ -86,7 +88,7 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
             <p className="w-full">
               Deposit ETH into the club to gain more ownership in club tokens
             </p>
-            <div className="w-full h-full">
+            <>
               {step === 1 && (
                 <InputBuyIn
                   onClick={(buyTokenCount: number) => {
@@ -112,7 +114,7 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
                   }}
                 />
               )}
-            </div>
+            </>
           </>
         )}
       </div>

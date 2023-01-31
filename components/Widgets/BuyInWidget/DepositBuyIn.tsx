@@ -49,8 +49,8 @@ export default function DepositBuyIn({
   }, [transactionHash]);
 
   return (
-    <div className="w-full h-full">
-      <div className="flex flex-col gap-4 items-center h-full">
+    <div className="w-full grow flex">
+      <div className="flex flex-col gap-4 items-center grow">
         <div className="flex flex-col gap-4 items-center justify-center grow">
           <Spinner success={success} error={error} />
           {error ? (
