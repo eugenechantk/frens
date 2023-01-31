@@ -21,7 +21,7 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
   const [ethPrice, setEthPrice] = useState(0);
   const [resetKey, setResetKey] = useState(0);
   // const [userSdk, setUserSdk] = useState<ThirdwebSDK>();
-  const userSdk = new ThirdwebSDK(signer);
+  const userSdk = new ThirdwebSDK(provider?.getSigner()!);
 
   // useEffect(() => {
   //   const _userThirdWebSDK = new ThirdwebSDK(provider?.getSigner()!);
