@@ -4,7 +4,7 @@ import { formatUnits } from "ethers/lib/utils";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { getUsdPrice } from "../../../lib/ethereum";
-import { provider } from "../../../lib/provider";
+import { provider, signer } from "../../../lib/provider";
 import { IClubInfo } from "../../../pages/clubs/[id]";
 import { Button } from "../../Button/Button";
 import LoadingWidget from "../LoadingWidget";
@@ -21,7 +21,7 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
   const [ethPrice, setEthPrice] = useState(0);
   const [resetKey, setResetKey] = useState(0);
   // const [userSdk, setUserSdk] = useState<ThirdwebSDK>();
-  const userSdk = new ThirdwebSDK(provider?.getSigner()!);
+  const userSdk = new ThirdwebSDK(signer);
 
   // useEffect(() => {
   //   const _userThirdWebSDK = new ThirdwebSDK(provider?.getSigner()!);

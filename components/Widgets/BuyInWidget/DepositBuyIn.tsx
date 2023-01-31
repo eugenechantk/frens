@@ -1,4 +1,4 @@
-import { ThirdwebSDK, TokenDrop } from "@thirdweb-dev/sdk";
+import { TokenDrop } from "@thirdweb-dev/sdk";
 import React, { useEffect, useState } from "react";
 import { provider } from "../../../lib/provider";
 import { Button } from "../../Button/Button";
