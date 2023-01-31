@@ -2,7 +2,7 @@ import Image, { StaticImageData } from "next/image";
 import React, { useState } from "react";
 import { Button } from "../Button/Button";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { provider } from "../../lib/provider";
+import { getSigner, provider, signer } from "../../lib/provider";
 import { signInMessage } from "../../lib/ethereum";
 import { signInWithCustomToken } from "firebase/auth";
 import { firebaseClientAuth } from "../../firebase/firebaseClient";
@@ -37,11 +37,12 @@ export default function AccountButton({
 
     try {
       // getting the end-users signer
-      const _signer = provider!.getSigner();
-      address = await _signer!.getAddress();
+      getSigner();
+      console.log(signer)
+      address = await signer.getAddress();
 
       // sending the message for the end-user to sign
-      sig = await _signer?.signMessage(signInMessage);
+      sig = await signer.signMessage(signInMessage);
     } catch (err) {
       console.log(err);
       setLoading(false);

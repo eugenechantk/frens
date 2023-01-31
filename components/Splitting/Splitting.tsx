@@ -22,7 +22,7 @@ export default function Splitting({
   const [splitContractAddress, setSplitContractAddress] = useState(data.split_contract_address)
   // STEP 1: Initiate a ethers wallet based on club wallet mnemonic
   const clubWallet = initWallet(data.club_wallet_mnemonic!);
-  console.log("Club wallet private key: ", clubWallet.privateKey);
+  // console.log("Club wallet private key: ", clubWallet.privateKey);
 
   // STEP 2: Initiate a ThirdWebSDK with the club wallet
   const sdk = new ThirdwebSDK(clubWallet);

@@ -1,4 +1,10 @@
-import React, { lazy, ReactElement, Suspense, useEffect } from "react";
+import React, {
+  lazy,
+  ReactElement,
+  Suspense,
+  useEffect,
+  useState,
+} from "react";
 import AppLayout from "../../../layout/AppLayout";
 import { NextPageWithLayout } from "../../_app";
 import { adminAuth, adminFirestore } from "../../../firebase/firebaseAdmin";
@@ -21,7 +27,16 @@ import NotVerified from "../../../components/NotVerified/NotVerified";
 import Splitting from "../../../components/Splitting/Splitting";
 import { useRouter } from "next/router";
 import LoadingWidget from "../../../components/Widgets/LoadingWidget";
-import { clearSignClients, legacySignClient, signClient } from "../../../lib/walletConnectLib";
+import {
+  clearSignClients,
+  legacySignClient,
+  signClient,
+} from "../../../lib/walletConnectLib";
+import BuyInWidgetWrapper from "../../../components/Widgets/BuyInWidget/BuyInWidgetWrapper";
+import { Button } from "../../../components/Button/Button";
+import { Modal } from "@nextui-org/react";
+import { Square2StackIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
@@ -138,9 +153,14 @@ export const getServerSideProps = async (context: any) => {
         userAddress,
         clubInfo.club_token_address!
       );
-      // console.log(verify)
+      // console.log(verify);
       if (!verify) {
-        throw Error("Not verified");
+        return {
+          props: {
+            clubInfo: clubInfo,
+            error: "user not verified",
+          },
+        };
       }
 
       // Step 3: Fetch porfolio of the club
@@ -179,38 +199,113 @@ const Dashboard: NextPageWithLayout<any> = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { id } = router.query;
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [copyLinkTooltip, setCopyLinkTooltip] = useState(false);
+
+  const copyLink = () => {
+    setCopyLinkTooltip(true);
+    navigator.clipboard.writeText(`${
+      typeof window !== "undefined" ? window.location.origin : ""
+    }
+    ${router.asPath}`);
+    setTimeout(() => setCopyLinkTooltip(false), 1000);
+  };
   return (
     <>
-      {!serverProps.error ? (
+      {serverProps.error === "Not authed" ? (
+        <NotAuthed />
+      ) : serverProps.error && serverProps.error !== "user not verified" ? (
+        <p>error</p>
+      ) : (
         <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
           {/* Left panel */}
-          <div className="flex flex-col items-start gap-8 w-full">
+          <div className={clsx(
+            "flex flex-col items-start gap-8 w-full md:h-full md:justify-center",
+            serverProps.error === "user not verified" && "md:w-1/2"
+          )}>
             {/* Club details and members */}
             <div className="flex flex-col items-start gap-4 w-full">
-              <ClubDetails data={serverProps.clubInfo!} />
-              <ClubMembers data={serverProps.members!} />
+              <ClubDetails
+                data={serverProps.clubInfo!}
+                verified={serverProps.error !== "user not verified"}
+              />
+              {serverProps.error !== "user not verified" && (
+                <div className="flex flex-row gap-2">
+                  <ClubMembers data={serverProps.members!} />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setInviteModalOpen(true)}
+                  >
+                    <h4>Invite</h4>
+                  </Button>
+                </div>
+              )}
             </div>
             {/* Balance */}
             {/* TODO: have a global state setting for whether to show club or me balance */}
-            <ClubBalance />
+            {serverProps.error !== "user not verified" && <ClubBalance />}
             {/* Portfolio */}
-            <Portfolio
-              data={serverProps.balance!}
-              clubWalletAddress={serverProps.clubInfo?.club_wallet_address!}
-            />
+            {serverProps.error !== "user not verified" && (
+              <Portfolio
+                data={serverProps.balance!}
+                clubWalletAddress={serverProps.clubInfo?.club_wallet_address!}
+              />
+            )}
           </div>
           {/* Right panel */}
-          <Suspense fallback={<LoadingWidget />}>
-            <WidgetSection data={serverProps.clubInfo!} />
-          </Suspense>
+          {serverProps.error !== "user not verified" && (
+            <Suspense fallback={<LoadingWidget />}>
+              <WidgetSection data={serverProps.clubInfo!} />
+            </Suspense>
+          )}
+          {serverProps.error === "user not verified" && (
+            <div className="md:h-full md:flex md:w-1/2 md:flex-col md:items-center md:justify-center">
+              <BuyInWidgetWrapper data={serverProps.clubInfo!} />
+            </div>
+          )}
           {/* FOR TESTING SPLITTING */}
-          <Splitting data={serverProps.clubInfo!} id={String(id)} />
+          {/* {serverProps.error !== "user not verified" && (
+            <Splitting data={serverProps.clubInfo!} id={String(id)} />
+          )} */}
         </div>
-      ) : serverProps.error === "Not authed" ? (
-        <NotAuthed />
-      ) : (
-        <NotVerified />
       )}
+      <Modal open={inviteModalOpen}>
+        <Modal.Header
+          css={{
+            marginTop: "8px",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "start",
+          }}
+        >
+          <h3>Invite new members</h3>
+        </Modal.Header>
+        <Modal.Body css={{ marginBottom: "8px" }}>
+          <div className="flex flex-col gap-4">
+            <p className="text-gray-800">
+              Share this link with others so they can deposit ETH and join your
+              club
+            </p>
+            <div className="flex flex-row gap-1 px-5 py-4 rounded-[6px] border border-secondary-300 items-center">
+              <p className="grow overflow-ellipsis overflow-hidden">
+                {typeof window !== "undefined" ? window.location.origin : ""}
+                {router.asPath}
+              </p>
+              <div className="relative">
+                <Button variant="text-only" onClick={copyLink}>
+                  <Square2StackIcon className="w-5" />
+                </Button>
+                {copyLinkTooltip && (
+                  <p className="absolute -top-8 -left-20 z-10 w-[138px] bg-gray-800 bg-opacity-80 px-3 py-1 rounded-[4px] text-white text-sm">
+                    Copied invite link
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };

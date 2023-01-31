@@ -39,9 +39,6 @@ export default function ClubMembers({ data }: { data: IMemberInfoData[] }) {
           );
         })}
       </div>
-      <Button variant="outline" size="sm" className="h-[44px]">
-        <h3>Invite</h3>
-      </Button>
     </div>
   );
 }

@@ -153,6 +153,7 @@ export async function verifyClubHolding(
   userAddress: string,
   clubTokenAddress: string
 ): Promise<boolean> {
+  let verified = false;
   // console.log(userAddress, clubTokenAddress)
   const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
   const options = {
@@ -174,14 +175,15 @@ export async function verifyClubHolding(
       .then((response) => response.data);
     // console.log(result)
     if (result.length !== 0) {
-      return true;
+      verified = true
     } else {
-      return false;
+      verified = false
     }
   } catch (err) {
     console.log(err);
-    return false;
+    verified = false
   }
+  return verified
 }
 
 // Returns USD price of the token
