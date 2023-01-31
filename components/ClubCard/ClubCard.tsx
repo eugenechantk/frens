@@ -16,7 +16,7 @@ export default function ClubCard({
 }: IClubCardProps) {
   return (
     <div
-      className="flex flex-col justify-between items-start p-6 h-[212px] bg-white rounded-20 w-full cursor-pointer border-[3px] border-white hover:border-primary-600"
+      className="flex flex-col justify-between items-start p-6 h-[212px] bg-white rounded-20 w-full cursor-pointer border border-secondary-300 hover:border-[3px] hover:border-primary-600 "
       onClick={props.onClick}
     >
       <div className="w-[52px] h-[52px] relative">
