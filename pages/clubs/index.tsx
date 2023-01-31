@@ -1,7 +1,6 @@
 import React, { ReactElement } from "react";
 import AppLayout from "../../layout/AppLayout";
 import { useRouter } from "next/router";
-import { useAuth } from "../../lib/auth";
 import { NextPageWithLayout } from "../_app";
 import { Button } from "../../components/Button/Button";
 import ClubCard from "../../components/ClubCard/ClubCard";
@@ -12,6 +11,7 @@ import NotAuthed from "../../components/NotAuthed/NotAuthed";
 import { IClubInfo } from "./[id]";
 import _ from "lodash";
 import { getUserHoldings } from "../../lib/ethereum";
+import { clearSignClients } from "../../lib/walletConnectLib";
 
 interface IClubData extends IClubInfo {
   club_id: string;
@@ -78,9 +78,8 @@ const ClubList: NextPageWithLayout<any> = ({
   ...serverProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   // console.log(serverProps);
-  const user = useAuth();
   const router = useRouter();
-  // console.log(user)
+  clearSignClients();
   return (
     <>
       {!serverProps.error ? (

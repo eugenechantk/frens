@@ -1,7 +1,6 @@
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import React, { useEffect, useState } from "react";
 import AccountButton from "./AccountButton";
-import ReactTooltip from "react-tooltip";
 import { Button } from "../Button/Button";
 import OutsideClickHandler from "react-outside-click-handler";
 import { useAuth } from "../../lib/auth";
@@ -96,13 +95,6 @@ export default function UserAccount() {
                 </span>
                 <Square2StackIcon className="inline w-5 text-gray-400" />
               </button>
-              <ReactTooltip
-                id="copyAddressTooltip"
-                place="bottom"
-                effect="solid"
-                className="rounded-8"
-                getContent={() => tooltip}
-              />
             </div>
             <div className="flex flex-col items-start gap-1 w-full">
               <Button variant="secondary" className="w-full" onClick={handleWallet}>

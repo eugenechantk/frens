@@ -1,4 +1,4 @@
-import React, { lazy, ReactElement } from "react";
+import React, { lazy, ReactElement, Suspense, useEffect } from "react";
 import AppLayout from "../../../layout/AppLayout";
 import { NextPageWithLayout } from "../../_app";
 import { adminAuth, adminFirestore } from "../../../firebase/firebaseAdmin";
@@ -7,7 +7,6 @@ import ClubDetails from "../../../components/ClubDetails/ClubDetails";
 import ClubMembers from "../../../components/ClubMembers/ClubMembers";
 import ClubBalance from "../../../components/ClubBalance/ClubBalance";
 import Portfolio from "../../../components/Portfolio/Portfolio";
-import WidgetSection from "../../../components/Widgets/WidgetSection";
 import _ from "lodash";
 import nookies from "nookies";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
@@ -21,6 +20,11 @@ import {
 import NotVerified from "../../../components/NotVerified/NotVerified";
 import Splitting from "../../../components/Splitting/Splitting";
 import { useRouter } from "next/router";
+import LoadingWidget from "../../../components/Widgets/LoadingWidget";
+import { clearSignClients, legacySignClient, signClient } from "../../../lib/walletConnectLib";
+const WidgetSection = lazy(
+  () => import("../../../components/Widgets/WidgetSection")
+);
 
 export interface IClubInfo {
   club_description: string;
@@ -173,8 +177,8 @@ export const getServerSideProps = async (context: any) => {
 const Dashboard: NextPageWithLayout<any> = ({
   ...serverProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const router = useRouter()
-  const {id} = router.query
+  const router = useRouter();
+  const { id } = router.query;
   return (
     <>
       {!serverProps.error ? (
@@ -196,9 +200,11 @@ const Dashboard: NextPageWithLayout<any> = ({
             />
           </div>
           {/* Right panel */}
-          <WidgetSection data={serverProps.clubInfo!} />
+          <Suspense fallback={<LoadingWidget />}>
+            <WidgetSection data={serverProps.clubInfo!} />
+          </Suspense>
           {/* FOR TESTING SPLITTING */}
-          <Splitting data={serverProps.clubInfo!} id={String(id)}/>
+          <Splitting data={serverProps.clubInfo!} id={String(id)} />
         </div>
       ) : serverProps.error === "Not authed" ? (
         <NotAuthed />

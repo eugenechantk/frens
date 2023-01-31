@@ -3,7 +3,7 @@ import { ConnectExtension } from "@magic-ext/connect";
 
 const createMagic = () => {
   if(typeof window != "undefined") {
-    return new Magic("pk_live_257001A814ED44DA", {
+    return new Magic(process.env.NEXT_PUBLIC_MAGIC_API_KEY!, {
       network: "goerli",
       extensions: [new ConnectExtension()],
     })
