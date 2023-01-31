@@ -41,6 +41,12 @@ export async function createSignClient(data: IClubInfo) {
     signClient = await SignClient.init({
       logger: "debug",
       projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
+      metadata: {
+        name: `${data.club_name} wallet`,
+        description: `frens club wallet for ${data.club_name}`,
+        url: 'https://joinfrens.xyz/',
+        icons: [data.club_image!]
+      }
     });
     signClientInitialized = true;
     clubWallet = {
