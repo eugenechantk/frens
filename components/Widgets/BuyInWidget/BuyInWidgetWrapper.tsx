@@ -1,7 +1,7 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ThirdwebSDK, TokenDrop } from "@thirdweb-dev/sdk";
 import { formatUnits } from "ethers/lib/utils";
-import Image from "next/image";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { getUsdPrice } from "../../../lib/ethereum";
 import { provider, signer } from "../../../lib/provider";
@@ -11,7 +11,7 @@ import LoadingWidget from "../LoadingWidget";
 import DepositBuyIn from "./DepositBuyIn";
 import InputBuyIn from "./InputBuyIn";
 
-export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
+export default function BuyInWidgetWrapper({ data, notVerify }: { data: IClubInfo, notVerify?:boolean }) {
   const [claimAmount, setClaimAmount] = useState(0);
   const [step, setStep] = useState(1);
   const [tokenContract, setTokenContract] = useState<TokenDrop>();
@@ -22,6 +22,7 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
   const [resetKey, setResetKey] = useState(0);
   // const [userSdk, setUserSdk] = useState<ThirdwebSDK>();
   const userSdk = new ThirdwebSDK(provider?.getSigner()!);
+  const router = useRouter();
 
   // useEffect(() => {
   //   const _userThirdWebSDK = new ThirdwebSDK(provider?.getSigner()!);
@@ -107,10 +108,14 @@ export default function BuyInWidgetWrapper({ data }: { data: IClubInfo }) {
                   tokenContract={tokenContract}
                   claimAmount={claimAmount}
                   onClick={async () => {
+                    if (notVerify) {
+                      router.replace({ pathname: router.pathname, query: router.query })
+                    } else {
                     setStep(1);
                     await getAllInfo();
                     setResetKey(resetKey + 1);
                     setClaimAmount(0);
+                    }
                   }}
                 />
               )}
