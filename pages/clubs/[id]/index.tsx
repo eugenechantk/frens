@@ -2,7 +2,6 @@ import React, {
   lazy,
   ReactElement,
   Suspense,
-  useEffect,
   useState,
 } from "react";
 import AppLayout from "../../../layout/AppLayout";
@@ -23,15 +22,8 @@ import {
   IHoldingsData,
   verifyClubHolding,
 } from "../../../lib/ethereum";
-import NotVerified from "../../../components/NotVerified/NotVerified";
-import Splitting from "../../../components/Splitting/Splitting";
 import { useRouter } from "next/router";
 import LoadingWidget from "../../../components/Widgets/LoadingWidget";
-import {
-  clearSignClients,
-  legacySignClient,
-  signClient,
-} from "../../../lib/walletConnectLib";
 import BuyInWidgetWrapper from "../../../components/Widgets/BuyInWidget/BuyInWidgetWrapper";
 import { Button } from "../../../components/Button/Button";
 import { Modal } from "@nextui-org/react";
