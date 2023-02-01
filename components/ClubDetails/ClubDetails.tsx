@@ -25,11 +25,11 @@ export default function ClubDetails({
       {/* Club name and settings button */}
       <div className="flex flex-row items-center gap-4">
         <h1>{data.club_name}</h1>
-        {verified && (
+        {/* {verified && (
           <Button variant="secondary-outline">
             <Cog6ToothIcon className=" w-5" />
           </Button>
-        )}
+        )} */}
       </div>
       {/* Club description */}
       <p>{data.club_description}</p>
