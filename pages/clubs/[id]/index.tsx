@@ -25,7 +25,7 @@ import { Modal } from "@nextui-org/react";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
-import { IClubInfo } from "../../../lib/fetchers";
+import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
@@ -56,28 +56,6 @@ export const getServerSideProps = async (context: any) => {
   const cookies = nookies.get(context);
   // console.log(cookies)
   // console.log(id);
-
-  // Fetch function for club information
-  const fetchClubInfo = async (id: string) => {
-    try {
-      const _clubInfo = await adminFirestore
-        .collection("clubs")
-        .doc(id)
-        .get()
-        .then((doc) => {
-          if (!doc.exists) {
-            throw new Error("club does not exist in database");
-          }
-          return doc.data() as IClubInfo;
-        })
-        .then((data) => {
-          return { ...data };
-        });
-      return _clubInfo;
-    } catch (err) {
-      throw err;
-    }
-  };
 
   // Fetcher function for club members
   const fetchMemberInfo = async (
