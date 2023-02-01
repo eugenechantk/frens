@@ -25,23 +25,12 @@ import { Modal } from "@nextui-org/react";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
+import { IClubInfo } from "../../../lib/fetchers";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
 
-export interface IClubInfo {
-  club_description: string;
-  club_image?: string;
-  club_name: string;
-  club_token_sym: string;
-  club_wallet_address?: string;
-  club_wallet_mnemonic?: string;
-  club_token_address?: string;
-  deposited?: boolean;
-  club_members?: { [k: string]: number };
-  last_retrieved_block?: number;
-  split_contract_address?: string;
-}
+
 
 export interface IMemberInfoData {
   display_name: string;

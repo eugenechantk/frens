@@ -4,9 +4,9 @@ import axios from "axios";
 import { BigNumber, ethers, Wallet } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
 import _ from "lodash";
-import { IClubInfo } from "../pages/clubs/[id]";
 import { abi } from "./abi";
 import { getChainData } from "./chains";
+import { IClubInfo } from './fetchers';
 import { getSignParamsMessage, getSignTypedDataParamsData } from './HelperUtil';
 
 interface IHolderBalanceInfo {

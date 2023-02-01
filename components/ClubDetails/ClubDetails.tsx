@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "../Button/Button";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
-import { IClubInfo } from "../../pages/clubs/[id]";
+import { IClubInfo } from "../../lib/fetchers";
 
 export default function ClubDetails({
   data,

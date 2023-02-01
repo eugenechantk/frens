@@ -4,6 +4,7 @@ import AppLayout from "../../../layout/AppLayout"
 import { NextPageWithLayout } from "../../_app"
 
 export const getServerSideProps = async (context: any) => {
+  
   return {
     props: {
 

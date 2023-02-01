@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { IClubInfo } from "../pages/clubs/[id]";
+import { IClubInfo } from "./fetchers";
 import { createSignClient } from "./walletConnectLib";
 
 export default function useWcinit(data: IClubInfo) {

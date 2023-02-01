@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Button } from "../Button/Button";
 import { parseUri } from "@walletconnect/utils";
-import { IClubInfo } from "../../pages/clubs/[id]";
+
 import {
   createLegacySignClient,
   legacySignClient,
@@ -17,6 +17,7 @@ import SimpleInputField from "../InputField/SimpleInputField";
 import { SessionTypes } from "@walletconnect/types";
 import { ILegacySession } from "./WidgetSection";
 import { useRouter } from "next/router";
+import { IClubInfo } from "../../lib/fetchers";
 
 export interface IClubWallet {
   club_wallet_address: string;
