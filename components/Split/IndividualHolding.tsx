@@ -4,10 +4,10 @@ export default function IndividualHolding() {
   return (
     <div className="flex flex-row gap-2">
       {/* Token name */}
-      <h5 className="text-gray-500 grow">Ethereum</h5>
+      <p className="text-gray-500 grow font-semibold text-sm">Ethereum</p>
       {/* Token amount */}
-      <h5 className=" inline-block text-gray-500">1,234,567</h5>
-      <h5 className=" inline-block text-gray-400">ETH</h5>
+      <p className=" inline-block text-gray-500 font-semibold text-sm">1,234,567</p>
+      <p className=" inline-block text-gray-400 text-sm">ETH</p>
     </div>
   );
 }

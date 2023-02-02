@@ -37,7 +37,7 @@ export default function OwnershipItem() {
       </Button>
       {/* Split amount */}
       {expand && (
-        <div className="flex flex-col gap-4 pt-1 pr-1 pb-3 pl-[52px]">
+        <div className="flex flex-col gap-4 pt-1 pr-2 pb-3 pl-[52px]">
           <p className="text-sm uppercase font-bold text-gray-400">
             Split amount
           </p>

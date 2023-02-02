@@ -34,7 +34,7 @@ const CloseClub: NextPageWithLayout<any> = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { id } = router.query;
-  const [payoutProgress, setPayoutProgress] = useState<'not started' | 'in progress' | 'done'>('done');
+  const [payoutProgress, setPayoutProgress] = useState<'not started' | 'in progress' | 'done'>('not started');
   return (
     <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 pb-5 h-full flex flex-col">
       <div className="flex flex-col gap-6 grow pb-4 md:flex-row md:items-center md:gap-10">
