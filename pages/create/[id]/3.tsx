@@ -9,7 +9,6 @@ import { useRouter } from "next/router";
 import nookies from "nookies";
 import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
-import { IClubInfo } from "../../clubs/[id]";
 import { clientFireStore } from "../../../firebase/firebaseClient";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ethers } from "ethers";
@@ -17,6 +16,7 @@ import { getChainData } from "../../../lib/chains";
 import { ClaimConditionInput, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { useAuth } from "../../../lib/auth";
 import _ from "lodash";
+import { IClubInfo } from "../../../lib/fetchers";
 
 export const getServerSideProps = async (context: any) => {
   const cookies = nookies.get(context);

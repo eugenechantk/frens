@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Button } from "../Button/Button";
 import { parseUri } from "@walletconnect/utils";
-import { IClubInfo } from "../../pages/clubs/[id]";
+
 import {
   createLegacySignClient,
   legacySignClient,
@@ -17,6 +17,7 @@ import SimpleInputField from "../InputField/SimpleInputField";
 import { SessionTypes } from "@walletconnect/types";
 import { ILegacySession } from "./WidgetSection";
 import { useRouter } from "next/router";
+import { IClubInfo } from "../../lib/fetchers";
 
 export interface IClubWallet {
   club_wallet_address: string;
@@ -82,7 +83,7 @@ export default function WalletConnect({
           <ChevronDownIcon width={20} height={20} />
           <p>How to connect to other apps</p>
         </Button>
-        {sessions?.length === 0 && !legacySession && (
+        {((sessions?.length === 0 && !legacySession) || showDesc) && (
           <div className="ml-3 mt-3">
             <div className="flex flex-row gap-[6px] mb-3">
               <p className="w-[13px] h-[28px]">1.</p>

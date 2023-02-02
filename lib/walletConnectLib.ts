@@ -6,11 +6,11 @@ import { EIP155_SIGNING_METHODS, initWallet } from "./ethereum";
 import { IClubWallet } from "../components/Widgets/WalletConnect";
 import { getSdkError } from "@walletconnect/utils";
 import { SignClientTypes } from "@walletconnect/types";
-import { IClubInfo } from "../pages/clubs/[id]";
 import { getChainData } from "./chains";
 import { ethers } from "ethers";
 import { getSignParamsMessage, getSignTypedDataParamsData } from "./HelperUtil";
 import { formatJsonRpcError, formatJsonRpcResult } from "@json-rpc-tools/utils";
+import { IClubInfo } from "./fetchers";
 
 export let signClient: SignClient | undefined;
 export let legacySignClient: LegacySignClient | undefined;

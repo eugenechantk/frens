@@ -1,9 +1,4 @@
-import React, {
-  lazy,
-  ReactElement,
-  Suspense,
-  useState,
-} from "react";
+import React, { lazy, ReactElement, Suspense, useState } from "react";
 import AppLayout from "../../../layout/AppLayout";
 import { NextPageWithLayout } from "../../_app";
 import { adminAuth, adminFirestore } from "../../../firebase/firebaseAdmin";
@@ -30,23 +25,12 @@ import { Modal } from "@nextui-org/react";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
+import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
 
-export interface IClubInfo {
-  club_description: string;
-  club_image?: string;
-  club_name: string;
-  club_token_sym: string;
-  club_wallet_address?: string;
-  club_wallet_mnemonic?: string;
-  club_token_address?: string;
-  deposited?: boolean;
-  club_members?: { [k: string]: number };
-  last_retrieved_block?: number;
-  split_contract_address?: string;
-}
+
 
 export interface IMemberInfoData {
   display_name: string;
@@ -73,37 +57,15 @@ export const getServerSideProps = async (context: any) => {
   // console.log(cookies)
   // console.log(id);
 
-  // Fetch function for club information
-  const fetchClubInfo = async (id: string) => {
-    try {
-      const _clubInfo = await adminFirestore
-        .collection("clubs")
-        .doc(id)
-        .get()
-        .then((doc) => {
-          if (!doc.exists) {
-            throw new Error("club does not exist in database");
-          }
-          return doc.data() as IClubInfo;
-        })
-        .then((data) => {
-          return { ...data };
-        });
-      return _clubInfo;
-    } catch (err) {
-      throw err;
-    }
-  };
-
   // Fetcher function for club members
   const fetchMemberInfo = async (
     clubInfo: IClubInfo
   ): Promise<IMemberInfoData[]> => {
     // STEP 1: Fetch the latest club member list
     const _club_members = await getClubMemberBalance(clubInfo, id);
-    
+
     // STEP 2: Update the club member list
-    const currentBlock = await getLatestBlockNumber()
+    const currentBlock = await getLatestBlockNumber();
     const result = adminFirestore.collection("clubs").doc(id).update({
       club_members: _club_members,
       last_retrieved_block: currentBlock,
@@ -212,10 +174,13 @@ const Dashboard: NextPageWithLayout<any> = ({
       ) : (
         <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
           {/* Left panel */}
-          <div className={clsx(
-            "flex flex-col items-start gap-8 w-full md:h-full",
-            serverProps.error === "user not verified" && "md:w-1/2 md:justify-center"
-          )}>
+          <div
+            className={clsx(
+              "flex flex-col items-start gap-8 w-full md:h-full",
+              serverProps.error === "user not verified" &&
+                "md:w-1/2 md:justify-center"
+            )}
+          >
             {/* Club details and members */}
             <div className="flex flex-col items-start gap-4 w-full">
               <ClubDetails
@@ -247,20 +212,23 @@ const Dashboard: NextPageWithLayout<any> = ({
             )}
           </div>
           {/* Right panel */}
-          {serverProps.error !== "user not verified" && (
-            <Suspense fallback={<LoadingWidget />}>
-              <WidgetSection data={serverProps.clubInfo!} />
-            </Suspense>
-          )}
-          {serverProps.error === "user not verified" && (
-            <div className="md:h-full md:flex md:w-1/2 md:flex-col md:items-center md:justify-center">
-              <BuyInWidgetWrapper data={serverProps.clubInfo!} notVerify/>
-            </div>
-          )}
-          {/* FOR TESTING SPLITTING */}
-          {/* {serverProps.error !== "user not verified" && (
+          <div className="flex flex-col gap-5">
+            {serverProps.error !== "user not verified" && (
+              <Suspense fallback={<LoadingWidget />}>
+                <WidgetSection data={serverProps.clubInfo!} />
+              </Suspense>
+            )}
+            {serverProps.error === "user not verified" && (
+              <div className="md:h-full md:flex md:w-1/2 md:flex-col md:items-center md:justify-center">
+                <BuyInWidgetWrapper data={serverProps.clubInfo!} notVerify />
+              </div>
+            )}
+            {/* FOR TESTING SPLITTING */}
+            {/* {serverProps.error !== "user not verified" && (
             <Splitting data={serverProps.clubInfo!} id={String(id)} />
-          )} */}
+            )} */}
+            <Button variant="secondary-outline" onClick={() => router.push(`/clubs/${id}/close`)}><h3>Close club and distribute</h3></Button>
+          </div>
         </div>
       )}
       <Modal open={inviteModalOpen}>

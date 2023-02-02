@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { NextApiRequest, NextApiResponse } from "next";
 import { adminFirestore } from "../../../firebase/firebaseAdmin";
-import { IClubInfo } from "../../clubs/[id]";
+import { IClubInfo } from "../../../lib/fetchers";
 import { withAuth } from "../middleware";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

@@ -9,7 +9,7 @@ import {
   initWallet,
   sendToken,
 } from "../../lib/ethereum";
-import { IClubInfo, IMemberInfoData } from "../../pages/clubs/[id]";
+import { IClubInfo } from "../../lib/fetchers";
 import { Button } from "../Button/Button";
 
 export default function Splitting({
