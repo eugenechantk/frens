@@ -1,8 +1,7 @@
 import { ArrowSmallDownIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { getUsdPrice } from "../../../lib/ethereum";
-import { IClubInfo } from "../../../pages/clubs/[id]";
+import { IClubInfo } from "../../../lib/fetchers";
 import { Button } from "../../Button/Button";
 
 export default function InputBuyIn({

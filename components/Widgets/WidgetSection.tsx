@@ -1,6 +1,7 @@
 import { IClientMeta } from "@walletconnect/legacy-types";
 import { useRouter } from "next/router";
 import React, { lazy, useState, Suspense, useEffect } from "react";
+import { IClubInfo } from "../../lib/fetchers";
 import { useSignClientEventsManager } from "../../lib/useWcEventsManager";
 import useWcinit from "../../lib/useWcInit";
 import {
@@ -8,7 +9,6 @@ import {
   legacySignClient,
   signClient,
 } from "../../lib/walletConnectLib";
-import { IClubInfo } from "../../pages/clubs/[id]";
 import BuyInWidgetWrapper from "./BuyInWidget/BuyInWidgetWrapper";
 import WalletConnect, { IClubWallet } from "./WalletConnect";
 import WidgetToggle from "./WidgetToggle";
