@@ -64,7 +64,7 @@ const CloseClub: NextPageWithLayout<any> = ({
               distributing the fund.
             </p>
           ) : payoutProgress === 'in progress' && (
-            <p className="bg-red-100 py-1 px-2 rounded-[4px] font-semibold text-error w-fit">
+            <p className="bg-red-100 py-1 px-2 rounded-[4px] font-semibold text-error w-fit mt-4">
               Do not close this window
             </p>
           )}
@@ -88,7 +88,7 @@ const CloseClub: NextPageWithLayout<any> = ({
         </div>
       </div>
       {/* Button group */}
-      <div className="flex flex-col items-center gap-3 bg-secondary-100">
+      <div className="flex flex-col items-center gap-3 bg-secondary-100 mb-4">
         {payoutProgress === 'not started' ? (<>
         <p className="bg-red-100 py-1 px-2 rounded-[4px] font-semibold text-error">
           Closing the club is irreversible
