@@ -1,12 +1,9 @@
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "../Button/Button";
-import defaultAvatar from "../../public/default_avatar.png";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import IndividualHolding from "./IndividualHolding";
-import { IHolderPower, IHoldingsData } from "../../lib/ethereum";
-import { adminAuth } from "../../firebase/firebaseAdmin";
-import { IMemberInfoData } from "../../pages/clubs/[id]";
+import { IHoldingsData } from "../../lib/ethereum";
 import { IMemberInfoAndClaimPower } from "../../pages/clubs/[id]/close";
 
 export default function OwnershipItem({
