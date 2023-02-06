@@ -382,10 +382,10 @@ export const sendToken = async (
   let send_abi = abi;
   let send_account = wallet.getAddress();
   // Base ethereum transfer gas of 21000 + contract execution gas (usually total up to 27xxx)
-  const _gasLimit = ethers.utils.hexlify(50000);
+  const _gasLimit = ethers.utils.hexlify(parseInt(process.env.NEXT_PUBLIC_SEND_ETH_GAS_LIMIT!));
 
   const {maxFeePerGas} = await wallet.provider.getFeeData();
-  console.log(clubWallet, maxFeePerGas, _gasLimit);
+  // console.log(clubWallet, maxFeePerGas, _gasLimit);
 
   if (contract_address) {
     console.log(`Sending ${contract_address} to split contract...`)

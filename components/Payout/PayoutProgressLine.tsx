@@ -117,7 +117,7 @@ export default function PayoutProgressLine({
 
   // Send all club assets to split contract
   const sendAllToSplit = async (splitContract: string) => {
-    const _gasForDistribute = clubPorfolio.length * 250000;
+    const _gasForDistribute = clubPorfolio.length * parseInt(process.env.NEXT_PUBLIC_SPLIT_GAS_LIMIT!);
     for (let token of clubPorfolio) {
       const result = await sendToken(
         splitContract,
