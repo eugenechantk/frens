@@ -9,6 +9,11 @@ import { getChainData } from "./chains";
 import { IClubInfo } from './fetchers';
 import { getSignParamsMessage, getSignTypedDataParamsData } from './HelperUtil';
 
+export interface IHolderPower {
+  address: string, 
+  sharesBps: number
+}
+
 interface IHolderBalanceInfo {
   balance: BigNumber;
   // power: BigNumber;
@@ -292,7 +297,7 @@ export const getClaimPower = (clubInfo: IClubInfo, _club_members: IClubMemberBal
   const totalSupply = Object.values(_club_members).reduce(
     (sum, cur) => (sum += cur)
   );
-  let _holderPower: {address: string, sharesBps: number}[] = [];
+  let _holderPower: IHolderPower[] = [];
   Object.keys(_club_members).forEach((member) => {
     _holderPower.push({address: member, sharesBps: ((_club_members[member] / totalSupply)*10000)|0});
   });
