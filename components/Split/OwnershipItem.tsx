@@ -5,6 +5,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import IndividualHolding from "./IndividualHolding";
 import { IHoldingsData } from "../../lib/ethereum";
 import { IMemberInfoAndClaimPower } from "../../pages/clubs/[id]/close";
+import { useAuth } from "../../lib/auth";
 
 export default function OwnershipItem({
   member,
@@ -14,6 +15,7 @@ export default function OwnershipItem({
   clubPortfolio: IHoldingsData[];
 }) {
   const [expand, setExpand] = useState(false);
+  const user = useAuth()
 
   return (
     <div className="flex flex-col gap-1 py-2 border-b border-secondary-300">
@@ -29,7 +31,7 @@ export default function OwnershipItem({
           {/* Display name and address */}
           <div className="flex flex-row gap-2 grow">
             <div className="flex flex-col gap-[2px] grow">
-              <h5 className=" text-left">{member.display_name}</h5>
+              <h5 className=" text-left">{member.uid === user.user?.uid ? "Me" : member.display_name}</h5>
               <p className="text-sm text-gray-400 text-left">
                 {member.uid.slice(0, 6)}...{member.uid.slice(-4)}
               </p>
