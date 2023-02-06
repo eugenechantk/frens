@@ -384,8 +384,8 @@ export const sendToken = async (
   // Base ethereum transfer gas of 21000 + contract execution gas (usually total up to 27xxx)
   const _gasLimit = ethers.utils.hexlify(50000);
 
-  const currentGasPrice = await wallet.provider.getGasPrice();
-  console.log(clubWallet, currentGasPrice, _gasLimit);
+  const {maxFeePerGas} = await wallet.provider.getFeeData();
+  console.log(clubWallet, maxFeePerGas, _gasLimit);
 
   if (contract_address) {
     console.log(`Sending ${contract_address} to split contract...`)
@@ -403,39 +403,37 @@ export const sendToken = async (
           await transferResult.wait()
           // make sure the nounceOffset increases for each transaction
           // nounceOffset++;
-          console.dir(transferResult);
-          alert("sent token");
+          return transferResult;
         });
     } catch (err) {
-      console.log(err);
-      alert(`failed to send token ${contract_address}`);
+      throw err;
     }
   } // ether send
   else {
     console.log(`Sending ETH to split contract`)
     const _ethLeft = await wallet.provider.getBalance(wallet.address);
     const _finalValue = _ethLeft
-      .sub(currentGasPrice.mul(BigNumber.from(_gasLimit)))
-      .sub(currentGasPrice.mul(BigNumber.from(_gasForDistribute)));
+      .sub(maxFeePerGas!.mul(BigNumber.from(_gasLimit)))
+      .sub(maxFeePerGas!.mul(BigNumber.from(_gasForDistribute)));
+    // console.log(_finalValue)
     // make sure it does not return the same nounce even when transactions are called too close to each other
     // const _nounce = await wallet.provider.getTransactionCount(send_account).then((nounce) => nounce + nounceOffset++)
     const tx = {
       from: send_account,
       to: to_address,
       value: _finalValue,
+      gasLimit: _gasLimit,
+      gasPrice: maxFeePerGas!,
       nonce: wallet.provider.getTransactionCount(send_account, 'latest'),
     };
-    console.log(tx)
     try {
       await wallet.sendTransaction(tx).then(async (transaction) => {
         // wait until the block is mined
-        // await transaction.wait()
-        console.dir(transaction);
-        alert("Send ETH finished!");
+        await transaction.wait();
+        return transaction;
       });
     } catch (error) {
-      console.log(error);
-      alert("failed to send ETH!!");
+      throw error
     }
   }
 };
