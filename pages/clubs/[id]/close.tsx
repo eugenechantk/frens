@@ -95,8 +95,6 @@ const CloseClub: NextPageWithLayout<any> = ({
   const clubWallet = initWallet(serverProps.clubData!.club_wallet_mnemonic!);
   const sdk = new ThirdwebSDK(clubWallet);
 
-  console.log(serverProps.claimPower);
-
   return serverProps.error === "Not authed" ? (
     <NotAuthed />
   ) : serverProps.error ? (
@@ -159,6 +157,8 @@ const CloseClub: NextPageWithLayout<any> = ({
               clubPorfolio={serverProps.clubPorfolio!}
               claimPower={serverProps.claimPower!}
               setPayoutProgress={setPayoutProgress}
+              clubInfo={serverProps.clubData!}
+              clubWallet={clubWallet}
             />
           )}
         </div>
