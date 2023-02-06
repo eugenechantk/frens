@@ -30,7 +30,7 @@ export interface ILegacySession {
 export default function WidgetSection({ data }: { data: IClubInfo }) {
   const [selected, setSelected] = useState("invest");
   const [sessions, setSessions] = useState(signClient?.session?.values!);
-  const [legacySession, setLegacySession] = useState(legacySignClient?.session!);
+  const [legacySession, setLegacySession] = useState<ILegacySession | undefined>(legacySignClient?.session!);
   const clubWallet: IClubWallet = {
     club_wallet_address: data.club_wallet_address!,
     club_wallet_mnemonic: data.club_wallet_mnemonic!,
