@@ -5,7 +5,6 @@ import { NextPageWithLayout } from "../../_app";
 import nookies from "nookies";
 import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";
 import Image from "next/image";
-import defaultClub from "../../../public/default_club.png";
 import OwnershipItem from "../../../components/Split/OwnershipItem";
 import { Button } from "../../../components/Button/Button";
 import { useRouter } from "next/router";
@@ -16,11 +15,12 @@ import {
   getClaimPower,
   fetchPortfolio,
   initWallet,
-  IHolderPower
+  IHolderPower,
 } from "../../../lib/ethereum";
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { IMemberInfoData } from ".";
 import { adminAuth } from "../../../firebase/firebaseAdmin";
+import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
 
 export interface IMemberInfoAndClaimPower extends IMemberInfoData {
   share: number;
@@ -37,37 +37,49 @@ export const getServerSideProps = async (context: any) => {
       },
     };
   } else {
-    // Get the club information for display and rendering
-    const _clubInfo: IClubInfo = await fetchClubInfo(id);
-    // Get club portfolio and club members
-    const [_clubPortfolio, _club_members] = await Promise.all([
-      fetchPortfolio(_clubInfo.club_wallet_address!),
-      getClubMemberBalance(_clubInfo, id),
-    ]);
-    // Get power of each member
-    const _holderPower: IHolderPower[] = getClaimPower(_clubInfo, _club_members);
-    console.log(_holderPower)
+    try {
+      // Get the club information for display and rendering
+      const _clubInfo: IClubInfo = await fetchClubInfo(id);
+      // Get club portfolio and club members
+      const [_clubPortfolio, _club_members] = await Promise.all([
+        fetchPortfolio(_clubInfo.club_wallet_address!),
+        getClubMemberBalance(_clubInfo, id),
+      ]);
+      // Get power of each member
+      const _holderPower: IHolderPower[] = getClaimPower(
+        _clubInfo,
+        _club_members
+      );
+      console.log(_holderPower);
 
-    let _claimPower = [] as IMemberInfoAndClaimPower[];
-    await Promise.all(
-      Object.keys(_club_members).map(async (uid) => {
-        // console.log(uid)
-        const _memberInfo = await adminAuth.getUser(uid);
-        _claimPower.push({
-          display_name: _memberInfo.displayName!,
-          profile_image: _memberInfo.photoURL!,
-          uid: _memberInfo.uid,
-          share: _holderPower.filter(member => member.address === uid)[0].sharesBps
-        });
-      })
-    );
-    return {
-      props: {
-        clubData: _clubInfo,
-        clubPorfolio: _clubPortfolio,
-        claimPower: _claimPower,
-      },
-    };
+      let _claimPower = [] as IMemberInfoAndClaimPower[];
+      await Promise.all(
+        Object.keys(_club_members).map(async (uid) => {
+          // console.log(uid)
+          const _memberInfo = await adminAuth.getUser(uid);
+          _claimPower.push({
+            display_name: _memberInfo.displayName!,
+            profile_image: _memberInfo.photoURL!,
+            uid: _memberInfo.uid,
+            share: _holderPower.filter((member) => member.address === uid)[0]
+              .sharesBps,
+          });
+        })
+      );
+      return {
+        props: {
+          clubData: _clubInfo,
+          clubPorfolio: _clubPortfolio,
+          claimPower: _claimPower,
+        },
+      };
+    } catch (err) {
+      return {
+        props: {
+          error: err,
+        },
+      };
+    }
   }
 };
 
@@ -78,15 +90,17 @@ const CloseClub: NextPageWithLayout<any> = ({
   const { id } = router.query;
   const [payoutProgress, setPayoutProgress] =
     useState<"not started" | "in progress" | "done">("not started");
-  
+
   // Initalize ThirdWebSDK with club wallet
   const clubWallet = initWallet(serverProps.clubData!.club_wallet_mnemonic!);
   const sdk = new ThirdwebSDK(clubWallet);
 
-  console.log(serverProps.claimPower)
+  console.log(serverProps.claimPower);
 
   return serverProps.error === "Not authed" ? (
     <NotAuthed />
+  ) : serverProps.error ? (
+    <ErrorMessage />
   ) : (
     <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 pb-5 h-full flex flex-col">
       <div className="flex flex-col gap-6 grow pb-4 md:flex-row md:items-center md:gap-10">
@@ -131,10 +145,21 @@ const CloseClub: NextPageWithLayout<any> = ({
                 Split breakdown
               </p>
               {/* For each member, show an ownership item */}
-              {serverProps.claimPower?.map((memberPower, index) => <OwnershipItem key={index} member={memberPower} clubPortfolio={serverProps.clubPorfolio}/>)}
+              {serverProps.claimPower?.map((memberPower, index) => (
+                <OwnershipItem
+                  key={index}
+                  member={memberPower}
+                  clubPortfolio={serverProps.clubPorfolio}
+                />
+              ))}
             </>
           ) : (
-            <PayoutProgressLine />
+            <PayoutProgressLine
+              sdk={sdk}
+              clubPorfolio={serverProps.clubPorfolio!}
+              claimPower={serverProps.claimPower!}
+              setPayoutProgress={setPayoutProgress}
+            />
           )}
         </div>
       </div>

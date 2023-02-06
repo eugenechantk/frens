@@ -1,7 +1,10 @@
-import React from 'react'
+import { ThirdwebSDK } from '@thirdweb-dev/sdk'
+import React, { Dispatch, SetStateAction } from 'react'
+import { IHoldingsData } from '../../lib/ethereum'
+import { IMemberInfoAndClaimPower } from '../../pages/clubs/[id]/close'
 import PayoutItem from './PayoutItem'
 
-export default function PayoutProgressLine() {
+export default function PayoutProgressLine({sdk, clubPorfolio, claimPower, setPayoutProgress}: {sdk: ThirdwebSDK, clubPorfolio: IHoldingsData[], claimPower:IMemberInfoAndClaimPower[], setPayoutProgress: Dispatch<SetStateAction<"not started" | "in progress" | "done">>}) {
   return (
     <div className='flex flex-col items-start gap-3 relative'>
       <PayoutItem title="Calculate members’ shares" txnStatus='done'/>
