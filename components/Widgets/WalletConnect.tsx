@@ -35,7 +35,7 @@ export default function WalletConnect({
   sessions: SessionTypes.Struct[];
   setSessions: Dispatch<SetStateAction<SessionTypes.Struct[]>>;
   legacySession: ILegacySession;
-  setLegacySession: Dispatch<SetStateAction<ILegacySession>>;
+  setLegacySession: Dispatch<SetStateAction<ILegacySession | undefined>>;
 }) {
   const [uri, setUri] = useState("");
   const clubWallet: IClubWallet = {
@@ -141,7 +141,10 @@ export default function WalletConnect({
               logo={legacySession.peerMeta?.icons[0]}
               name={legacySession.peerMeta?.name}
               url={legacySession.peerMeta?.url}
-              onDisconnect={() => legacySignClient?.killSession()}
+              onDisconnect={() => {
+                legacySignClient?.killSession();
+                setLegacySession(undefined);
+              }}
             />
           )}
           {sessions?.length !== 0 &&
