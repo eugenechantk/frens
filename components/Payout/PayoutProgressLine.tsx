@@ -81,7 +81,7 @@ export default function PayoutProgressLine({
 
   // Deploy split contract based on club member's token ownership
   const deploySplitContract = async () => {
-    let splitContract = ""
+    let splitAddress = ""
     if (!splitContractAddress) {
       // STEP 1: calcualte the shares of each member + adding remainder to club wallet
       const _holderClaimPower = claimPower.map((member) => {
@@ -108,19 +108,19 @@ export default function PayoutProgressLine({
           split_contract_address: _splitContractAddress,
         }
       );
-      splitContract = _splitContractAddress
+      splitAddress = _splitContractAddress
     } else {
-      splitContract = splitContractAddress
+      splitAddress = splitContractAddress
     }
-    return splitContract
+    return splitAddress
   };
 
   // Send all club assets to split contract
-  const sendAllToSplit = async (splitContract: string) => {
+  const sendAllToSplit = async (splitAddress: string) => {
     const _gasForDistribute = clubPorfolio.length * parseInt(process.env.NEXT_PUBLIC_SPLIT_GAS_LIMIT!);
     for (let token of clubPorfolio) {
       const result = await sendToken(
-        splitContract,
+        splitAddress,
         clubWallet,
         String(token.balance),
         String(token.token_address),
@@ -128,32 +128,35 @@ export default function PayoutProgressLine({
       );
       console.log(`Send ${token.name} to split contract success: ${result}`);
     }
-    return splitContract
+    return splitAddress
   };
 
   useEffect(() => {
     let step = 0;
     setStatusToProgress(ops, step);
+    // Deploy the split contract
     deploySplitContract()
-      .then((splitContract) => {
+      .then((splitAddress) => {
         setStatusToDone(ops, step);
         step++;
-        return splitContract
+        return splitAddress
       })
-      .then(async (splitContract) => {
+      // Send the club assets to the split contract
+      .then(async (splitAddress) => {
         setStatusToProgress(ops, step);
-        const _splitContract = await sendAllToSplit(splitContract);
-        return _splitContract
+        const _splitAddress = await sendAllToSplit(splitAddress);
+        return _splitAddress
       })
-      .then((splitContract) => {
+      .then((splitAddress) => {
         setStatusToDone(ops, step);
         step++;
-        return splitContract
+        return splitAddress
       })
-      .then(async (_splitContract) => {
+      // Split the tokens in the contract back to members
+      .then(async (splitAddress) => {
         setStatusToProgress(ops, step);
         const splitContract = await sdk.getContract(
-          _splitContract,
+          splitAddress,
           "split"
         );
         // Splitting the tokens left
@@ -186,7 +189,12 @@ export default function PayoutProgressLine({
       })
       .then(() => {
         setStatusToDone(ops, step);
-        setPayoutProgress("done");
+        step++;
+      })
+      .then(() => {
+        // TODO: burn all club tokens of each member
+        setStatusToDone(ops, step);
+        setPayoutProgress("done")
       })
       .catch((err) => {
         setStatusToError(ops, step, err);
