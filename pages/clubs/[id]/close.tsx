@@ -186,7 +186,7 @@ const CloseClub: NextPageWithLayout<any> = ({
           </>
         ) : (
           payoutProgress === "done" && (
-            <Button className="w-[218px]">
+            <Button className="w-[218px]" onClick={() => router.push('/clubs')}>
               <h3>Back to my clubs</h3>
             </Button>
           )
