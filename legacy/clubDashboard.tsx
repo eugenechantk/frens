@@ -29,11 +29,6 @@ import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
-export interface IMemberInfoData {
-  display_name: string;
-  profile_image: string;
-  uid: string;
-}
 
 interface ITransferEvent {
   transaction_hash: string;

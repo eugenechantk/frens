@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React, { useState } from "react";
-import { IMemberInfoData } from "../../legacy/clubDashboard";
+import { IMemberInfoData } from "../../lib/types/club";
 import { Button } from "../Button/Button";
 
 export default function ClubMembers({ data }: { data: IMemberInfoData[] }) {

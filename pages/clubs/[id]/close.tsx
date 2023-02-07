@@ -21,7 +21,7 @@ import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 
 import { adminAuth } from "../../../firebase/firebaseAdmin";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
-import { IMemberInfoData } from "../../../legacy/clubDashboard";
+import { IMemberInfoData } from "../../../lib/types/club";
 
 export interface IMemberInfoAndClaimPower extends IMemberInfoData {
   share: number;
