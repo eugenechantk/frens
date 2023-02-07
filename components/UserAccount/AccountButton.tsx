@@ -1,3 +1,5 @@
+'use client';
+
 import Image, { StaticImageData } from "next/image";
 import React, { useState } from "react";
 import { Button } from "../Button/Button";
@@ -7,7 +9,7 @@ import { signInMessage } from "../../lib/ethereum";
 import { signInWithCustomToken } from "firebase/auth";
 import { firebaseClientAuth } from "../../firebase/firebaseClient";
 import { useAuth } from "../../lib/auth";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface IAccountButtonProps {
   onClick?: (e: any) => void;
@@ -71,7 +73,8 @@ export default function AccountButton({
     try {
       await signInWithCustomToken(firebaseClientAuth, token);
       setLoading(false);
-      router.replace({ pathname: router.pathname, query: router.query })
+      // router.replace({ pathname: router.pathname, query: router.query })
+      router.refresh();
     } catch (err) {
       console.log(err);
       setLoading(false);

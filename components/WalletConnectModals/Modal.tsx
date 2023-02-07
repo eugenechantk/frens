@@ -1,3 +1,5 @@
+'use client';
+
 import { Modal as NextModal } from "@nextui-org/react";
 import { useSnapshot } from "valtio";
 import ModalStore from "./ModalStore";

@@ -18,9 +18,10 @@ import {
   IHolderPower,
 } from "../../../lib/ethereum";
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
-import { IMemberInfoData } from ".";
+
 import { adminAuth } from "../../../firebase/firebaseAdmin";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
+import { IMemberInfoData } from "../../../legacy/clubDashboard";
 
 export interface IMemberInfoAndClaimPower extends IMemberInfoData {
   share: number;

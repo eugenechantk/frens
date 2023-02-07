@@ -1,3 +1,5 @@
+'use client';
+
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import React, { useEffect, useState } from "react";
 import AccountButton from "./AccountButton";
@@ -9,7 +11,7 @@ import { signOut } from "firebase/auth";
 import { firebaseClientAuth } from "../../firebase/firebaseClient";
 import defaultProfilePic from '../../public/default_avatar.png'
 import { StaticImageData } from "next/image";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function UserAccount() {
   const { user } = useAuth();
@@ -42,7 +44,8 @@ export default function UserAccount() {
         throw err;
       }
       setExpand(false);
-      router.replace({ pathname: router.pathname, query: router.query })
+      // router.replace({ pathname: router.pathname, query: router.query })
+      router.refresh();
     });
   };
 

@@ -1,10 +1,12 @@
+'use client';
+
 import React from "react";
 import { Button } from "../Button/Button";
 import logoSrc from "../../public/logo.png";
 import Image from "next/image";
 import UserAccount from "../UserAccount/UserAccount";
-import { useRouter } from "next/router";
 import { useAuth } from "../../lib/auth";
+import {useRouter} from "next/navigation"
 
 export default function NavBar() {
   const user = useAuth();

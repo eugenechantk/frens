@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useState, useEffect, useContext } from "react";
 import { signInWithCustomToken, User } from "firebase/auth";
 import nookies, { parseCookies } from "nookies";
