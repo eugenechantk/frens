@@ -24,6 +24,7 @@ import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
 
 export interface IMemberInfoAndClaimPower extends IMemberInfoData {
   share: number;
+  tokenAmount: number;
 }
 
 export const getServerSideProps = async (context: any) => {
@@ -63,6 +64,7 @@ export const getServerSideProps = async (context: any) => {
             uid: _memberInfo.uid,
             share: _holderPower.filter((member) => member.address === uid)[0]
               .sharesBps,
+            tokenAmount: _club_members[uid]
           });
         })
       );
@@ -90,6 +92,8 @@ const CloseClub: NextPageWithLayout<any> = ({
   const { id } = router.query;
   const [payoutProgress, setPayoutProgress] =
     useState<"not started" | "in progress" | "done">("not started");
+
+  console.log(serverProps.claimPower)
 
   // Initalize ThirdWebSDK with club wallet
   const clubWallet = initWallet(serverProps.clubData!.club_wallet_mnemonic!);
