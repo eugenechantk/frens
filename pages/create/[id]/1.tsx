@@ -41,7 +41,6 @@ const StepOne: NextPageWithLayout<any> = ({
           </p>
           <FeeEstimate
             eth={String(process.env.NEXT_PUBLIC_CLUB_DEPOSIT)}
-            usd={12.37}
             className="w-5/6 md:min-w-[296px] min-w-full"
           />
           <Button
