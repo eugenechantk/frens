@@ -10,7 +10,7 @@ import LoadingClubCard from "./(ClubCard)/LoadingClubCard";
 import NotAuthed from "../../components/NotAuthed/NotAuthed";
 
 // Get the cookies and determine auth state
-async function getAuth() {
+async function getUserAddress() {
   let userAddress = undefined;
   const token = cookies().get("token")?.value;
   if (token) {
@@ -34,7 +34,7 @@ async function getAllClubIds(userAddress: string) {
 }
 
 export default async function Page() {
-  const userAddress = await getAuth();
+  const userAddress = await getUserAddress();
   let clubIds: string[] = []
   if (userAddress) {
     clubIds = await getAllClubIds(userAddress);

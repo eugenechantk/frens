@@ -1,39 +1,32 @@
-'use client';
-
-import React from "react";
+import React, { Suspense } from "react";
 import { Button } from "../Button/Button";
 import logoSrc from "../../public/logo.png";
 import Image from "next/image";
 import UserAccount from "../UserAccount/UserAccount";
-import { useAuth } from "../../lib/auth";
-import {useRouter} from "next/navigation"
+import Link from "next/link";
 
 export default function NavBar() {
-  const user = useAuth();
-  const router = useRouter()
   return (
     <div className="w-full min-h-[76px] relative z-50">
-      <Button
-        variant="ghost"
-        className="absolute top-[calc(50%-44px/2)] left-[6px]"
-        onClick={() => router.push('/clubs')}
-      >
-        <h5>My clubs</h5>
-      </Button>
-      <Image
-        src={logoSrc}
-        alt="frens Logo"
-        className="absolute left-[calc(50%-40px/2+3px)] top-[calc(50%-40px/2+2px)] cursor-pointer"
-        onClick={() => {
-          if(user.user) {
-            router.push('/clubs')
-          } else {
-            router.push('/');
-          }
-        }}
-      />
+      <Link href="/clubs">
+        <Button
+          variant="ghost"
+          className="absolute top-[calc(50%-44px/2)] left-[6px]"
+        >
+          <h5>My clubs</h5>
+        </Button>
+      </Link>
+      <Link href="/clubs">
+        <Image
+          src={logoSrc}
+          alt="frens Logo"
+          className="absolute left-[calc(50%-40px/2+3px)] top-[calc(50%-40px/2+2px)] cursor-pointer"
+        />
+      </Link>
       <div className="absolute top-[calc(50%-38px/2)] right-4">
-        <UserAccount/>
+        <Suspense fallback={<Button variant="secondary-outline" loading className="h-[38px] w-[70px]"/>}>
+          <UserAccount />
+        </Suspense>
       </div>
     </div>
   );
