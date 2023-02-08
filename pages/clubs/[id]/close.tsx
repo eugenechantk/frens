@@ -16,12 +16,14 @@ import {
   fetchPortfolio,
   initWallet,
   IHolderPower,
+  verifyClubHolding,
 } from "../../../lib/ethereum";
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { IMemberInfoData, serverPropsError } from ".";
 import { adminAuth } from "../../../firebase/firebaseAdmin";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
 import ClubClosed from "../../../components/ClubClosed/ClubClosed";
+import { redis } from "../../../lib/redis";
 
 export interface IMemberInfoAndClaimPower extends IMemberInfoData {
   share: number;
@@ -39,6 +41,19 @@ export const getServerSideProps = async (context: any) => {
     };
   } else {
     try {
+      const [decodedToken, tokenAddress] = await Promise.all([
+        await adminAuth.verifyIdToken(cookies.token),
+        await redis.hget<string>(id, "token_address"),
+      ]);
+      const verify = await verifyClubHolding(decodedToken.uid, tokenAddress!);
+      if (!verify) {
+        return {
+          props: {
+            error: serverPropsError.NOT_VERIFIED,
+          },
+        };
+      }
+
       // Get the club information for display and rendering
       const _clubInfo: IClubInfo = await fetchClubInfo(id);
       if (_clubInfo.closed) {
@@ -104,8 +119,10 @@ const CloseClub: NextPageWithLayout<any> = ({
   const clubWallet = initWallet(serverProps.clubData!.club_wallet_mnemonic!);
   const sdk = new ThirdwebSDK(clubWallet);
 
-  return serverProps.error === "Not authed" ? (
+  return serverProps.error === serverPropsError.NOT_AUTH ? (
     <NotAuthed />
+  ) : serverProps.error === serverPropsError.NOT_VERIFIED ? (
+    <>You are not authorized</>
   ) : serverProps.error && !(serverProps.error in serverPropsError) ? (
     <ErrorMessage />
   ) : (
@@ -143,7 +160,7 @@ const CloseClub: NextPageWithLayout<any> = ({
               </p>
             )
           )}
-          {serverProps.error === serverPropsError.CLOSED && <ClubClosed/>}
+          {serverProps.error === serverPropsError.CLOSED && <ClubClosed />}
         </div>
         {/* Split breakdown */}
         {!serverProps.error && (

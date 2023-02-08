@@ -4,7 +4,7 @@ import axios from "axios";
 import { BigNumber, ethers, Wallet } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
 import _ from "lodash";
-import { abi } from "./abi";
+import { abi, minABI } from "./abi";
 import { getChainData } from "./chains";
 import { IClubInfo } from './fetchers';
 import { getSignParamsMessage, getSignTypedDataParamsData } from './HelperUtil';
@@ -52,6 +52,14 @@ export interface IHoldingsData {
   balance: string;
   value?: number;
 };
+
+export function getInfuraProvider() {
+  const rpcUrl = getChainData(
+    parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
+  ).rpc_url;
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  return provider
+}
 
 // Get the latest block number, using the INFURA rpc node
 export async function getLatestBlockNumber() {
@@ -159,37 +167,50 @@ export async function verifyClubHolding(
   clubTokenAddress: string
 ): Promise<boolean> {
   let verified = false;
-  // console.log(userAddress, clubTokenAddress)
-  const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
-  const options = {
-    method: "GET",
-    url: "https://deep-index.moralis.io/api/v2/%address%/erc20".replace(
-      "%address%",
-      userAddress
-    ),
-    params: {
-      chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
-        .network,
-      token_addresses: clubTokenAddress,
-    },
-    headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-  };
-  try {
-    const result = await axios
-      .request(options)
-      .then((response) => response.data);
-    // console.log(result)
-    if (result.length !== 0) {
-      verified = true
-    } else {
-      verified = false
+  let contract = new ethers.Contract(clubTokenAddress, minABI, getInfuraProvider());
+  await contract.functions.balanceOf(userAddress).then((result: BigNumber[]) => {
+    if (!result[0].eq(0)) {
+      verified = true;
     }
-  } catch (err) {
-    console.log(err);
-    verified = false
-  }
+  });
   return verified
 }
+// export async function verifyClubHolding(
+//   userAddress: string,
+//   clubTokenAddress: string
+// ): Promise<boolean> {
+//   let verified = false;
+//   // console.log(userAddress, clubTokenAddress)
+//   const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
+//   const options = {
+//     method: "GET",
+//     url: "https://deep-index.moralis.io/api/v2/%address%/erc20".replace(
+//       "%address%",
+//       userAddress
+//     ),
+//     params: {
+//       chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
+//         .network,
+//       token_addresses: clubTokenAddress,
+//     },
+//     headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
+//   };
+//   try {
+//     const result = await axios
+//       .request(options)
+//       .then((response) => response.data);
+//     // console.log(result)
+//     if (result.length !== 0) {
+//       verified = true
+//     } else {
+//       verified = false
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     verified = false
+//   }
+//   return verified
+// }
 
 // Returns USD price of the token
 export async function getUsdPrice(tokenAddress?: string): Promise<number> {

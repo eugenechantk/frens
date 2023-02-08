@@ -26,6 +26,7 @@ import clsx from "clsx";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
 import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";
 import ClubClosed from "../../../components/ClubClosed/ClubClosed";
+import { redis } from "../../../lib/redis";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
@@ -114,12 +115,12 @@ export const getServerSideProps = async (context: any) => {
           },
         };
       }
-
       // Step 2: Check if the user has club tokens to access this club
-      const verify = await verifyClubHolding(
-        userAddress,
-        clubInfo.club_token_address!
-      );
+      const [decodedToken, tokenAddress] = await Promise.all([
+        await adminAuth.verifyIdToken(cookies.token),
+        await redis.hget<string>(id, "token_address"),
+      ]);
+      const verify = await verifyClubHolding(decodedToken.uid, tokenAddress!);
       // console.log(verify);
       if (!verify) {
         return {
