@@ -19,7 +19,6 @@ export default function Loading() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 w-full justify-items-center">
             <LoadingClubCard />
             <LoadingClubCard />
-            <LoadingClubCard />
             <Link href="/create">
               <Button className="w-[218px] md:hidden">
                 <h3>Create new club</h3>
