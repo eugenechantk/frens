@@ -1,33 +1,34 @@
 import React, { lazy, ReactElement, Suspense, useState } from "react";
-import AppLayout from "../../../layout/AppLayout";
-import { NextPageWithLayout } from "../../_app";
-import { adminAuth, adminFirestore } from "../../../firebase/firebaseAdmin";
+import AppLayout from "../layout/AppLayout";
+import { NextPageWithLayout } from "../pages/_app";
+import { adminAuth, adminFirestore } from "../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
-import ClubDetails from "../../../components/ClubDetails/ClubDetails";
-import ClubMembers from "../../../components/ClubMembers/ClubMembers";
-import ClubBalance from "../../../components/ClubBalance/ClubBalance";
-import Portfolio from "../../../components/Portfolio/Portfolio";
+import ClubDetails from "../components/ClubDetails/ClubDetails";
+import ClubMembers from "../components/ClubMembers/ClubMembers";
+import ClubBalance from "../components/ClubBalance/ClubBalance";
+import Portfolio from "../components/Portfolio/Portfolio";
 import _ from "lodash";
 import nookies from "nookies";
-import NotAuthed from "../../../components/NotAuthed/NotAuthed";
+import NotAuthed from "../components/NotAuthed/NotAuthed";
 import {
   fetchPortfolio,
   getClubMemberBalance,
   getLatestBlockNumber,
   IHoldingsData,
   verifyClubHolding,
-} from "../../../lib/ethereum";
+} from "../lib/ethereum";
 import { useRouter } from "next/router";
-import LoadingWidget from "../../../components/Widgets/LoadingWidget";
-import BuyInWidgetWrapper from "../../../components/Widgets/BuyInWidget/BuyInWidgetWrapper";
-import { Button } from "../../../components/Button/Button";
+import LoadingWidget from "../components/Widgets/LoadingWidget";
+import BuyInWidgetWrapper from "../components/Widgets/BuyInWidget/BuyInWidgetWrapper";
+import { Button } from "../components/Button/Button";
 import { Modal } from "@nextui-org/react";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
-import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";
+import ErrorMessage from "../components/ErrorMessage/ErrorMessage";
+import { fetchClubInfo, IClubInfo } from "../lib/fetchers";
+import { IMemberInfoData } from "../lib/types/club";
 const WidgetSection = lazy(
-  () => import("../../../components/Widgets/WidgetSection")
+  () => import("../components/Widgets/WidgetSection")
 );
 
 interface ITransferEvent {

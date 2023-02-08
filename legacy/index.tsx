@@ -1,17 +1,17 @@
 import React, { ReactElement } from "react";
-import AppLayout from "../../layout/AppLayout";
+import AppLayout from "../layout/AppLayout";
 import { useRouter } from "next/router";
-import { NextPageWithLayout } from "../_app";
-import { Button } from "../../components/Button/Button";
-import ClubCard from "../../components/ClubCard/ClubCard";
+import { NextPageWithLayout } from "../pages/_app";
+import { Button } from "../components/Button/Button";
+import ClubCard from "../components/ClubCard/ClubCard";
 import nookies from "nookies";
-import { adminAuth, adminFirestore} from "../../firebase/firebaseAdmin";
+import { adminAuth, adminFirestore} from "../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
-import NotAuthed from "../../components/NotAuthed/NotAuthed";
+import NotAuthed from "../components/NotAuthed/NotAuthed";
 import _ from "lodash";
-import { getUserHoldings } from "../../lib/ethereum";
-import { clearSignClients } from "../../lib/walletConnectLib";
-import { IClubInfo } from "../../lib/fetchers";
+import { getUserHoldings } from "../lib/ethereum";
+import { clearSignClients } from "../lib/walletConnectLib";
+import { IClubInfo } from "../lib/fetchers";
 
 interface IClubData extends IClubInfo {
   club_id: string;

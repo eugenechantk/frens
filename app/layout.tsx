@@ -18,7 +18,9 @@ export default function RootLayout({
           className={montserrat.className}
           style={{ height: "100%", width: "100%" }}
         >
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
           <Modal />
         </main>
       </body>
