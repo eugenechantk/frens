@@ -121,13 +121,14 @@ const StepThree: NextPageWithLayout<any> = ({
       // console.log("Claim condition set for: ", setClaimCondition);
 
       // Step 6: add the club token address to the club record and redis store for future use
-      const [res1, res2] = await Promise.all([
+      const [res1, res2, res3] = await Promise.all([
         await updateDoc(clubDocRef, {
           club_token_address: clubTokenContractAddress.toLowerCase(),
         }),
-        await redis.set(String(id), clubTokenContractAddress),
+        await redis.hset(String(id), {token_address: clubTokenContractAddress, wallet_address: clubInfo.club_wallet_address!}),
+        await redis.set(clubTokenContractAddress, String(id))
       ]);
-      console.log("Club token address updated to: ", res1, res2);
+      console.log("Club token address updated to: ", res1, res2, res3);
 
       setSuccess(true);
       setTimeout(() => router.push(`/create/${id}/complete`), 1500);
