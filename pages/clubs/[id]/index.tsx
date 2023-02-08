@@ -161,6 +161,9 @@ const Dashboard: NextPageWithLayout<any> = ({
     ${router.asPath}`);
     setTimeout(() => setCopyLinkTooltip(false), 1000);
   };
+
+  const invitePath = 
+    typeof window !== "undefined" ? `${window.location.origin}${router.asPath}` : ""
   return (
     <>
       {serverProps.error === "Not authed" ? (
@@ -251,9 +254,7 @@ const Dashboard: NextPageWithLayout<any> = ({
             </p>
             <div className="flex flex-row gap-1 px-5 py-4 rounded-[6px] border border-secondary-300 items-center">
               <p className="grow overflow-ellipsis overflow-hidden">
-                {`${
-                  typeof window !== "undefined" ? window.location.origin : ""
-                }${router.asPath}`}
+                {invitePath}
               </p>
               <div className="relative">
                 <Button variant="text-only" onClick={copyLink}>
