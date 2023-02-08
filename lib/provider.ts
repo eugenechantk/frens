@@ -15,6 +15,7 @@ export const getSigner = () => {
     if (!signer) {
       signer = provider!.getSigner();
     }
+    return signer
   }
 }
 

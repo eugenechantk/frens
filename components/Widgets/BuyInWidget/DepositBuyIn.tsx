@@ -26,6 +26,7 @@ export default function DepositBuyIn({
       const claimResult = await tokenContract!.claim(claimAmount);
       setTransactionHash(claimResult.receipt.transactionHash);
     } catch (err) {
+      console.log(err)
       setError(err);
     }
     setLoading(false);

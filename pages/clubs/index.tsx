@@ -5,13 +5,14 @@ import { NextPageWithLayout } from "../_app";
 import { Button } from "../../components/Button/Button";
 import ClubCard from "../../components/ClubCard/ClubCard";
 import nookies from "nookies";
-import { adminAuth, adminFirestore} from "../../firebase/firebaseAdmin";
+import { adminAuth, adminFirestore } from "../../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../components/NotAuthed/NotAuthed";
 import _ from "lodash";
 import { getUserHoldings } from "../../lib/ethereum";
 import { clearSignClients } from "../../lib/walletConnectLib";
 import { IClubInfo } from "../../lib/fetchers";
+import Link from "next/link";
 
 interface IClubData extends IClubInfo {
   club_id: string;
@@ -33,7 +34,7 @@ export const getServerSideProps = async (context: any) => {
         .verifyIdToken(cookies.token)
         .then((decodedToken) => decodedToken.uid);
       // console.log(userAddress);
-      const erc20Tokens = await getUserHoldings(userAddress)
+      const erc20Tokens = await getUserHoldings(userAddress);
       // console.log(erc20Tokens);
 
       // Step 2: query the club collection to find matching clubs with the same token address
@@ -51,9 +52,9 @@ export const getServerSideProps = async (context: any) => {
           .get();
         if (!snapshot.empty) {
           snapshot.forEach((doc) => {
-            let clubInfo = doc.data()
-            clubInfo['club_id'] = doc.id
-            userClubs.push(clubInfo as IClubData)
+            let clubInfo = doc.data();
+            clubInfo["club_id"] = doc.id;
+            userClubs.push(clubInfo as IClubData);
           });
         }
       }
@@ -82,7 +83,7 @@ const ClubList: NextPageWithLayout<any> = ({
   clearSignClients();
   return (
     <>
-      {!serverProps.error ? (
+      {!serverProps.error  ? (
         <div className="h-full w-full py-8 md:py-12 px-4 md:px-6">
           <div className="flex flex-col gap-6 md:gap-8 max-w-[1000px] mx-auto">
             {/* Title and create button for desktop */}
@@ -101,13 +102,13 @@ const ClubList: NextPageWithLayout<any> = ({
                 <>
                   {serverProps.clubData.map((club, index) => {
                     return (
-                      <ClubCard
-                        key={index}
-                        clubName={club.club_name}
-                        clubDes={club.club_description}
-                        profileImgUrl={club.club_image!}
-                        onClick={() => router.push(`/clubs/${club.club_id}`)}
-                      />
+                      <Link href={`/clubs/${club.club_id}`} className="w-full" key={index}>
+                        <ClubCard
+                          clubName={club.club_name}
+                          clubDes={club.club_description}
+                          profileImgUrl={club.club_image!}
+                        />
+                      </Link>
                     );
                   })}
                   <Button
