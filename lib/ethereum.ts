@@ -53,6 +53,14 @@ export interface IHoldingsData {
   value?: number;
 };
 
+export function getInfuraProvider() {
+  const rpcUrl = getChainData(
+    parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
+  ).rpc_url;
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  return provider
+}
+
 // Get the latest block number, using the INFURA rpc node
 export async function getLatestBlockNumber() {
   // STEP 2: Get the transfer events ellapsed from last time the club is retrieved
