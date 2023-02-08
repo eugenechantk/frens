@@ -10,6 +10,8 @@ import LoadingClubMembers from "./(ClubMembers)/LoadingClubMembers";
 import PortfolioWrapper from "./(Portfolio)/PortfolioWrapper";
 import WidgetSectionWrapper from "./(Widget)/WidgetSectionWrapper";
 import LoadingWidgetSectionWrapper from "./(Widget)/LoadingWidgetSectionWrapper";
+import InviteModalWrapper from "./(InviteModal)/InviteModalWrapper";
+import InviteButton from "./(InviteModal)/InviteButton";
 
 // Get the cookies and determine auth state
 async function getAuth() {
@@ -48,9 +50,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                     {/* @ts-expect-error Server Component */}
                     <ClubMembers id={params.id} />
                   </Suspense>
-                  <Button variant="outline" size="sm">
-                    <h4>Invite</h4>
-                  </Button>
+                  <InviteButton />
                 </div>
               )}
             </div>
@@ -68,6 +68,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       ) : (
         <>Not authed</>
       )}
+      <InviteModalWrapper />
     </>
   );
 }
