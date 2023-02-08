@@ -9,7 +9,9 @@ export default function Loading() {
         <LoadingClubDetails />
         <LoadingHoldingList />
       </div>
-      <LoadingWidgetSectionWrapper />
+      <div className="flex flex-col gap-5 md:w-2/5">
+        <LoadingWidgetSectionWrapper />
+      </div>
     </div>
   );
 }
