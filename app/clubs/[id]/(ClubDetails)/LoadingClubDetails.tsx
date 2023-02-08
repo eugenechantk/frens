@@ -1,9 +1,8 @@
 import React from 'react'
-import Skeleton from 'react-loading-skeleton';
 
 export default function LoadingClubDetails() {
   return (
-    <div className="flex flex-col items-start gap-3 w-full animate-pulse">
+    <div className="flex flex-col items-start gap-3 w-full">
       <div className="w-[60px] md:w-[52px] h-[60px] md:h-[52px] relative rounded-10 bg-gray-300">
       </div>
       {/* Club name and settings button */}

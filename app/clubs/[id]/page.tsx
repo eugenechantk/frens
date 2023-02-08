@@ -8,12 +8,11 @@ import ClubDetails from "./(ClubDetails)/ClubDetails";
 import ClubMembers from "./(ClubMembers)/ClubMembers";
 import LoadingClubMembers from "./(ClubMembers)/LoadingClubMembers";
 import PortfolioWrapper from "./(Portfolio)/PortfolioWrapper";
-import LoadingWidget from "../../../components/Widgets/LoadingWidget";
 import WidgetSectionWrapper from "./(Widget)/WidgetSectionWrapper";
+import LoadingWidgetSectionWrapper from "./(Widget)/LoadingWidgetSectionWrapper";
 
 // Get the cookies and determine auth state
 async function getAuth() {
-  let authed = false;
   const nextCookies = cookies();
   return nextCookies.get("token")?.value;
 }
@@ -61,12 +60,10 @@ export default async function Page({ params }: { params: { id: string } }) {
             )}
           </div>
           {/* Right panel */}
-          <div className="flex flex-col gap-5">
-              <Suspense>
-                {/* @ts-expect-error Server Component */}
-                <WidgetSectionWrapper id={params.id} verify/>
-              </Suspense>
-          </div>
+          <Suspense fallback={<LoadingWidgetSectionWrapper />}>
+            {/* @ts-expect-error Server Component */}
+            <WidgetSectionWrapper id={params.id} verify />
+          </Suspense>
         </div>
       ) : (
         <>Not authed</>
