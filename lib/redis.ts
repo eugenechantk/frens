@@ -1,15 +1,10 @@
-import { Redis } from '@upstash/redis'
-
-let _redis: Redis
+import { Redis } from "@upstash/redis";
 
 function createRedis() {
-  if (!_redis) {
-    _redis = new Redis({
-      url: process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL!,
-      token: process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN!,
-    })
-  }
-  return _redis
+  return new Redis({
+    url: process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_URL!,
+    token: process.env.NEXT_PUBLIC_UPSTASH_REDIS_REST_TOKEN!,
+  });
 }
 
 export const redis = createRedis();
