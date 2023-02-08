@@ -31,7 +31,7 @@ export default function NavBar() {
         }}
       />
       <div className="absolute top-[calc(50%-38px/2)] right-4">
-        <Suspense fallback={<Button variant="secondary-outline" className="w-[212px]"/>}>
+        <Suspense fallback={<Button variant="secondary-outline" className="w-[72px]" loading/>}>
           <UserAccount />
         </Suspense>
       </div>
