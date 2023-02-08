@@ -125,8 +125,8 @@ const StepThree: NextPageWithLayout<any> = ({
         await updateDoc(clubDocRef, {
           club_token_address: clubTokenContractAddress.toLowerCase(),
         }),
-        await redis.hset(String(id), {token_address: clubTokenContractAddress, wallet_address: clubInfo.club_wallet_address!}),
-        await redis.set(clubTokenContractAddress, String(id))
+        await redis.hset(String(id), {token_address: clubTokenContractAddress.toLowerCase(), wallet_address: clubInfo.club_wallet_address!}),
+        await redis.set(clubTokenContractAddress.toLowerCase(), String(id))
       ]);
       console.log("Club token address updated to: ", res1, res2, res3);
 

@@ -13,22 +13,15 @@ export default function InviteModalWrapper() {
   const [copyLinkTooltip, setCopyLinkTooltip] = useState(false);
   const pathname = usePathname();
   const copyLink = () => {
-    setCopyLinkTooltip(true);
-    navigator.clipboard.writeText(`${
-      typeof window !== "undefined" ? window.location.origin : ""
+    if (typeof window !== 'undefined') {
+      setCopyLinkTooltip(true);
+      navigator.clipboard.writeText(`${window.location.origin}${pathname}`);
+      setTimeout(() => setCopyLinkTooltip(false), 1000);
     }
-    ${pathname}`);
-    setTimeout(() => setCopyLinkTooltip(false), 1000);
   };
 
   return (
-    <NextModal
-      blur
-      open={open}
-      onClose={() => 
-        InviteModalStore.close()
-      }
-    >
+    <NextModal blur open={open} onClose={() => InviteModalStore.close()}>
       <NextModal.Header
         css={{
           marginTop: "8px",

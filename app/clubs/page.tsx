@@ -25,10 +25,12 @@ async function getAllClubIds(userAddress: string) {
   const erc20Tokens = await getUserHoldings(userAddress);
   const results = await Promise.all(
     erc20Tokens.map(async (token) => {
+      // console.log(token)
       const id: string | null = await redis.get(token);
       return id;
     })
   );
+  // console.log(results)
   const clubIds = results.filter((result) => result !== null);
   return clubIds as string[];
 }

@@ -8,6 +8,7 @@ import { adminFirestore } from "../../../firebase/firebaseAdmin";
 import Image from "next/image";
 import nookies from "nookies";
 import NotAuthed from "../../../components/NotAuthed/NotAuthed";
+import Link from "next/link";
 
 export const getServerSideProps = async (context: any) => {
   const { id } = context.params;
@@ -23,27 +24,27 @@ export const getServerSideProps = async (context: any) => {
   // Step 1: fetch the information about this club
   try {
     const res = await adminFirestore
-    .collection("clubs")
-    .doc(id)
-    .get()
-    .then((doc) => {
-      if (!doc.exists) {
-        throw new Error("club does not exist");
-      }
-      return doc.data();
-    })
+      .collection("clubs")
+      .doc(id)
+      .get()
+      .then((doc) => {
+        if (!doc.exists) {
+          throw new Error("club does not exist");
+        }
+        return doc.data();
+      });
     return {
       props: {
         clubName: res!.club_name,
         profileImgUrl: res!.club_image,
-      }
-    }
+      },
+    };
   } catch (err: any) {
     return {
       props: {
-        error: err.message
-      }
-    }
+        error: err.message,
+      },
+    };
   }
 };
 
@@ -63,7 +64,7 @@ const StepComplete: NextPageWithLayout<any> = (
                 src={serverProps.profileImgUrl}
                 alt={`Profile image for ${serverProps.clubName}`}
                 fill
-                style={{'objectFit': 'cover'}}
+                style={{ objectFit: "cover" }}
               />
             </div>
             {/* TODO: render name of the club created */}
@@ -72,12 +73,11 @@ const StepComplete: NextPageWithLayout<any> = (
               In your club, you can raise money from your friends and invest
               together in cryptocurrencies
             </p>
-            <Button
-              className="w-[245px]"
-              onClick={() => router.push(`/clubs/${id}`)}
-            >
-              <h3>Go to club</h3>
-            </Button>
+            <Link href={`/clubs/${id}`} className='w-[245px]'>
+              <Button className='w-[245px]'>
+                <h3>Go to club</h3>
+              </Button>
+            </Link>
           </div>
         </div>
       ) : (

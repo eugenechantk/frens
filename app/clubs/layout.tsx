@@ -15,7 +15,7 @@ export default async function ClubLayout({
   const authToken = await getAuth();
   return (
     <AppLayout>
-      {authToken ? <>{children}</> : <NotAuthed/>}
+      {authToken ? <div className="w-full h-full">{children}</div> : <NotAuthed/>}
     </AppLayout>
   );
 }

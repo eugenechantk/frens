@@ -80,7 +80,7 @@ const StepTwo: NextPageWithLayout<any> = ({
 
     // Get gas price, club wallet address, nonce of the user and user address
     const [_gasPrice, clubWalletAddress] = await Promise.allSettled([
-      await provider?.getGasPrice(),
+      (await provider?.getFeeData()!).maxFeePerGas,
       await (
         await getDoc(doc(clientFireStore, "clubs", String(clubId)))
       ).data()!.club_wallet_address,
