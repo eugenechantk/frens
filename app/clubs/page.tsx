@@ -35,11 +35,11 @@ async function getAllClubIds(userAddress: string) {
 
 export default async function Page() {
   const userAddress = await getUserAddress();
-  let clubIds: string[] = []
+  let clubIds: string[] = [];
   if (userAddress) {
     clubIds = await getAllClubIds(userAddress);
   }
-  
+
   return (
     <>
       {!userAddress ? (
@@ -60,10 +60,8 @@ export default async function Page() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 w-full justify-items-center">
               {clubIds.map((id, index) => {
                 return (
-                  <Suspense fallback={<LoadingClubCard />} key={index}>
-                    {/* @ts-expect-error Server Component */}
-                    <ClubCard id={id} />
-                  </Suspense>
+                    // @ts-expect-error Server Component
+                    <ClubCard id={id} key={index}/>
                 );
               })}
               <Link href="/create">

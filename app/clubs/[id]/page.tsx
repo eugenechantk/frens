@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { Suspense } from "react";
-import { Button } from "../../../components/Button/Button";
 import { adminAuth } from "../../../firebase/firebaseAdmin";
 import { verifyClubHolding } from "../../../lib/ethereum";
 import { redis } from "../../../lib/redis";
@@ -12,7 +11,6 @@ import WidgetSectionWrapper from "./(Widget)/WidgetSectionWrapper";
 import LoadingWidgetSectionWrapper from "./(Widget)/LoadingWidgetSectionWrapper";
 import InviteModalWrapper from "./(InviteModal)/InviteModalWrapper";
 import InviteButton from "./(InviteModal)/InviteButton";
-import Link from "next/link";
 
 // Get the cookies and determine auth state
 async function getAuth() {
@@ -34,7 +32,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   const verify = await verifyAccess(params.id, authToken!);
   return (
     <>
-      <div className="md:max-w-[1000px] w-full md:mx-auto h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8 md:gap-10">
+      <div className="md:max-w-[1000px] w-full md:mx-auto h-full md:flex md:flex-row md:items-start flex flex-col gap-8 md:gap-10">
         {/* Left panel */}
         <div className="flex flex-col items-start gap-8 w-full md:w-3/5">
           {/* Club details and members */}
