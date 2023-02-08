@@ -5,7 +5,6 @@ import { adminAuth, adminFirestore } from "../../../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
 import ClubDetails from "../../../components/ClubDetails/ClubDetails";
 import ClubMembers from "../../../components/ClubMembers/ClubMembers";
-import ClubBalance from "../../../components/ClubBalance/ClubBalance";
 import Portfolio from "../../../components/Portfolio/Portfolio";
 import _ from "lodash";
 import nookies from "nookies";
@@ -199,7 +198,7 @@ const Dashboard: NextPageWithLayout<any> = ({
             </div>
             {/* Balance */}
             {/* TODO: have a global state setting for whether to show club or me balance */}
-            {serverProps.error !== "user not verified" && <ClubBalance />}
+            {/* {serverProps.error !== "user not verified" && <ClubBalance />} */}
             {/* Portfolio */}
             {serverProps.error !== "user not verified" && (
               <Portfolio
@@ -228,7 +227,7 @@ const Dashboard: NextPageWithLayout<any> = ({
           </div>
         </div>
       )}
-      <Modal open={inviteModalOpen}>
+      <Modal open={inviteModalOpen} onClose={()=>setInviteModalOpen(false)}>
         <Modal.Header
           css={{
             marginTop: "8px",
