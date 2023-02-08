@@ -25,6 +25,7 @@ import { Square2StackIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
 import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";
+import ClubClosed from "../../../components/ClubClosed/ClubClosed";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
@@ -47,7 +48,7 @@ interface ITransferEvent {
   log_index: number;
 }
 
-enum serverPropsError {
+export enum serverPropsError {
   NOT_AUTH,
   NOT_VERIFIED,
   CLOSED,
@@ -225,7 +226,7 @@ const Dashboard: NextPageWithLayout<any> = ({
                 clubWalletAddress={serverProps.clubInfo?.club_wallet_address!}
               />
             )}
-            {serverProps.error === serverPropsError.CLOSED && <>This club is closed</>}
+            {serverProps.error === serverPropsError.CLOSED && <ClubClosed/>}
           </div>
           {/* Right panel */}
           <div className="flex flex-col gap-5">

@@ -18,9 +18,10 @@ import {
   IHolderPower,
 } from "../../../lib/ethereum";
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
-import { IMemberInfoData } from ".";
+import { IMemberInfoData, serverPropsError } from ".";
 import { adminAuth } from "../../../firebase/firebaseAdmin";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
+import ClubClosed from "../../../components/ClubClosed/ClubClosed";
 
 export interface IMemberInfoAndClaimPower extends IMemberInfoData {
   share: number;
@@ -33,13 +34,21 @@ export const getServerSideProps = async (context: any) => {
   if (!cookies.token) {
     return {
       props: {
-        error: "Not authed",
+        error: serverPropsError.NOT_AUTH,
       },
     };
   } else {
     try {
       // Get the club information for display and rendering
       const _clubInfo: IClubInfo = await fetchClubInfo(id);
+      if (_clubInfo.closed) {
+        return {
+          props: {
+            clubData: _clubInfo,
+            error: serverPropsError.CLOSED,
+          },
+        };
+      }
       // Get club portfolio and club members
       const [_clubPortfolio, _club_members] = await Promise.all([
         fetchPortfolio(_clubInfo.club_wallet_address!),
@@ -76,7 +85,7 @@ export const getServerSideProps = async (context: any) => {
     } catch (err) {
       return {
         props: {
-          error: err,
+          error: JSON.parse(JSON.stringify(err)),
         },
       };
     }
@@ -97,7 +106,7 @@ const CloseClub: NextPageWithLayout<any> = ({
 
   return serverProps.error === "Not authed" ? (
     <NotAuthed />
-  ) : serverProps.error ? (
+  ) : serverProps.error && !(serverProps.error in serverPropsError) ? (
     <ErrorMessage />
   ) : (
     <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 pb-5 h-full flex flex-col">
@@ -134,62 +143,78 @@ const CloseClub: NextPageWithLayout<any> = ({
               </p>
             )
           )}
+          {serverProps.error === serverPropsError.CLOSED && <ClubClosed/>}
         </div>
         {/* Split breakdown */}
-        <div className="overflow-y-scroll md:w-1/2 grow">
-          {payoutProgress === "not started" ? (
-            <>
-              <p className="mb-2 text-sm font-bold uppercase text-secondary-600">
-                Split breakdown
-              </p>
-              {/* For each member, show an ownership item */}
-              {serverProps.claimPower?.map((memberPower, index) => (
-                <OwnershipItem
-                  key={index}
-                  member={memberPower}
-                  clubPortfolio={serverProps.clubPorfolio}
-                />
-              ))}
-            </>
-          ) : (
-            <PayoutProgressLine
-              sdk={sdk}
-              clubPorfolio={serverProps.clubPorfolio!}
-              claimPower={serverProps.claimPower!}
-              setPayoutProgress={setPayoutProgress}
-              clubInfo={serverProps.clubData!}
-              clubWallet={clubWallet}
-            />
-          )}
-        </div>
+        {!serverProps.error && (
+          <div className="overflow-y-scroll md:w-1/2 grow">
+            {payoutProgress === "not started" ? (
+              <>
+                <p className="mb-2 text-sm font-bold uppercase text-secondary-600">
+                  Split breakdown
+                </p>
+                {/* For each member, show an ownership item */}
+                {serverProps.claimPower?.map((memberPower, index) => (
+                  <OwnershipItem
+                    key={index}
+                    member={memberPower}
+                    clubPortfolio={serverProps.clubPorfolio}
+                  />
+                ))}
+              </>
+            ) : (
+              <PayoutProgressLine
+                sdk={sdk}
+                clubPorfolio={serverProps.clubPorfolio!}
+                claimPower={serverProps.claimPower!}
+                setPayoutProgress={setPayoutProgress}
+                clubInfo={serverProps.clubData!}
+                clubWallet={clubWallet}
+              />
+            )}
+          </div>
+        )}
       </div>
       {/* Button group */}
       <div className="flex flex-col items-center gap-3 bg-secondary-100 mb-4">
-        {payoutProgress === "not started" ? (
-          <>
-            <p className="bg-red-100 py-1 px-2 rounded-[4px] font-semibold text-error">
-              Closing the club is irreversible
-            </p>
-            <Button
-              className="!bg-error !border-none w-[312px] hover:!bg-red-600 active:!bg-red-700"
-              onClick={() => setPayoutProgress("in progress")}
-            >
-              <h5>Close club and distribute</h5>
-            </Button>
-            <Button
-              variant="secondary-outline"
-              className="w-[312px]"
-              onClick={() => router.push(`/clubs/${id}`)}
-            >
-              <h5>Go back</h5>
-            </Button>
-          </>
-        ) : (
-          payoutProgress === "done" && (
-            <Button className="w-[218px]" onClick={() => router.push('/clubs')}>
-              <h3>Back to my clubs</h3>
-            </Button>
+        {!serverProps.error ? (
+          payoutProgress === "not started" ? (
+            <>
+              <p className="bg-red-100 py-1 px-2 rounded-[4px] font-semibold text-error">
+                Closing the club is irreversible
+              </p>
+              <Button
+                className="!bg-error !border-none w-[312px] hover:!bg-red-600 active:!bg-red-700"
+                onClick={() => setPayoutProgress("in progress")}
+              >
+                <h5>Close club and distribute</h5>
+              </Button>
+              <Button
+                variant="secondary-outline"
+                className="w-[312px]"
+                onClick={() => router.push(`/clubs/${id}`)}
+              >
+                <h5>Go back</h5>
+              </Button>
+            </>
+          ) : (
+            payoutProgress === "done" && (
+              <Button
+                className="w-[218px]"
+                onClick={() => router.push("/clubs")}
+              >
+                <h3>Back to my clubs</h3>
+              </Button>
+            )
           )
+        ) : (
+          <Button
+            variant="secondary-outline"
+            className="w-[312px]"
+            onClick={() => router.push(`/clubs/${id}`)}
+          >
+            <h5>Go back</h5>
+          </Button>
         )}
       </div>
     </div>
