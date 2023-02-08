@@ -1,9 +1,11 @@
+'use client';
+
 import React, { useEffect, useState } from "react";
 import defaultIcon from "../../public/default_avatar.png";
 import Image from "next/image";
 import _ from "lodash";
 import { BigNumber, ethers } from "ethers";
-import { getUsdPrice, IHoldingsData } from "../../lib/ethereum";
+import { getUsdPrice, IHoldingsData } from "../../../../lib/ethereum";
 
 export default function Holding({ data }: { data: IHoldingsData }) {
   const [usd, setUsd] = useState("...");
