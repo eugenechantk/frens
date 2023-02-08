@@ -223,11 +223,16 @@ const Dashboard: NextPageWithLayout<any> = ({
             {/* {serverProps.error !== "user not verified" && (
             <Splitting data={serverProps.clubInfo!} id={String(id)} />
             )} */}
-            <Button variant="secondary-outline" onClick={() => router.push(`/clubs/${id}/close`)}><h3>Close club and distribute</h3></Button>
+            <Button
+              variant="secondary-outline"
+              onClick={() => router.push(`/clubs/${id}/close`)}
+            >
+              <h3>Close club and distribute</h3>
+            </Button>
           </div>
         </div>
       )}
-      <Modal open={inviteModalOpen} onClose={()=>setInviteModalOpen(false)}>
+      <Modal open={inviteModalOpen} onClose={() => setInviteModalOpen(false)}>
         <Modal.Header
           css={{
             marginTop: "8px",
@@ -246,8 +251,9 @@ const Dashboard: NextPageWithLayout<any> = ({
             </p>
             <div className="flex flex-row gap-1 px-5 py-4 rounded-[6px] border border-secondary-300 items-center">
               <p className="grow overflow-ellipsis overflow-hidden">
-                {typeof window !== "undefined" ? window.location.origin : ""}
-                {router.asPath}
+                {`${
+                  typeof window !== "undefined" ? window.location.origin : ""
+                }${router.asPath}`}
               </p>
               <div className="relative">
                 <Button variant="text-only" onClick={copyLink}>
