@@ -15,12 +15,11 @@ async function getClubMember (id: string) {
 
 export default async function ClubMembers({id}: {id: string}) {
   const memberInfo = await getClubMember(id);
-  console.log(memberInfo);
   return (
     <div className="flex flex-row items-center justify-center gap-2">
       <div className="flex flex-row">
         {memberInfo.map((member, index) => 
-          <ClubMemberAvatar index={index} profileImage={member.profile_image} uid={member.uid}/>
+          <ClubMemberAvatar key={index} index={index} profileImage={member.profile_image} uid={member.uid}/>
         )}
       </div>
     </div>

@@ -7,7 +7,6 @@ export default function ClubMemberAvatar({index, profileImage, uid}: {index: num
   const [show, setShow] = useState(false);
   return (
     <div
-      key={index}
       className="first:ml-0 -ml-1 relative"
       onMouseOver={() => setShow(true)}
       onMouseLeave={() => setShow(false)}

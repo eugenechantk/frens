@@ -42,10 +42,10 @@ export const fetchMemberInfo = async (
   id: string
 ): Promise<IMemberInfoData[]> => {
   const clubInfo: IClubInfo = await fetchClubInfo(id);
-  console.log(clubInfo)
+
   // STEP 1: Fetch the latest club member list
   const _club_members = await getClubMemberBalance(clubInfo, id);
-  console.log(_club_members)
+
   // STEP 2: Update the club member list
   const currentBlock = await getLatestBlockNumber();
   const result = adminFirestore.collection("clubs").doc(id).update({
@@ -66,6 +66,6 @@ export const fetchMemberInfo = async (
       });
     })
   );
-  console.log(memberInfo)
+
   return memberInfo;
 };
