@@ -30,12 +30,14 @@ export default function WalletConnect({
   setSessions,
   legacySession,
   setLegacySession,
+  id
 }: {
   data: IClubInfo;
   sessions: SessionTypes.Struct[];
   setSessions: Dispatch<SetStateAction<SessionTypes.Struct[]>>;
   legacySession: ILegacySession;
   setLegacySession: Dispatch<SetStateAction<ILegacySession | undefined>>;
+  id: string
 }) {
   const [uri, setUri] = useState("");
   const clubWallet: IClubWallet = {
@@ -43,8 +45,6 @@ export default function WalletConnect({
     club_wallet_mnemonic: data.club_wallet_mnemonic!,
   };
   const [showDesc, setShowDesc] = useState(true);
-  const id = useSearchParams().get('id')
-  console.log(id, typeof id);
 
   const onConnect = async (uri: string) => {
     const { version } = parseUri(uri);

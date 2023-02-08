@@ -12,6 +12,7 @@ import WidgetSectionWrapper from "./(Widget)/WidgetSectionWrapper";
 import LoadingWidgetSectionWrapper from "./(Widget)/LoadingWidgetSectionWrapper";
 import InviteModalWrapper from "./(InviteModal)/InviteModalWrapper";
 import InviteButton from "./(InviteModal)/InviteButton";
+import Link from "next/link";
 
 // Get the cookies and determine auth state
 async function getAuth() {
@@ -37,9 +38,9 @@ export default async function Page({ params }: { params: { id: string } }) {
   return (
     <>
       {authToken ? (
-        <div className="md:max-w-[1000px] w-full md:mx-auto h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
+        <div className="md:max-w-[1000px] w-full md:mx-auto h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8 md:gap-10">
           {/* Left panel */}
-          <div className="flex flex-col items-start gap-8 w-full">
+          <div className="flex flex-col items-start gap-8 w-full md:w-3/5">
             {/* Club details and members */}
             <div className="flex flex-col items-start gap-4 w-full">
               {/* @ts-expect-error Server Component */}
@@ -60,10 +61,12 @@ export default async function Page({ params }: { params: { id: string } }) {
             )}
           </div>
           {/* Right panel */}
-          <Suspense fallback={<LoadingWidgetSectionWrapper />}>
-            {/* @ts-expect-error Server Component */}
-            <WidgetSectionWrapper id={params.id} verify />
-          </Suspense>
+          <div className="flex flex-col gap-5 md:w-2/5">
+            <Suspense fallback={<LoadingWidgetSectionWrapper />}>
+              {/* @ts-expect-error Server Component */}
+              <WidgetSectionWrapper id={params.id} verify />
+            </Suspense>
+          </div>
         </div>
       ) : (
         <>Not authed</>

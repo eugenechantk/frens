@@ -12,7 +12,7 @@ export default async function WidgetSectionWrapper({id, verify}: {id:string, ver
   const clubInfo = await getClubInfo(id);
   return (
     <>
-      {verify ? <WidgetSection data={clubInfo}/> : <BuyInWidgetWrapper data={clubInfo} verify/>}
+      {verify ? <WidgetSection data={clubInfo} id={id}/> : <BuyInWidgetWrapper data={clubInfo} verify/>}
     </>
   )
 }
