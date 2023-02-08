@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { adminAuth } from "../../../firebase/firebaseAdmin";
 import { verifyClubHolding } from "../../../lib/ethereum";
 import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";
+import { redis } from "../../../lib/redis";
 
 // Get the cookies and determine auth state
 async function getAuth() {
@@ -10,34 +11,32 @@ async function getAuth() {
   return nextCookies.get("token")?.value;
 }
 
-async function getClubInfo(id: string) {
-  const clubInfo: IClubInfo = await fetchClubInfo(id);
-  return clubInfo
+async function verifyAccess(clubId: string, authToken: string) {
+  const [decodedToken, tokenAddress] = await Promise.all([
+    await adminAuth.verifyIdToken(authToken),
+    await redis.get<string>(clubId),
+  ]);
+  const verify = await verifyClubHolding(decodedToken.uid, tokenAddress!);
+  return verify;
 }
 
-async function verifyAccess(authToken: string, tokenAddress: string) {
-  const userAddress = await adminAuth
-    .verifyIdToken(authToken)
-    .then((decodedToken) => decodedToken.uid);
-  const verify = await verifyClubHolding(
-    userAddress,
-    tokenAddress
-  );
-  return verify
-}
-
-export default async function Page({params}: {params: {id: string}}) {
+export default async function Page({ params }: { params: { id: string } }) {
   const authToken = await getAuth();
-  let verify = false
+  let verify = false;
   if (authToken) {
-    verify = await getClubInfo(params.id).then(async (data: IClubInfo) => {
-      const verify = await verifyAccess(authToken, data.club_token_address!)
-      return verify
-    });
+    verify = await verifyAccess(params.id, authToken);
   }
   return (
     <>
-      {authToken ? (verify ? <>Club Dashboard</> : <>Not verified</>) : <>Not authed</>}
+      {authToken ? (
+        verify ? (
+          <>Club Dashboard</>
+        ) : (
+          <>This user is not verified</>
+        )
+      ) : (
+        <>Not authed</>
+      )}
     </>
   );
 }
