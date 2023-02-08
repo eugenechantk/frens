@@ -15,7 +15,7 @@ import { IClubInfo } from "../../lib/fetchers";
 import Link from "next/link";
 
 interface IClubData extends IClubInfo {
-  club_id: string;
+  club_id?: string;
 }
 
 export const getServerSideProps = async (context: any) => {
@@ -52,9 +52,11 @@ export const getServerSideProps = async (context: any) => {
           .get();
         if (!snapshot.empty) {
           snapshot.forEach((doc) => {
-            let clubInfo = doc.data();
-            clubInfo["club_id"] = doc.id;
-            userClubs.push(clubInfo as IClubData);
+            let clubInfo = doc.data() as IClubData;
+            if (!clubInfo.closed) {
+              clubInfo["club_id"] = doc.id;
+              userClubs.push(clubInfo);
+            }
           });
         }
       }
@@ -83,7 +85,7 @@ const ClubList: NextPageWithLayout<any> = ({
   clearSignClients();
   return (
     <>
-      {!serverProps.error  ? (
+      {!serverProps.error ? (
         <div className="h-full w-full py-8 md:py-12 px-4 md:px-6">
           <div className="flex flex-col gap-6 md:gap-8 max-w-[1000px] mx-auto">
             {/* Title and create button for desktop */}
@@ -102,7 +104,11 @@ const ClubList: NextPageWithLayout<any> = ({
                 <>
                   {serverProps.clubData.map((club, index) => {
                     return (
-                      <Link href={`/clubs/${club.club_id}`} className="w-full" key={index}>
+                      <Link
+                        href={`/clubs/${club.club_id}`}
+                        className="w-full"
+                        key={index}
+                      >
                         <ClubCard
                           clubName={club.club_name}
                           clubDes={club.club_description}

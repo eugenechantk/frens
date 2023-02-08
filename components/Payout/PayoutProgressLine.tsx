@@ -191,8 +191,12 @@ export default function PayoutProgressLine({
         setStatusToDone(ops, step);
         step++;
       })
-      .then(() => {
+      .then(async () => {
         // TODO: burn all club tokens of each member
+        await updateDoc(doc(clientFireStore, 'clubs', String(id)),{
+          closed: true
+        })
+      }).then(() => {
         setStatusToDone(ops, step);
         setPayoutProgress("done")
       })

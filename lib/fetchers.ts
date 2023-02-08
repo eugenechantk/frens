@@ -12,6 +12,7 @@ export interface IClubInfo {
   club_members?: { [k: string]: number };
   last_retrieved_block?: number;
   split_contract_address?: string;
+  closed?:boolean
 }
 
 // Fetch function for club information
