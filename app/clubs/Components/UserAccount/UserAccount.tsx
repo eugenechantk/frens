@@ -3,12 +3,12 @@
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import React, { useEffect, useState } from "react";
 import AccountButton from "./AccountButton";
-import { Button } from "../Button/Button";
+import { Button } from "../../../../components/Button/Button";
 import OutsideClickHandler from "react-outside-click-handler";
-import { useAuth } from "../../lib/auth";
-import { magic } from "../../lib/magic";
+import { useAuth } from "../../../../lib/auth";
+import { magic } from "../../../../lib/magic";
 import { signOut } from "firebase/auth";
-import { firebaseClientAuth } from "../../firebase/firebaseClient";
+import { firebaseClientAuth } from "../../../../firebase/firebaseClient";
 import defaultProfilePic from '../../public/default_avatar.png'
 import { StaticImageData } from "next/image";
 import { useRouter } from "next/navigation";

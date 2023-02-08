@@ -1,6 +1,6 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import AccountButton from "../components/UserAccount/AccountButton";
+import AccountButton from "../app/clubs/Components/UserAccount/AccountButton";
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {

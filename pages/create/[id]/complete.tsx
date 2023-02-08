@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 import { NextPageWithLayout } from "../../_app";
-import AppLayout from "../../../layout/AppLayout";
+import AppLayout from "../../../app/clubs/AppLayout";
 import { Button } from "../../../components/Button/Button";
 import { useRouter } from "next/router";
 import { InferGetServerSidePropsType } from "next";

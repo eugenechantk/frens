@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 import { NextPageWithLayout } from "../../_app";
-import AppLayout from "../../../layout/AppLayout";
+import AppLayout from "../../../app/clubs/AppLayout";
 import CreateLayout from "../../../layout/CreateLayout";
 import CreateProcessLayout from "../../../layout/CreateProcessLayout";
 import FeeEstimate from "../../../components/FeeEstimate/FeeEstimate";

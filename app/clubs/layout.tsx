@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import NotAuthed from "../../components/NotAuthed/NotAuthed";
-import AppLayout from "../../layout/AppLayout";
+import AppLayout from "./AppLayout";
 
 async function getAuth() {
   const nextCookies = cookies();

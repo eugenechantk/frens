@@ -1,6 +1,6 @@
 import { InferGetServerSidePropsType } from "next";
 import { ReactElement, useState } from "react";
-import AppLayout from "../../../layout/AppLayout";
+import AppLayout from "../../../app/clubs/AppLayout";
 import { NextPageWithLayout } from "../../_app";
 import nookies from "nookies";
 import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";

@@ -2,13 +2,13 @@
 
 import Image, { StaticImageData } from "next/image";
 import React, { useState } from "react";
-import { Button } from "../Button/Button";
+import { Button } from "../../../../components/Button/Button";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { getSigner, provider, signer } from "../../lib/provider";
-import { signInMessage } from "../../lib/ethereum";
+import { getSigner, provider, signer } from "../../../../lib/provider";
+import { signInMessage } from "../../../../lib/ethereum";
 import { signInWithCustomToken } from "firebase/auth";
-import { firebaseClientAuth } from "../../firebase/firebaseClient";
-import { useAuth } from "../../lib/auth";
+import { firebaseClientAuth } from "../../../../firebase/firebaseClient";
+import { useAuth } from "../../../../lib/auth";
 import { useRouter } from "next/navigation";
 
 interface IAccountButtonProps {

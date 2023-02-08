@@ -1,6 +1,6 @@
 import React, { ReactElement, useRef, useState } from "react";
 import { NextPageWithLayout } from "../_app";
-import AppLayout from "../../layout/AppLayout";
+import AppLayout from "../../app/clubs/AppLayout";
 import CreateLayout from "../../layout/CreateLayout";
 import ImageUpload from "../../components/ImageUpload/ImageUpload";
 import InputField from "../../components/InputField/InputField";

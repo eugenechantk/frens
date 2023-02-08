@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { Button } from "../Button/Button";
 import logoSrc from "../../public/logo.png";
 import Image from "next/image";
-import UserAccount from "../UserAccount/UserAccount";
+import UserAccount from "../../app/clubs/Components/UserAccount/UserAccount";
 import Link from "next/link";
 
 export default function NavBar() {

@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
-import AppLayout from "../../../layout/AppLayout";
+import AppLayout from "../../../app/clubs/AppLayout";
 import CreateLayout from "../../../layout/CreateLayout";
 import CreateProcessLayout from "../../../layout/CreateProcessLayout";
 import Spinner from "../../../components/Spinner/Spinner";
