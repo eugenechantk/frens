@@ -13,11 +13,9 @@ export default function InviteModalWrapper() {
   const [copyLinkTooltip, setCopyLinkTooltip] = useState(false);
   const pathname = usePathname();
   const copyLink = () => {
-    if (typeof window !== 'undefined') {
-      setCopyLinkTooltip(true);
-      navigator.clipboard.writeText(`${window.location.origin}${pathname}`);
-      setTimeout(() => setCopyLinkTooltip(false), 1000);
-    }
+    setCopyLinkTooltip(true);
+    navigator.clipboard.writeText(`${window.location.origin}${pathname}`);
+    setTimeout(() => setCopyLinkTooltip(false), 1000);
   };
 
   return (
