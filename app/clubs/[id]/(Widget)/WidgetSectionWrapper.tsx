@@ -10,9 +10,10 @@ async function getClubInfo (id: string) {
 
 export default async function WidgetSectionWrapper({id, verify}: {id:string, verify: boolean}) {
   const clubInfo = await getClubInfo(id);
+  console.log(verify, typeof verify)
   return (
     <>
-      {verify ? <WidgetSection data={clubInfo} id={id}/> : <BuyInWidgetWrapper data={clubInfo} verify/>}
+      {verify ? <WidgetSection data={clubInfo} id={id}/> : <BuyInWidgetWrapper data={clubInfo} verify={verify}/>}
     </>
   )
 }

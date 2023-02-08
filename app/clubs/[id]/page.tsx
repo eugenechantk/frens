@@ -11,6 +11,7 @@ import WidgetSectionWrapper from "./(Widget)/WidgetSectionWrapper";
 import LoadingWidgetSectionWrapper from "./(Widget)/LoadingWidgetSectionWrapper";
 import InviteModalWrapper from "./(InviteModal)/InviteModalWrapper";
 import InviteButton from "./(InviteModal)/InviteButton";
+import clsx from "clsx";
 
 // Get the cookies and determine auth state
 async function getAuth() {
@@ -30,11 +31,12 @@ async function verifyAccess(clubId: string, authToken: string) {
 export default async function Page({ params }: { params: { id: string } }) {
   const authToken = await getAuth();
   const verify = await verifyAccess(params.id, authToken!);
+  // console.log(verify, typeof verify)
   return (
     <>
       <div className="md:max-w-[1000px] w-full md:mx-auto h-full md:flex md:flex-row md:items-start flex flex-col gap-8 md:gap-10">
         {/* Left panel */}
-        <div className="flex flex-col items-start gap-8 grow">
+        <div className="flex flex-col items-start gap-8 md:grow md:h-full">
           {/* Club details and members */}
           <div className="flex flex-col items-start gap-4 w-full">
             {/* @ts-expect-error Server Component */}
@@ -58,7 +60,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         <div className="flex flex-col gap-5 md:w-[420px]">
           <Suspense fallback={<LoadingWidgetSectionWrapper />}>
             {/* @ts-expect-error Server Component */}
-            <WidgetSectionWrapper id={params.id} verify />
+            <WidgetSectionWrapper id={params.id} verify={verify} />
           </Suspense>
         </div>
       </div>
