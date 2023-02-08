@@ -1,4 +1,6 @@
-import { adminFirestore } from "../firebase/firebaseAdmin";
+import { adminAuth, adminFirestore } from "../firebase/firebaseAdmin";
+import { getClubMemberBalance, getLatestBlockNumber } from "./ethereum";
+import { IMemberInfoData } from "./types/club";
 
 export interface IClubInfo {
   club_description: string;
@@ -34,4 +36,36 @@ export const fetchClubInfo = async (id: string) => {
   } catch (err) {
     throw err;
   }
+};
+
+export const fetchMemberInfo = async (
+  id: string
+): Promise<IMemberInfoData[]> => {
+  const clubInfo: IClubInfo = await fetchClubInfo(id);
+  console.log(clubInfo)
+  // STEP 1: Fetch the latest club member list
+  const _club_members = await getClubMemberBalance(clubInfo, id);
+  console.log(_club_members)
+  // STEP 2: Update the club member list
+  const currentBlock = await getLatestBlockNumber();
+  const result = adminFirestore.collection("clubs").doc(id).update({
+    club_members: _club_members,
+    last_retrieved_block: currentBlock,
+  });
+
+  // STEP 3: Fetch club members info by the updated club member list
+  let memberInfo = [] as IMemberInfoData[];
+  await Promise.all(
+    Object.keys(_club_members).map(async (uid) => {
+      // console.log(uid)
+      const _memberInfo = await adminAuth.getUser(uid);
+      memberInfo.push({
+        display_name: _memberInfo.displayName!,
+        profile_image: _memberInfo.photoURL!,
+        uid: _memberInfo.uid,
+      });
+    })
+  );
+  console.log(memberInfo)
+  return memberInfo;
 };
