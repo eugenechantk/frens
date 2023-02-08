@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react'
 import AssetStatus from "./AssetStatus";
 import Toggle from './Toggle';
