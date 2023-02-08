@@ -58,6 +58,7 @@ export default function BuyInWidgetWrapper({ data, verify }: { data: IClubInfo, 
     }
     setLoading(false);
   };
+  
   useEffect(() => {
     const getContract = async () => {
       const contract = await userSdk.getContract(
@@ -69,10 +70,6 @@ export default function BuyInWidgetWrapper({ data, verify }: { data: IClubInfo, 
     };
     getContract().then(async (contract) => await getAllInfo(contract));
   }, []);
-
-  useEffect(() => {
-    console.log(claimAmount, step);
-  }, [claimAmount, step]);
 
   return (
       <div className="bg-white flex flex-col items-center p-4 gap-4 rounded-[16px] min-h-[444px] w-full border">

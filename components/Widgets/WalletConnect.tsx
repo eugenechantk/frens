@@ -81,7 +81,7 @@ export default function WalletConnect({
       <div>
         <Button variant="text-only" onClick={() => setShowDesc(!showDesc)}>
           <ChevronDownIcon width={20} height={20} />
-          <p>How to connect to other apps</p>
+          <p className="text-left">How to connect to other apps</p>
         </Button>
         {((sessions?.length === 0 && !legacySession) || showDesc) && (
           <div className="ml-3 mt-3">
