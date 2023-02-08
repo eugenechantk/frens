@@ -47,31 +47,29 @@ export default async function Page() {
       {!userAddress ? (
         <NotAuthed />
       ) : (
-        <div className="h-full w-full">
-          <div className="flex flex-col gap-6 md:gap-8 max-w-[1000px] mx-auto">
-            {/* Title and create button for desktop */}
-            <div className="flex flex-row items-start justify-between w-full">
-              <h1>My clubs</h1>
-              <Link href="/create">
-                <Button className="w-[218px] hidden md:block">
-                  <h3>Create new club</h3>
-                </Button>
-              </Link>
-            </div>
-            {/* Club cards */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 w-full justify-items-center">
-              {clubIds.map((id, index) => {
-                return (
-                    // @ts-expect-error Server Component
-                    <ClubCard id={id} key={index}/>
-                );
-              })}
-              <Link href="/create">
-                <Button className="w-[218px] md:hidden">
-                  <h3>Create new club</h3>
-                </Button>
-              </Link>
-            </div>
+        <div className="flex flex-col gap-6 md:gap-8 max-w-[1000px] mx-auto">
+          {/* Title and create button for desktop */}
+          <div className="flex flex-row items-start justify-between w-full">
+            <h1>My clubs</h1>
+            <Link href="/create">
+              <Button className="w-[218px] hidden md:block">
+                <h3>Create new club</h3>
+              </Button>
+            </Link>
+          </div>
+          {/* Club cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 w-full justify-items-center">
+            {clubIds.map((id, index) => {
+              return (
+                // @ts-expect-error Server Component
+                <ClubCard id={id} key={index} />
+              );
+            })}
+            <Link href="/create">
+              <Button className="w-[218px] md:hidden">
+                <h3>Create new club</h3>
+              </Button>
+            </Link>
           </div>
         </div>
       )}
