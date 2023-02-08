@@ -153,17 +153,15 @@ const Dashboard: NextPageWithLayout<any> = ({
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [copyLinkTooltip, setCopyLinkTooltip] = useState(false);
 
-  const copyLink = () => {
-    setCopyLinkTooltip(true);
-    navigator.clipboard.writeText(`${
-      typeof window !== "undefined" ? window.location.origin : ""
-    }
-    ${router.asPath}`);
-    setTimeout(() => setCopyLinkTooltip(false), 1000);
-  };
-
   const invitePath = 
     typeof window !== "undefined" ? `${window.location.origin}${router.asPath}` : ""
+
+  const copyLink = () => {
+    setCopyLinkTooltip(true);
+    navigator.clipboard.writeText(invitePath);
+    setTimeout(() => setCopyLinkTooltip(false), 1000);
+  };
+  
   return (
     <>
       {serverProps.error === "Not authed" ? (
