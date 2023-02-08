@@ -9,7 +9,7 @@ import { useAuth } from "../../../../lib/auth";
 import { magic } from "../../../../lib/magic";
 import { signOut } from "firebase/auth";
 import { firebaseClientAuth } from "../../../../firebase/firebaseClient";
-import defaultProfilePic from '../../public/default_avatar.png'
+import defaultProfilePic from '../../../../public/default_avatar.png'
 import { StaticImageData } from "next/image";
 import { useRouter } from "next/navigation";
 
