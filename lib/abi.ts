@@ -220,3 +220,26 @@ export const abi = `[
       "type": "event"
   }
 ]`
+
+// The minimum ABI to get ERC20 Token balance
+export const minABI = [
+    {
+        "constant": true,
+        "inputs": [
+          {
+            "name": "_owner",
+            "type": "address"
+          }
+        ],
+        "name": "balanceOf",
+        "outputs": [
+          {
+            "name": "balance",
+            "type": "uint256"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    }
+  ];
