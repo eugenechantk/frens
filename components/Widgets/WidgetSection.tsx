@@ -1,5 +1,7 @@
+'use client';
+
 import { IClientMeta } from "@walletconnect/legacy-types";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import React, { lazy, useState, Suspense, useEffect } from "react";
 import { IClubInfo } from "../../lib/fetchers";
 import { useSignClientEventsManager } from "../../lib/useWcEventsManager";
@@ -28,6 +30,8 @@ export interface ILegacySession {
 }
 
 export default function WidgetSection({ data }: { data: IClubInfo }) {
+  const id = useSearchParams().get('id')
+  console.log(id, typeof id);
   const [selected, setSelected] = useState("invest");
   const [sessions, setSessions] = useState(signClient?.session?.values!);
   const [legacySession, setLegacySession] = useState<ILegacySession | undefined>(legacySignClient?.session!);
@@ -35,8 +39,6 @@ export default function WidgetSection({ data }: { data: IClubInfo }) {
     club_wallet_address: data.club_wallet_address!,
     club_wallet_mnemonic: data.club_wallet_mnemonic!,
   };
-  const router = useRouter();
-  const { id } = router.query;
 
   // Initialize the WalletConnect Sign Client
   const initalized = useWcinit(data);

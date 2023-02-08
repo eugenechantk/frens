@@ -2,7 +2,6 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Button } from "../Button/Button";
 import { parseUri } from "@walletconnect/utils";
-
 import {
   createLegacySignClient,
   legacySignClient,
@@ -18,6 +17,7 @@ import { SessionTypes } from "@walletconnect/types";
 import { ILegacySession } from "./WidgetSection";
 import { useRouter } from "next/router";
 import { IClubInfo } from "../../lib/fetchers";
+import { useSearchParams } from "next/navigation";
 
 export interface IClubWallet {
   club_wallet_address: string;
@@ -43,8 +43,8 @@ export default function WalletConnect({
     club_wallet_mnemonic: data.club_wallet_mnemonic!,
   };
   const [showDesc, setShowDesc] = useState(true);
-  const router = useRouter();
-  const { id } = router.query;
+  const id = useSearchParams().get('id')
+  console.log(id, typeof id);
 
   const onConnect = async (uri: string) => {
     const { version } = parseUri(uri);
