@@ -17,6 +17,7 @@ import { ClaimConditionInput, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { useAuth } from "../../../lib/auth";
 import _ from "lodash";
 import { IClubInfo } from "../../../lib/fetchers";
+import { redis } from "../../../lib/redis";
 
 export const getServerSideProps = async (context: any) => {
   const cookies = nookies.get(context);
@@ -119,11 +120,14 @@ const StepThree: NextPageWithLayout<any> = ({
         );
       // console.log("Claim condition set for: ", setClaimCondition);
 
-      // Step 6: add the club token address to the club record for future use
-      const updateResult = await updateDoc(clubDocRef, {
-        club_token_address: clubTokenContractAddress.toLowerCase(),
-      });
-      // console.log("Club token address updated to: ", updateResult);
+      // Step 6: add the club token address to the club record and redis store for future use
+      const [res1, res2] = await Promise.all([
+        await updateDoc(clubDocRef, {
+          club_token_address: clubTokenContractAddress.toLowerCase(),
+        }),
+        await redis.set(String(id), clubTokenContractAddress),
+      ]);
+      console.log("Club token address updated to: ", res1, res2);
 
       setSuccess(true);
       setTimeout(() => router.push(`/create/${id}/complete`), 1500);
