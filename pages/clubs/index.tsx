@@ -5,16 +5,17 @@ import { NextPageWithLayout } from "../_app";
 import { Button } from "../../components/Button/Button";
 import ClubCard from "../../components/ClubCard/ClubCard";
 import nookies from "nookies";
-import { adminAuth, adminFirestore} from "../../firebase/firebaseAdmin";
+import { adminAuth, adminFirestore } from "../../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
 import NotAuthed from "../../components/NotAuthed/NotAuthed";
 import _ from "lodash";
 import { getUserHoldings } from "../../lib/ethereum";
 import { clearSignClients } from "../../lib/walletConnectLib";
 import { IClubInfo } from "../../lib/fetchers";
+import Link from "next/link";
 
 interface IClubData extends IClubInfo {
-  club_id: string;
+  club_id?: string;
 }
 
 export const getServerSideProps = async (context: any) => {
@@ -33,7 +34,7 @@ export const getServerSideProps = async (context: any) => {
         .verifyIdToken(cookies.token)
         .then((decodedToken) => decodedToken.uid);
       // console.log(userAddress);
-      const erc20Tokens = await getUserHoldings(userAddress)
+      const erc20Tokens = await getUserHoldings(userAddress);
       // console.log(erc20Tokens);
 
       // Step 2: query the club collection to find matching clubs with the same token address
@@ -51,9 +52,11 @@ export const getServerSideProps = async (context: any) => {
           .get();
         if (!snapshot.empty) {
           snapshot.forEach((doc) => {
-            let clubInfo = doc.data()
-            clubInfo['club_id'] = doc.id
-            userClubs.push(clubInfo as IClubData)
+            let clubInfo = doc.data() as IClubData;
+            if (!clubInfo.closed) {
+              clubInfo["club_id"] = doc.id;
+              userClubs.push(clubInfo);
+            }
           });
         }
       }
@@ -101,13 +104,17 @@ const ClubList: NextPageWithLayout<any> = ({
                 <>
                   {serverProps.clubData.map((club, index) => {
                     return (
-                      <ClubCard
+                      <Link
+                        href={`/clubs/${club.club_id}`}
+                        className="w-full"
                         key={index}
-                        clubName={club.club_name}
-                        clubDes={club.club_description}
-                        profileImgUrl={club.club_image!}
-                        onClick={() => router.push(`/clubs/${club.club_id}`)}
-                      />
+                      >
+                        <ClubCard
+                          clubName={club.club_name}
+                          clubDes={club.club_description}
+                          profileImgUrl={club.club_image!}
+                        />
+                      </Link>
                     );
                   })}
                   <Button

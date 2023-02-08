@@ -11,7 +11,7 @@ export default function Portfolio({data, clubWalletAddress}: {data: IHoldingsDat
       <div className='flex flex-row justify-between items-center w-full'>
         <h2>Portfolio</h2>
         <Button variant="text-only" size='sm' onClick={() => {
-          window.open(`https://etherscan.io/address/${clubWalletAddress}`)
+          window.open(`${process.env.NEXT_PUBLIC_ETHERSCAN_DOMAIN}/address/${clubWalletAddress}`)
         }}>
           <p className='!text-gray-500 !font-sans'>View activity</p>
           <ArrowTopRightOnSquareIcon className='w-5 !text-gray-500'/>

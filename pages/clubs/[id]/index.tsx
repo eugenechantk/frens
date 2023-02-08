@@ -5,7 +5,6 @@ import { adminAuth, adminFirestore } from "../../../firebase/firebaseAdmin";
 import { InferGetServerSidePropsType } from "next";
 import ClubDetails from "../../../components/ClubDetails/ClubDetails";
 import ClubMembers from "../../../components/ClubMembers/ClubMembers";
-import ClubBalance from "../../../components/ClubBalance/ClubBalance";
 import Portfolio from "../../../components/Portfolio/Portfolio";
 import _ from "lodash";
 import nookies from "nookies";
@@ -26,12 +25,11 @@ import { Square2StackIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
 import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";
+import ClubClosed from "../../../components/ClubClosed/ClubClosed";
+import { redis } from "../../../lib/redis";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
 );
-
-
-
 export interface IMemberInfoData {
   display_name: string;
   profile_image: string;
@@ -49,6 +47,12 @@ interface ITransferEvent {
   value: string;
   transaction_index: number;
   log_index: number;
+}
+
+export enum serverPropsError {
+  NOT_AUTH,
+  NOT_VERIFIED,
+  CLOSED,
 }
 
 export const getServerSideProps = async (context: any) => {
@@ -90,7 +94,7 @@ export const getServerSideProps = async (context: any) => {
   if (!cookies.token) {
     return {
       props: {
-        error: "Not authed",
+        error: serverPropsError.NOT_AUTH,
       },
     };
   } else {
@@ -100,23 +104,33 @@ export const getServerSideProps = async (context: any) => {
         .verifyIdToken(cookies.token)
         .then((decodedToken) => decodedToken.uid);
       // console.log(userAddress)
-      // Step 1: Get club information
       const clubInfo: IClubInfo = await fetchClubInfo(id);
 
+      // Step 1: See if the club is closed
+      if (clubInfo.closed) {
+        return {
+          props: {
+            clubInfo: clubInfo,
+            error: serverPropsError.CLOSED,
+          },
+        };
+      }
       // Step 2: Check if the user has club tokens to access this club
-      const verify = await verifyClubHolding(
-        userAddress,
-        clubInfo.club_token_address!
-      );
+      const [decodedToken, tokenAddress] = await Promise.all([
+        await adminAuth.verifyIdToken(cookies.token),
+        await redis.hget<string>(id, "token_address"),
+      ]);
+      const verify = await verifyClubHolding(decodedToken.uid, tokenAddress!);
       // console.log(verify);
       if (!verify) {
         return {
           props: {
             clubInfo: clubInfo,
-            error: "user not verified",
+            error: serverPropsError.NOT_VERIFIED,
           },
         };
       }
+
 
       // Step 3: Fetch porfolio of the club
       const balance: IHoldingsData[] = await fetchPortfolio(
@@ -157,19 +171,22 @@ const Dashboard: NextPageWithLayout<any> = ({
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [copyLinkTooltip, setCopyLinkTooltip] = useState(false);
 
+  const invitePath =
+    typeof window !== "undefined"
+      ? `${window.location.origin}${router.asPath}`
+      : "";
+
   const copyLink = () => {
     setCopyLinkTooltip(true);
-    navigator.clipboard.writeText(`${
-      typeof window !== "undefined" ? window.location.origin : ""
-    }
-    ${router.asPath}`);
+    navigator.clipboard.writeText(invitePath);
     setTimeout(() => setCopyLinkTooltip(false), 1000);
   };
+
   return (
     <>
-      {serverProps.error === "Not authed" ? (
+      {serverProps.error === serverPropsError.NOT_AUTH ? (
         <NotAuthed />
-      ) : serverProps.error && serverProps.error !== "user not verified" ? (
+      ) : (serverProps.error && !(serverProps.error in serverPropsError)) ? (
         <ErrorMessage />
       ) : (
         <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
@@ -177,7 +194,7 @@ const Dashboard: NextPageWithLayout<any> = ({
           <div
             className={clsx(
               "flex flex-col items-start gap-8 w-full md:h-full",
-              serverProps.error === "user not verified" &&
+              serverProps.error === serverPropsError.NOT_VERIFIED &&
                 "md:w-1/2 md:justify-center"
             )}
           >
@@ -185,9 +202,9 @@ const Dashboard: NextPageWithLayout<any> = ({
             <div className="flex flex-col items-start gap-4 w-full">
               <ClubDetails
                 data={serverProps.clubInfo!}
-                verified={serverProps.error !== "user not verified"}
+                verified={serverProps.error !== serverPropsError.NOT_VERIFIED}
               />
-              {serverProps.error !== "user not verified" && (
+              {!serverProps.error && (
                 <div className="flex flex-row gap-2">
                   <ClubMembers data={serverProps.members!} />
                   <Button
@@ -202,23 +219,24 @@ const Dashboard: NextPageWithLayout<any> = ({
             </div>
             {/* Balance */}
             {/* TODO: have a global state setting for whether to show club or me balance */}
-            {serverProps.error !== "user not verified" && <ClubBalance />}
+            {/* {serverProps.error !== "user not verified" && <ClubBalance />} */}
             {/* Portfolio */}
-            {serverProps.error !== "user not verified" && (
+            {!serverProps.error && (
               <Portfolio
                 data={serverProps.balance!}
                 clubWalletAddress={serverProps.clubInfo?.club_wallet_address!}
               />
             )}
+            {serverProps.error === serverPropsError.CLOSED && <ClubClosed/>}
           </div>
           {/* Right panel */}
           <div className="flex flex-col gap-5">
-            {serverProps.error !== "user not verified" && (
+            {!serverProps.error && (
               <Suspense fallback={<LoadingWidget />}>
                 <WidgetSection data={serverProps.clubInfo!} />
               </Suspense>
             )}
-            {serverProps.error === "user not verified" && (
+            {serverProps.error === serverPropsError.NOT_VERIFIED && (
               <div className="md:h-full md:flex md:w-1/2 md:flex-col md:items-center md:justify-center">
                 <BuyInWidgetWrapper data={serverProps.clubInfo!} notVerify />
               </div>
@@ -227,11 +245,18 @@ const Dashboard: NextPageWithLayout<any> = ({
             {/* {serverProps.error !== "user not verified" && (
             <Splitting data={serverProps.clubInfo!} id={String(id)} />
             )} */}
-            <Button variant="secondary-outline" onClick={() => router.push(`/clubs/${id}/close`)}><h3>Close club and distribute</h3></Button>
+            {!serverProps.error && (
+              <Button
+                variant="secondary-outline"
+                onClick={() => router.push(`/clubs/${id}/close`)}
+              >
+                <h3>Close club and distribute</h3>
+              </Button>
+            )}
           </div>
         </div>
       )}
-      <Modal open={inviteModalOpen}>
+      <Modal open={inviteModalOpen} onClose={() => setInviteModalOpen(false)}>
         <Modal.Header
           css={{
             marginTop: "8px",
@@ -250,8 +275,7 @@ const Dashboard: NextPageWithLayout<any> = ({
             </p>
             <div className="flex flex-row gap-1 px-5 py-4 rounded-[6px] border border-secondary-300 items-center">
               <p className="grow overflow-ellipsis overflow-hidden">
-                {typeof window !== "undefined" ? window.location.origin : ""}
-                {router.asPath}
+                {invitePath}
               </p>
               <div className="relative">
                 <Button variant="text-only" onClick={copyLink}>

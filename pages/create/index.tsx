@@ -167,7 +167,6 @@ const CreateClub: NextPageWithLayout<any> = ({
 
             <FeeEstimate
               eth={String(process.env.NEXT_PUBLIC_CLUB_DEPOSIT)}
-              usd={12.37}
               className="w-full"
             />
           </div>

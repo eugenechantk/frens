@@ -38,7 +38,7 @@ export default function AccountButton({
     try {
       // getting the end-users signer
       getSigner();
-      console.log(signer)
+      // console.log(signer)
       address = await signer.getAddress();
 
       // sending the message for the end-user to sign

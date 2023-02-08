@@ -4,10 +4,15 @@ import axios from "axios";
 import { BigNumber, ethers, Wallet } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
 import _ from "lodash";
-import { abi } from "./abi";
+import { abi, minABI } from "./abi";
 import { getChainData } from "./chains";
 import { IClubInfo } from './fetchers';
 import { getSignParamsMessage, getSignTypedDataParamsData } from './HelperUtil';
+
+export interface IHolderPower {
+  address: string, 
+  sharesBps: number
+}
 
 interface IHolderBalanceInfo {
   balance: BigNumber;
@@ -47,6 +52,14 @@ export interface IHoldingsData {
   balance: string;
   value?: number;
 };
+
+export function getInfuraProvider() {
+  const rpcUrl = getChainData(
+    parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
+  ).rpc_url;
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  return provider
+}
 
 // Get the latest block number, using the INFURA rpc node
 export async function getLatestBlockNumber() {
@@ -154,37 +167,50 @@ export async function verifyClubHolding(
   clubTokenAddress: string
 ): Promise<boolean> {
   let verified = false;
-  // console.log(userAddress, clubTokenAddress)
-  const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
-  const options = {
-    method: "GET",
-    url: "https://deep-index.moralis.io/api/v2/%address%/erc20".replace(
-      "%address%",
-      userAddress
-    ),
-    params: {
-      chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
-        .network,
-      token_addresses: clubTokenAddress,
-    },
-    headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-  };
-  try {
-    const result = await axios
-      .request(options)
-      .then((response) => response.data);
-    // console.log(result)
-    if (result.length !== 0) {
-      verified = true
-    } else {
-      verified = false
+  let contract = new ethers.Contract(clubTokenAddress, minABI, getInfuraProvider());
+  await contract.functions.balanceOf(userAddress).then((result: BigNumber[]) => {
+    if (!result[0].eq(0)) {
+      verified = true;
     }
-  } catch (err) {
-    console.log(err);
-    verified = false
-  }
+  });
   return verified
 }
+// export async function verifyClubHolding(
+//   userAddress: string,
+//   clubTokenAddress: string
+// ): Promise<boolean> {
+//   let verified = false;
+//   // console.log(userAddress, clubTokenAddress)
+//   const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
+//   const options = {
+//     method: "GET",
+//     url: "https://deep-index.moralis.io/api/v2/%address%/erc20".replace(
+//       "%address%",
+//       userAddress
+//     ),
+//     params: {
+//       chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
+//         .network,
+//       token_addresses: clubTokenAddress,
+//     },
+//     headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
+//   };
+//   try {
+//     const result = await axios
+//       .request(options)
+//       .then((response) => response.data);
+//     // console.log(result)
+//     if (result.length !== 0) {
+//       verified = true
+//     } else {
+//       verified = false
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     verified = false
+//   }
+//   return verified
+// }
 
 // Returns USD price of the token
 export async function getUsdPrice(tokenAddress?: string): Promise<number> {
@@ -292,7 +318,7 @@ export const getClaimPower = (clubInfo: IClubInfo, _club_members: IClubMemberBal
   const totalSupply = Object.values(_club_members).reduce(
     (sum, cur) => (sum += cur)
   );
-  let _holderPower: {address: string, sharesBps: number}[] = [];
+  let _holderPower: IHolderPower[] = [];
   Object.keys(_club_members).forEach((member) => {
     _holderPower.push({address: member, sharesBps: ((_club_members[member] / totalSupply)*10000)|0});
   });
@@ -377,10 +403,10 @@ export const sendToken = async (
   let send_abi = abi;
   let send_account = wallet.getAddress();
   // Base ethereum transfer gas of 21000 + contract execution gas (usually total up to 27xxx)
-  const _gasLimit = ethers.utils.hexlify(50000);
+  const _gasLimit = ethers.utils.hexlify(parseInt(process.env.NEXT_PUBLIC_SEND_ETH_GAS_LIMIT!));
 
-  const currentGasPrice = await wallet.provider.getGasPrice();
-  console.log(clubWallet, currentGasPrice, _gasLimit);
+  const {maxFeePerGas} = await wallet.provider.getFeeData();
+  // console.log(clubWallet, maxFeePerGas, _gasLimit);
 
   if (contract_address) {
     console.log(`Sending ${contract_address} to split contract...`)
@@ -398,39 +424,37 @@ export const sendToken = async (
           await transferResult.wait()
           // make sure the nounceOffset increases for each transaction
           // nounceOffset++;
-          console.dir(transferResult);
-          alert("sent token");
+          return transferResult;
         });
     } catch (err) {
-      console.log(err);
-      alert(`failed to send token ${contract_address}`);
+      throw err;
     }
   } // ether send
   else {
     console.log(`Sending ETH to split contract`)
     const _ethLeft = await wallet.provider.getBalance(wallet.address);
     const _finalValue = _ethLeft
-      .sub(currentGasPrice.mul(BigNumber.from(_gasLimit)))
-      .sub(currentGasPrice.mul(BigNumber.from(_gasForDistribute)));
+      .sub(maxFeePerGas!.mul(BigNumber.from(_gasLimit)))
+      .sub(maxFeePerGas!.mul(BigNumber.from(_gasForDistribute)));
+    // console.log(_finalValue)
     // make sure it does not return the same nounce even when transactions are called too close to each other
     // const _nounce = await wallet.provider.getTransactionCount(send_account).then((nounce) => nounce + nounceOffset++)
     const tx = {
       from: send_account,
       to: to_address,
       value: _finalValue,
+      gasLimit: _gasLimit,
+      gasPrice: maxFeePerGas!,
       nonce: wallet.provider.getTransactionCount(send_account, 'latest'),
     };
-    console.log(tx)
     try {
       await wallet.sendTransaction(tx).then(async (transaction) => {
         // wait until the block is mined
-        // await transaction.wait()
-        console.dir(transaction);
-        alert("Send ETH finished!");
+        await transaction.wait();
+        return transaction;
       });
     } catch (error) {
-      console.log(error);
-      alert("failed to send ETH!!");
+      throw error
     }
   }
 };

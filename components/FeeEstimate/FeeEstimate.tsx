@@ -1,13 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
+import { getUsdPrice } from '../../lib/ethereum';
 
 interface IFeeEstimateProps {
   eth: string;
-  usd?: number;
   className?: string;
 }
 
 export default function FeeEstimate(props: IFeeEstimateProps) {
+  const [ethUsd, setEthUsd] = useState<number>()
+  useEffect(() => {
+    const calcETHPrice = async () => {
+      const ethUsd = await getUsdPrice()
+      return ethUsd * parseFloat(props.eth)
+    }
+    calcETHPrice().then((ethUsd) => {
+      setEthUsd(ethUsd)
+    })
+  })
   return (
     <div className={`flex flex-row items-start px-4 py-3 gap-4 bg-primary-200 border border-primary-300 rounded-8 ${props.className}`}>
           {/* Estimated fee icons and title */}
@@ -24,7 +34,7 @@ export default function FeeEstimate(props: IFeeEstimateProps) {
               {props.eth} ETH
             </p>
             <p className="text-primary-500 text-base leading-6 font-semibold">
-              {props.usd ? props.usd : props.eth} USD
+              {ethUsd ? ethUsd.toFixed(2) : "..."} USD
             </p>
           </div>
         </div>
