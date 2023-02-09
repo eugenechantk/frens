@@ -5,7 +5,7 @@ import { Button } from "../Button/Button";
 import Alarm3d from '../../public/Alarm_3d.png'
 import { CodeBlock } from "react-code-blocks";
 
-export default function ErrorMessage(err: string) {
+export default function ErrorMessage({err}: {err: string}) {
   const router = useRouter();
   return (
     <div className="h-full max-w-[480px] py-8 md:py-12 px-4 md:px-6 flex flex-col items-center justify-center gap-4 mx-auto">
