@@ -13,6 +13,8 @@ import { getUserHoldings } from "../../lib/ethereum";
 import { clearSignClients } from "../../lib/walletConnectLib";
 import { IClubInfo } from "../../lib/fetchers";
 import Link from "next/link";
+import { serverPropsError } from "./[id]";
+import NoClub from "../../components/NoClub/NoClub";
 
 interface IClubData extends IClubInfo {
   club_id?: string;
@@ -24,7 +26,7 @@ export const getServerSideProps = async (context: any) => {
   if (!cookies.token) {
     return {
       props: {
-        error: "user not authed",
+        error: serverPropsError.NOT_AUTH,
       },
     };
   } else {
@@ -85,7 +87,7 @@ const ClubList: NextPageWithLayout<any> = ({
   clearSignClients();
   return (
     <>
-      {!serverProps.error ? (
+      {serverProps.error === serverPropsError.NOT_AUTH ? <NotAuthed /> : serverProps.clubData?.length === 0 ? <NoClub /> : (
         <div className="h-full w-full py-8 md:py-12 px-4 md:px-6">
           <div className="flex flex-col gap-6 md:gap-8 max-w-[1000px] mx-auto">
             {/* Title and create button for desktop */}
@@ -128,8 +130,6 @@ const ClubList: NextPageWithLayout<any> = ({
             </div>
           </div>
         </div>
-      ) : (
-        <NotAuthed />
       )}
     </>
   );
