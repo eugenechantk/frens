@@ -24,6 +24,7 @@ import { adminAuth } from "../../../firebase/firebaseAdmin";
 import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
 import ClubClosed from "../../../components/ClubClosed/ClubClosed";
 import { redis } from "../../../lib/redis";
+import NotVerified from "../../../components/NotVerified/NotVerified";
 
 export interface IMemberInfoAndClaimPower extends IMemberInfoData {
   share: number;
@@ -122,7 +123,7 @@ const CloseClub: NextPageWithLayout<any> = ({
   return serverProps.error === serverPropsError.NOT_AUTH ? (
     <NotAuthed />
   ) : serverProps.error === serverPropsError.NOT_VERIFIED ? (
-    <>You are not authorized</>
+    <NotVerified/>
   ) : serverProps.error && !(serverProps.error in serverPropsError) ? (
     <ErrorMessage />
   ) : (

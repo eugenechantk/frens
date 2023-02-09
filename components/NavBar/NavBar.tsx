@@ -22,6 +22,8 @@ export default function NavBar() {
         src={logoSrc}
         alt="frens Logo"
         className="absolute left-[calc(50%-40px/2+3px)] top-[calc(50%-40px/2+2px)] cursor-pointer"
+        height={40}
+        width={40}
         onClick={() => {
           if (user.user) {
             router.push("/clubs");
