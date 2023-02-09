@@ -61,7 +61,7 @@ const Home: NextPage = ({...serverProps}: InferGetServerSidePropsType<typeof get
         </div>
         <main className="grow w-full">
           {/* Hero section */}
-          <div className="h-[375px] max-w-[609px] relative mx-auto mt-6 md:mt-10 mb-5">
+          <div className="h-[375px] md:max-w-[609px] w-full relative mx-auto mt-6 md:mt-10 mb-5 overflow-hidden">
             <Image
               src={Cards}
               alt="Digital assets"
@@ -95,7 +95,7 @@ const Home: NextPage = ({...serverProps}: InferGetServerSidePropsType<typeof get
                 Invest in digital assets together with your friends, or anyone.{" "}
               </p>
             </div>
-            <Link href="/club" className="w-[200px]">
+            <Link href="/clubs" className="w-[200px]">
               <Button className="w-full">
                 <h5>Start or join a club</h5>
               </Button>
