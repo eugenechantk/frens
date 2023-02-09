@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import { useAuth } from "../../lib/auth";
 import Lock3d from "../../public/Lock_3d.png";
 import { Button } from "../Button/Button";
 
@@ -14,7 +15,13 @@ export default function NotAuthed() {
           start investing with your friends
         </p>
       </div>
-      <Button className="w-60">
+      <Button
+        className="w-60"
+        onClick={() => {
+          const accountButton = document.getElementById("account-button")
+          accountButton?.click();
+        }}
+      >
         <h5>Sign up or Log in</h5>
       </Button>
     </div>
