@@ -1,25 +1,20 @@
 import Image from "next/image";
-import { useRouter } from "next/router";
 import React from "react";
 import { Button } from "../Button/Button";
-import Alarm3d from '../../public/Alarm_3d.png'
-import { CodeBlock } from "react-code-blocks";
+import Magnify3d from "../../public/Magnifying_3d.png"
+import { useRouter } from "next/router";
 
-export default function ErrorMessage({err}: {err: string}) {
+export default function NotVerified() {
   const router = useRouter();
   return (
     <div className="h-full max-w-[480px] py-8 md:py-12 px-4 md:px-6 flex flex-col items-center justify-center gap-4 mx-auto">
-      <Image src={Alarm3d} alt="error occured" height={86} />
+      <Image src={Magnify3d} alt="not authorized" height={86} />
       <div className="flex flex-col gap-2">
-        <h3 className="text-center">Something went wrong</h3>
+        <h3 className="text-center">Looks like you are lost</h3>
         <p className="text-center">
-        Don’t worry. Just refresh the page and see if it helps, or go back to the previous page.
+        You seem to not have access to this page. Just refresh or go back to where you came from.
         </p>
       </div>
-      <CodeBlock
-        text={err}
-        wrapLines
-      />
       <Button className="w-[180px]" variant="secondary" onClick={() => router.back()}>
         <h5>Go back</h5>
       </Button>

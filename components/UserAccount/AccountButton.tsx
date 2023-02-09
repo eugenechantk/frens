@@ -86,6 +86,7 @@ export default function AccountButton({
       onClick={user ? onClick : handleLogin}
       loading={loading}
       spinnerColor="#948669"
+      id="account-button"
     >
       {!user ? (
         <h6>Log in</h6>
