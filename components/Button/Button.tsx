@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React from "react";
+import React, { MutableRefObject } from "react";
 import Spinner from "../Spinner/Spinner";
 
 interface ButtonProps {
@@ -18,6 +18,7 @@ interface ButtonProps {
   type?: "button" | "reset" | "submit";
   loading?: boolean;
   spinnerColor?: string;
+  id?: string;
 }
 
 export const Button = ({
@@ -27,6 +28,7 @@ export const Button = ({
   loading = false,
   ...props
 }: ButtonProps) => {
+  const buttonRef = React.useRef();
   return (
     <button
       type={type}
@@ -47,6 +49,7 @@ export const Button = ({
       )}
       onClick={props.onClick}
       disabled={props.disabled || loading}
+      id={props.id}
     >
       {loading ? <Spinner size={24} color={props.spinnerColor}/> : props.children}
     </button>
