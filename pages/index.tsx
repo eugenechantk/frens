@@ -1,4 +1,4 @@
-import type { NextPage } from "next";
+import type { InferGetServerSidePropsType, NextPage } from "next";
 import Head from "next/head";
 import { Button } from "../components/Button/Button";
 import { useRouter } from "next/router";
@@ -15,10 +15,27 @@ import MockUpPhone from "../public/Mockup_Phone.png";
 import logoSrc from "../public/logo.png";
 import Image from "next/image";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import nookies from "nookies";
 
-const Home: NextPage = () => {
+export const getServerSideProps = async (context: any) => {
+  // Step 0: get auth status of the user
+  const cookies = nookies.get(context);
+  if (cookies.token) {
+    return {
+      redirect: {
+        destination: "/clubs",
+        permanent: false,
+      },
+    };
+  } else {
+    return {
+      props: {},
+    };
+  }
+}
+
+const Home: NextPage = ({...serverProps}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
       <Head>
