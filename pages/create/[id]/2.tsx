@@ -48,7 +48,7 @@ const StepTwo: NextPageWithLayout<any> = ({
 
   const initClubWallet = async () => {
     // console.log("Initializing club wallet");
-    setTransactionHash("")
+    setTransactionHash("");
     setError(null);
     setLoading(true);
     try {
@@ -65,13 +65,19 @@ const StepTwo: NextPageWithLayout<any> = ({
 
   const handleClubWalletCreate = async () => {
     const data = await axios
-      .post("/api/create/wallet", { clubId: clubId }, {headers: {
-        "authorization": 'Bearer ' + await user.user?.getIdToken(),
-        "content-type": 'application/json'
-      }})
+      .post(
+        "/api/create/wallet",
+        { clubId: clubId },
+        {
+          headers: {
+            authorization: "Bearer " + (await user.user?.getIdToken()),
+            "content-type": "application/json",
+          },
+        }
+      )
       .then((res) => {
         return res.data;
-      })
+      });
     return { ...data };
   };
 
@@ -95,6 +101,7 @@ const StepTwo: NextPageWithLayout<any> = ({
         })
       )
       .catch((err) => {
+        console.log(err);
         setLoading(false);
         setSuccess(false);
         setError(err);
@@ -118,22 +125,23 @@ const StepTwo: NextPageWithLayout<any> = ({
     // console.log(_gasPrice, _signer, clubWalletAddress, userAddress, _nonce);
 
     // send the transaction using user's wallet
-    const _transaction: ethers.providers.TransactionResponse =
-      await _signer.sendTransaction(tx);
+    const _transaction: ethers.providers.TransactionResponse = await _signer
+      .sendTransaction(tx)
 
+    console.log(error);
     setTransactionHash(_transaction.hash);
   };
 
   // Only move on if the deposit is in the club wallet
   useEffect(() => {
-    provider?.removeAllListeners()
+    provider?.removeAllListeners();
     if (transactionHash) {
       // console.log('transaction pending')
       provider?.on(transactionHash, async (transaction) => {
         // console.log(transaction);
         setLoading(false);
         setSuccess(true);
-        setError({});
+        setError(null);
         await updateDoc(doc(clientFireStore, "clubs", String(clubId)), {
           deposited: true,
         });
