@@ -14,11 +14,11 @@ import {
   getClubMemberBalance,
   getLatestBlockNumber,
   IHoldingsData,
+  initWallet,
   verifyClubHolding,
 } from "../../../lib/ethereum";
 import { useRouter } from "next/router";
 import LoadingWidget from "../../../components/Widgets/LoadingWidget";
-import BuyInWidgetWrapper from "../../../components/Widgets/BuyInWidget/BuyInWidgetWrapper";
 import { Button } from "../../../components/Button/Button";
 import { Modal } from "@nextui-org/react";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
@@ -27,8 +27,12 @@ import ErrorMessage from "../../../components/ErrorMessage/ErrorMessage";
 import { fetchClubInfo, IClubInfo } from "../../../lib/fetchers";
 import ClubClosed from "../../../components/ClubClosed/ClubClosed";
 import { redis } from "../../../lib/redis";
+import { provider } from "../../../lib/provider";
 const WidgetSection = lazy(
   () => import("../../../components/Widgets/WidgetSection")
+);
+const BuyInWidgetWrapper = lazy(
+  () => import("../../../components/Widgets/BuyInWidget/BuyInWidgetWrapper")
 );
 export interface IMemberInfoData {
   display_name: string;
@@ -131,7 +135,6 @@ export const getServerSideProps = async (context: any) => {
         };
       }
 
-
       // Step 3: Fetch porfolio of the club
       const balance: IHoldingsData[] = await fetchPortfolio(
         clubInfo.club_wallet_address!
@@ -144,6 +147,10 @@ export const getServerSideProps = async (context: any) => {
       } catch (err) {
         console.log(err);
       }
+
+      // // FOR TESTING ONLY
+      // const clubWallet = initWallet(clubInfo.club_wallet_mnemonic!)
+      // console.log(`Club wallet private key: ${clubWallet.privateKey}`);
 
       return {
         props: {
@@ -186,8 +193,8 @@ const Dashboard: NextPageWithLayout<any> = ({
     <>
       {serverProps.error === serverPropsError.NOT_AUTH ? (
         <NotAuthed />
-      ) : (serverProps.error && !(serverProps.error in serverPropsError)) ? (
-        <ErrorMessage err={serverProps.error}/>
+      ) : serverProps.error && !(serverProps.error in serverPropsError) ? (
+        <ErrorMessage err={serverProps.error} />
       ) : (
         <div className="md:max-w-[1000px] w-full md:mx-auto px-4 pt-3 md:pt-12 pb-5 h-full md:flex md:flex-row md:items-start md:gap-6 flex flex-col gap-8">
           {/* Left panel */}
@@ -227,19 +234,25 @@ const Dashboard: NextPageWithLayout<any> = ({
                 clubWalletAddress={serverProps.clubInfo?.club_wallet_address!}
               />
             )}
-            {serverProps.error === serverPropsError.CLOSED && <ClubClosed/>}
+            {serverProps.error === serverPropsError.CLOSED && <ClubClosed />}
           </div>
           {/* Right panel */}
-          <div className="flex flex-col gap-5">
+          <div
+            className={clsx(
+              "flex flex-col gap-5 md:h-full",
+              serverProps.error === serverPropsError.NOT_VERIFIED &&
+                "md:w-1/2 md:justify-center"
+            )}
+          >
             {!serverProps.error && (
               <Suspense fallback={<LoadingWidget />}>
                 <WidgetSection data={serverProps.clubInfo!} />
               </Suspense>
             )}
             {serverProps.error === serverPropsError.NOT_VERIFIED && (
-              <div className="md:h-full md:flex md:w-1/2 md:flex-col md:items-center md:justify-center">
+              <Suspense>
                 <BuyInWidgetWrapper data={serverProps.clubInfo!} notVerify />
-              </div>
+              </Suspense>
             )}
             {/* FOR TESTING SPLITTING */}
             {/* {serverProps.error !== "user not verified" && (

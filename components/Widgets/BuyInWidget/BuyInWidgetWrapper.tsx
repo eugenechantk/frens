@@ -11,7 +11,13 @@ import LoadingWidget from "../LoadingWidget";
 import DepositBuyIn from "./DepositBuyIn";
 import InputBuyIn from "./InputBuyIn";
 
-export default function BuyInWidgetWrapper({ data, notVerify }: { data: IClubInfo, notVerify?:boolean }) {
+export default function BuyInWidgetWrapper({
+  data,
+  notVerify,
+}: {
+  data: IClubInfo;
+  notVerify?: boolean;
+}) {
   const [claimAmount, setClaimAmount] = useState(0);
   const [step, setStep] = useState(1);
   const [tokenContract, setTokenContract] = useState<TokenDrop>();
@@ -21,7 +27,11 @@ export default function BuyInWidgetWrapper({ data, notVerify }: { data: IClubInf
   const [ethPrice, setEthPrice] = useState(0);
   const [resetKey, setResetKey] = useState(0);
   // const [userSdk, setUserSdk] = useState<ThirdwebSDK>();
-  const userSdk = new ThirdwebSDK(provider?.getSigner()!);
+  let userSdk: ThirdwebSDK;
+  try {
+    userSdk = new ThirdwebSDK(provider?.getSigner()!);
+  } catch (err: any) {}
+
   const router = useRouter();
 
   // useEffect(() => {
@@ -73,55 +83,58 @@ export default function BuyInWidgetWrapper({ data, notVerify }: { data: IClubInf
   }, [claimAmount, step]);
 
   return (
-      <div className="bg-white flex flex-col items-center p-4 gap-4 rounded-[16px] min-h-[444px] w-full border">
-        {loading ? (
-          <div className="w-full grow flex flex-col justify-center">
-            <LoadingWidget />
+    <div className="bg-white flex flex-col items-center p-4 gap-4 rounded-[16px] min-h-[444px] w-full border">
+      {loading ? (
+        <div className="w-full grow flex flex-col justify-center">
+          <LoadingWidget />
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-row items-center justify-between w-full">
+            <h3>Invest in club assets</h3>
+            <Button variant="secondary-outline" className="hidden">
+              <XMarkIcon className=" w-5" />
+            </Button>
           </div>
-        ) : (
+          <p className="w-full">
+            Deposit ETH into the club to gain more ownership in club tokens
+          </p>
           <>
-            <div className="flex flex-row items-center justify-between w-full">
-              <h3>Invest in club assets</h3>
-              <Button variant="secondary-outline" className="hidden">
-                <XMarkIcon className=" w-5"/>
-              </Button>
-            </div>
-            <p className="w-full">
-              Deposit ETH into the club to gain more ownership in club tokens
-            </p>
-            <>
-              {step === 1 && (
-                <InputBuyIn
-                  onClick={(buyTokenCount: number) => {
-                    setStep(2);
-                    setClaimAmount(buyTokenCount);
-                  }}
-                  data={data}
-                  userBalance={userBalance}
-                  totalSupply={totalSupply}
-                  ethPrice={ethPrice}
-                  key={resetKey}
-                />
-              )}
-              {step === 2 && (
-                <DepositBuyIn
-                  tokenContract={tokenContract}
-                  claimAmount={claimAmount}
-                  onClick={async () => {
-                    if (notVerify) {
-                      router.replace({ pathname: router.pathname, query: router.query })
-                    } else {
+            {step === 1 && (
+              <InputBuyIn
+                onClick={(buyTokenCount: number) => {
+                  setStep(2);
+                  setClaimAmount(buyTokenCount);
+                }}
+                data={data}
+                userBalance={userBalance}
+                totalSupply={totalSupply}
+                ethPrice={ethPrice}
+                key={resetKey}
+              />
+            )}
+            {step === 2 && (
+              <DepositBuyIn
+                tokenContract={tokenContract}
+                claimAmount={claimAmount}
+                onClick={async () => {
+                  if (notVerify) {
+                    router.replace({
+                      pathname: router.pathname,
+                      query: router.query,
+                    });
+                  } else {
                     setStep(1);
                     await getAllInfo();
                     setResetKey(resetKey + 1);
                     setClaimAmount(0);
-                    }
-                  }}
-                />
-              )}
-            </>
+                  }
+                }}
+              />
+            )}
           </>
-        )}
-      </div>
+        </>
+      )}
+    </div>
   );
 }

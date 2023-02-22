@@ -1,13 +1,9 @@
-import { SignClientTypes } from '@walletconnect/types'
-import { getSdkError } from '@walletconnect/utils'
 import axios from "axios";
 import { BigNumber, ethers, Wallet } from "ethers";
-import { formatUnits } from "ethers/lib/utils";
 import _ from "lodash";
 import { abi, minABI } from "./abi";
 import { getChainData } from "./chains";
 import { IClubInfo } from './fetchers';
-import { getSignParamsMessage, getSignTypedDataParamsData } from './HelperUtil';
 
 export interface IHolderPower {
   address: string, 
