@@ -5,17 +5,17 @@ import { abi, minABI } from "./abi";
 import { getChainData } from "./chains";
 import { IClubInfo } from './fetchers';
 
+/**
+ * This interface is used to define the structure of a member's share percentage
+ */
 export interface IHolderPower {
   address: string, 
   sharesBps: number
 }
 
-interface IHolderBalanceInfo {
-  balance: BigNumber;
-  // power: BigNumber;
-  // share: { tokenAddress: string | undefined; value: BigNumber }[];
-}
-
+/**
+ * This interface is used to define the structure of the transfer event fetched from moralis
+ */
 interface ITransferEvent {
   transaction_hash: string;
   address: string;
@@ -29,15 +29,16 @@ interface ITransferEvent {
   log_index: number;
 }
 
-
-// TODO: fix the line break of the sign in message
-export const signInMessage =
-  "Welcome to frens!\n\nYou are one step away from investing cryptocurrencies with your friends.\n\nClick to sign in and accept the frens Terms of Service\n\nThis request will not trigger a blockchain transaction or cost any gas fees.";
-
+/**
+ * This interface is used to define the the object that holds each club member's club token balance
+ */
 export interface IClubMemberBalance {
   [member_address: string]: number;
 }
 
+/**
+ * This interface is used to define the structure of each holding in the club's portfolio
+ */
 export interface IHoldingsData {
   token_address: string;
   name: string;
@@ -49,25 +50,6 @@ export interface IHoldingsData {
   value?: number;
 };
 
-export function getInfuraProvider() {
-  const rpcUrl = getChainData(
-    parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
-  ).rpc_url;
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-  return provider
-}
-
-// Get the latest block number, using the INFURA rpc node
-export async function getLatestBlockNumber() {
-  // STEP 2: Get the transfer events ellapsed from last time the club is retrieved
-  const rpcUrl = getChainData(
-    parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
-  ).rpc_url;
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-  const currentBlock = await provider.getBlockNumber();
-  return currentBlock;
-}
- 
 // Types of ETH signing methods supported by WalletConnect
 export const EIP155_SIGNING_METHODS = {
   PERSONAL_SIGN: 'personal_sign',
@@ -80,19 +62,54 @@ export const EIP155_SIGNING_METHODS = {
   ETH_SEND_TRANSACTION: 'eth_sendTransaction'
 }
 
-// function to verfiy signature with user address
-export function verifyAddress(sig: string, address: string): boolean {
-  const recoveredAddress = ethers.utils.verifyMessage(signInMessage, sig);
-  if (address === recoveredAddress) {
-    return true;
-  } else {
-    return false;
-  }
+
+export const signInMessage =
+  "Welcome to frens!\n\nYou are one step away from investing cryptocurrencies with your friends.\n\nClick to sign in and accept the frens Terms of Service\n\nThis request will not trigger a blockchain transaction or cost any gas fees.";
+
+/**
+ * @returns a JsonRpcProvider object that is connected to the INFURA node
+ */
+export function getInfuraProvider() {
+  const rpcUrl = getChainData(
+    parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
+  ).rpc_url;
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  return provider
 }
 
-// initilaize a wallet given mnemonic, and connect to infura node
-export function initWallet(mnemonic: string) {
-  let wallet = ethers.Wallet.fromMnemonic(mnemonic);
+/**
+ * Get the latest block number, using the INFURA rpc node
+ * @returns {number} the latest block number
+ */ 
+export async function getLatestBlockNumber() {
+  // STEP 2: Get the transfer events ellapsed from last time the club is retrieved
+  const rpcUrl = getChainData(
+    parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
+  ).rpc_url;
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const currentBlock = await provider.getBlockNumber();
+  return currentBlock;
+}
+ 
+
+
+/** 
+ * function to verfiy signature with user address
+ * @param {string} sig - the signature to be verified
+ * @param {string} address - the user address
+ */
+export function verifyAddress(sig: string, userAddress: string): boolean {
+  const recoveredAddress = ethers.utils.verifyMessage(signInMessage, sig);
+  return (userAddress === recoveredAddress)
+}
+
+/**  
+ * initilaize a wallet given mnemonic, and connect to infura node
+ * @param {string} mnemonic - the mnemonic of the club wallet
+ * @returns {Wallet} a ethers.js Wallet object
+*/
+export function initWallet(clubWalletMnemonic: string) {
+  let wallet = ethers.Wallet.fromMnemonic(clubWalletMnemonic);
   const rpcUrl = getChainData(
     parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!)
   ).rpc_url;
@@ -105,7 +122,12 @@ export function getPk(wallet: ethers.Wallet) {
   return wallet.privateKey;
 }
 
-// utility function to send transaction from a wallet
+/**   
+ * utility function to send transaction from a wallet
+ * @param {any} transaction - the transaction object
+ * @param {Wallet} wallet - the ethers.js wallet to send the transaction from
+ * @returns {string | null} the transaction hash, or null
+*/
 export async function sendTransaction(transaction: any, wallet: ethers.Wallet) {
   if (wallet) {
     if (
@@ -133,7 +155,12 @@ export async function sendTransaction(transaction: any, wallet: ethers.Wallet) {
   return null;
 }
 
-// Get all the token addresses that the user has
+/**  
+ * Get all the token addresses that the user has 
+ * 
+ * @param {string} userAddress - the user address
+ * @returns {string[]} an array of token addresses the user owns
+*/
 export async function getUserHoldings(userAddress: string): Promise<string[]> {
   const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
   const tokensOptions = {
@@ -157,7 +184,14 @@ export async function getUserHoldings(userAddress: string): Promise<string[]> {
   return erc20Tokens;
 }
 
-// Return a boolean value if the user's wallet holds a specific club token
+/**  
+ * Return a boolean value if the user's wallet holds a specific club token
+ * 
+ * @param {string} userAddress - the user address
+ * @param {string} clubTokenAddress - the club token address
+ * 
+ * @returns {boolean} true if the user holds the club token, false otherwise
+ * */ 
 export async function verifyClubHolding(
   userAddress: string,
   clubTokenAddress: string
@@ -171,48 +205,17 @@ export async function verifyClubHolding(
   });
   return verified
 }
-// export async function verifyClubHolding(
-//   userAddress: string,
-//   clubTokenAddress: string
-// ): Promise<boolean> {
-//   let verified = false;
-//   // console.log(userAddress, clubTokenAddress)
-//   const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
-//   const options = {
-//     method: "GET",
-//     url: "https://deep-index.moralis.io/api/v2/%address%/erc20".replace(
-//       "%address%",
-//       userAddress
-//     ),
-//     params: {
-//       chain: getChainData(parseInt(process.env.NEXT_PUBLIC_ACTIVE_CHAIN_ID!))
-//         .network,
-//       token_addresses: clubTokenAddress,
-//     },
-//     headers: { accept: "application/json", "X-API-Key": MORALIS_API_KEY },
-//   };
-//   try {
-//     const result = await axios
-//       .request(options)
-//       .then((response) => response.data);
-//     // console.log(result)
-//     if (result.length !== 0) {
-//       verified = true
-//     } else {
-//       verified = false
-//     }
-//   } catch (err) {
-//     console.log(err);
-//     verified = false
-//   }
-//   return verified
-// }
 
-// Returns USD price of the token
+/**  
+ * Returns USD price of the token
+ * 
+ * @param {string} tokenAddress - the token address
+ * @returns {number} the USD price of the token
+ * */ 
 export async function getUsdPrice(tokenAddress?: string): Promise<number> {
   const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
   let usdPrice = 0;
-  const options = {
+  const apiOptions = {
     method: "GET",
     url: "https://deep-index.moralis.io/api/v2/erc20/%address%/price".replace(
       "%address%",
@@ -227,7 +230,7 @@ export async function getUsdPrice(tokenAddress?: string): Promise<number> {
   try {
     if (tokenAddress) {
       const result = await axios
-        .request(options)
+        .request(apiOptions)
         .then((response) => response.data);
       if (result.usdPrice) {
         usdPrice = result.usdPrice;
@@ -246,8 +249,13 @@ export async function getUsdPrice(tokenAddress?: string): Promise<number> {
   return usdPrice;
 }
 
-// Get member's club token balance
-export async function getClubMemberBalance (clubInfo: IClubInfo, id: string) {
+/** 
+ * Get member's club token balance
+ * 
+ * @param {IClubInfo} clubInfo - The information of the club
+ * @returns {Promise<IClubMemberBalance>} - The club member list with their token balance
+ * */ 
+export async function getClubMemberBalance (clubInfo: IClubInfo) {
   // STEP 1: Fetch the last updated club member list
   let _club_members: IClubMemberBalance;
   if (clubInfo.club_members) {
@@ -309,7 +317,16 @@ export async function getClubMemberBalance (clubInfo: IClubInfo, id: string) {
   return _club_members
 }
 
-// To calculate the claim power of each member
+/** 
+ * To calculate the claim power of each member
+ * 
+ * Claim power is the percentage (in base points) of the club member club token ownership compared to the total supply
+ * 
+ * @param {IClubInfo} clubInfo - The information of the club
+ * @param {IClubMemberBalance} _club_members - The club member list with their club token balance
+ * 
+ * @returns {IHolderPower[]} - The club member list with their claim power in base points
+ * */ 
 export const getClaimPower = (clubInfo: IClubInfo, _club_members: IClubMemberBalance) => {
   const totalSupply = Object.values(_club_members).reduce(
     (sum, cur) => (sum += cur)
@@ -323,7 +340,13 @@ export const getClaimPower = (clubInfo: IClubInfo, _club_members: IClubMemberBal
   return _holderPower
 };
 
-// Fetch all the assets of an address
+/** 
+ * Fetch all the assets of an address 
+ * 
+ * @param {string} address - The address to fetch the assets
+ * 
+ * @returns {Promise<IHoldingsData[]>} - The list of assets, with their metadata including token address, balance, etc.
+ * */ 
 export const fetchPortfolio = async (address: string) => {
   let balances = [] as IHoldingsData[];
   const MORALIS_API_KEY = process.env.NEXT_PUBLIC_MORALIS_KEY;
@@ -387,12 +410,22 @@ export const fetchPortfolio = async (address: string) => {
   }
 };
 
-// Send specific token to split contract
+/** 
+ * Send specific token to an address (can be contract or wallet) 
+ * 
+ * @param {string} to_address - The contract address to send the token to
+ * @param {Wallet} clubWallet - The club wallet to send the token from
+ * @param {string} send_token_amount - The amount of token to send
+ * @param {string=} token_address - The address of the token to be sent (none for ETH)
+ * @param {number=} _gasForDistribute - The gas limit for distributing the tokens (only for split contract)
+ * 
+ * @returns {Promise<TransactionResponse>} - The transaction response
+ * */
 export const sendToken = async (
   to_address: string,
   clubWallet: Wallet,
   send_token_amount?: string,
-  contract_address?: string,
+  token_address?: string,
   _gasForDistribute?: number,
 ) => {
   let wallet = clubWallet
@@ -404,10 +437,10 @@ export const sendToken = async (
   const {maxFeePerGas} = await wallet.provider.getFeeData();
   // console.log(clubWallet, maxFeePerGas, _gasLimit);
 
-  if (contract_address) {
-    console.log(`Sending ${contract_address} to split contract...`)
+  if (token_address) {
+    console.log(`Sending ${token_address} to split contract...`)
     // general token send
-    let contract = new ethers.Contract(contract_address, send_abi, wallet);
+    let contract = new ethers.Contract(token_address, send_abi, wallet);
 
     // How many tokens?
     let numberOfTokens = BigNumber.from(send_token_amount);
