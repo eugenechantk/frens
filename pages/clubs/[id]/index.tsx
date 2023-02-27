@@ -70,7 +70,7 @@ export const getServerSideProps = async (context: any) => {
     clubInfo: IClubInfo
   ): Promise<IMemberInfoData[]> => {
     // STEP 1: Fetch the latest club member list
-    const _club_members = await getClubMemberBalance(clubInfo, id);
+    const _club_members = await getClubMemberBalance(clubInfo);
 
     // STEP 2: Update the club member list
     const currentBlock = await getLatestBlockNumber();

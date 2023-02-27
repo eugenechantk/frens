@@ -30,7 +30,7 @@ export default function Splitting({
   // STEP 3: Deploy split contract based on club member's token ownership
   const deploySplitContract = async () => {
     // STEP 3.1: Get latest club member list
-    const _club_members = await getClubMemberBalance(data, id);
+    const _club_members = await getClubMemberBalance(data);
     // STEP 3.2: calcualte the shares of each member
     const _holderClaimPower = getClaimPower(data, _club_members);
     // STEP 3.3: Deploy the split contract

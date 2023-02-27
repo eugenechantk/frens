@@ -68,7 +68,7 @@ export const getServerSideProps = async (context: any) => {
       // Get club portfolio and club members
       const [_clubPortfolio, _club_members] = await Promise.all([
         fetchPortfolio(_clubInfo.club_wallet_address!),
-        getClubMemberBalance(_clubInfo, id),
+        getClubMemberBalance(_clubInfo),
       ]);
       // Get power of each member
       const _holderPower: IHolderPower[] = getClaimPower(
